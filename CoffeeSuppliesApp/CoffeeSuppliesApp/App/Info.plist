@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>ApplePayMerchantId</key>
+	<string>merchant.com.haderapp.coffeesuppliesapp</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>ar</string>
 	<key>CFBundleDisplayName</key>
@@ -28,8 +30,6 @@
 	<true/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>نحتاج موقعك لتحديد عنوان التوصيل</string>
-	<key>ApplePayMerchantId</key>
-	<string>merchant.com.haderapp.coffeesuppliesapp</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Fraunces-Regular.ttf</string>

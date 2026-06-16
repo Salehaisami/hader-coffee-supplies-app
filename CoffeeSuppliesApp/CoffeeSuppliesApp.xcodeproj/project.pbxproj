@@ -63,6 +63,8 @@
 		9AC071C5BB542030029876C4 /* CoffeeSuppliesAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40363DB9ED92F531EF747B09 /* CoffeeSuppliesAppUITests.swift */; };
 		9CCEDD7C6B91291C29A9F6BF /* CartStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7A2D0443CBFB2E90DBCC25 /* CartStoreTests.swift */; };
 		9EA5128473DD2DF5AD64230A /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = D09D1CAD6E75D290880AC49D /* FirebaseStorage */; };
+		A23C66FC2FE2121800318124 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = AABB1122334455667788CCDD /* Kingfisher */; };
+		A23C66FE2FE2136400318124 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A23C66FD2FE2136400318124 /* Assets.xcassets */; };
 		A4B2757C97D4A3CDEC0A3563 /* OrdersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B734F7B4389709F1D89B6CA /* OrdersView.swift */; };
 		A5D56AD8DBEE55A0D76725D1 /* AuthServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E85F799FA5F2B8CD28E37B /* AuthServiceProtocol.swift */; };
 		A8B2A853B6643F07E745D970 /* MockFirestoreService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476CE83C6EC178FCFE5C5CA7 /* MockFirestoreService.swift */; };
@@ -189,6 +191,7 @@
 		9E0D55933F39C643A34E290C /* PrimaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryButton.swift; sourceTree = "<group>"; };
 		9E952BB273B126D1415F2EA8 /* ProductDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDetailView.swift; sourceTree = "<group>"; };
 		A104C4A4781B368EF2535364 /* MessagingServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagingServiceProtocol.swift; sourceTree = "<group>"; };
+		A23C66FD2FE2136400318124 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A288727FC8A8A227309CCC70 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		A529783DD91F5CB46B018D36 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		A5298B53243CA22725AA44C5 /* OrderModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderModelTests.swift; sourceTree = "<group>"; };
@@ -230,6 +233,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A23C66FC2FE2121800318124 /* Kingfisher in Frameworks */,
 				2082A276F691F8147DF0465B /* FirebaseFirestore in Frameworks */,
 				0781F7BD8C1C90913C353FFC /* FirebaseAuth in Frameworks */,
 				9EA5128473DD2DF5AD64230A /* FirebaseStorage in Frameworks */,
@@ -382,6 +386,7 @@
 		4F1148B710DC44E5F0AF142D /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				A23C66FD2FE2136400318124 /* Assets.xcassets */,
 				96D9D99BE732D660C4F8EFFA /* GoogleService-Info-Dev.plist */,
 				C353833E1F8CF07C3E1DCCAF /* GoogleService-Info-Prod.plist */,
 				F0921748C5EAD3F4821842CF /* GoogleService-Info.plist */,
@@ -618,6 +623,7 @@
 				B30122A66A02C86912D5D5BD /* IBMPlexSansArabic-Regular.ttf in Resources */,
 				71A978B28BD6806E5DC9676F /* IBMPlexSansArabic-SemiBold.ttf in Resources */,
 				B855C07ECE7B88C6A96BD848 /* InfoPlist.strings in Resources */,
+				A23C66FE2FE2136400318124 /* Assets.xcassets in Resources */,
 				B0DA372E98A70957B9051F2E /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -874,6 +880,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = CoffeeSuppliesApp/App/CoffeeSuppliesApp.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
@@ -912,6 +919,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = CoffeeSuppliesApp/App/CoffeeSuppliesApp.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
@@ -1076,6 +1084,11 @@
 			package = 63BFD512C53E929D372C62AD /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAuth;
 		};
+		AABB1122334455667788CCDD /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A1B2C3D4E5F6789012345678 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
 		D09D1CAD6E75D290880AC49D /* FirebaseStorage */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 63BFD512C53E929D372C62AD /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
@@ -1090,11 +1103,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 63BFD512C53E929D372C62AD /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseMessaging;
-		};
-		AABB1122334455667788CCDD /* Kingfisher */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A1B2C3D4E5F6789012345678 /* XCRemoteSwiftPackageReference "Kingfisher" */;
-			productName = Kingfisher;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
