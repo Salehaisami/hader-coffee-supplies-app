@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@theme {
+  /* Stone palette — warm grey neutrals (backgrounds, surfaces, borders) */
+  --color-stone-50: #F6F4F1;
+  --color-stone-100: #ECE8E3;
+  --color-stone-200: #DAD3CB;
+  --color-stone-400: #A89E92;
+  --color-stone-600: #7A7068;
+  --color-stone-800: #4A423C;
+  --color-stone-900: #3A332E;
+
+  /* Ink — espresso near-black (text) */
+  --color-ink: #2B2724;
+  --color-ink-soft: #5C554E;
+
+  /* Clay — warm terracotta accent (buttons, links, active states) */
+  --color-clay: #9C5B3B;
+  --color-clay-deep: #7E4730;
+
+  /* Sage — positive signals (success, in-stock) */
+  --color-sage: #6E7257;
+}
+
+body {
+  background-color: var(--color-stone-50);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}

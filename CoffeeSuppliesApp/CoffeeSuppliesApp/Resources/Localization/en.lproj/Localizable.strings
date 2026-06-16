@@ -1,0 +1,124 @@
+/* Tabs */
+"tab.shop" = "Shop";
+"tab.cart" = "Cart";
+"tab.orders" = "Orders";
+"tab.account" = "Account";
+
+/* Shop */
+"shop.search.placeholder" = "Search products...";
+"shop.all.categories" = "All";
+"shop.from.price" = "from";
+"shop.add.to.cart" = "Add";
+"shop.out.of.stock" = "Out of stock";
+"shop.in.stock" = "In stock";
+"shop.no.results" = "No results";
+"shop.clear.search" = "Clear search";
+
+/* Product Detail */
+"product.add.to.cart" = "Add to Cart";
+"product.made.to.order" = "Made to Order";
+"product.made.to.order.note" = "This item is made to order and may take additional time";
+"product.select.variant" = "Select size";
+"product.delivery.estimate" = "Delivery in";
+
+/* Cart */
+"cart.title" = "Cart";
+"cart.empty.title" = "Your cart is empty";
+"cart.empty.message" = "Start browsing products and add them to your cart";
+"cart.browse.supplies" = "Browse Supplies";
+"cart.subtotal" = "Subtotal";
+"cart.checkout" = "Checkout";
+"cart.remove" = "Remove";
+
+/* Checkout */
+"checkout.title" = "Checkout";
+"checkout.delivery.details" = "Delivery Details";
+"checkout.payment" = "Payment";
+"checkout.apple.pay" = "Apple Pay";
+"checkout.cash.on.delivery" = "Cash on Delivery";
+"checkout.place.order" = "Place Order";
+"checkout.outside.jeddah" = "We currently deliver within Jeddah only";
+"checkout.street" = "Street / Building";
+"checkout.notes" = "Additional notes";
+"checkout.set.location" = "Set delivery location";
+"checkout.location.set" = "Location set";
+"checkout.select.district" = "Select district";
+"checkout.business.name" = "Business Name";
+"checkout.phone" = "Phone";
+"checkout.edit.location" = "Edit location";
+"checkout.apple.pay.failed" = "Apple Pay payment could not be completed. You can split your order or pay cash on delivery.";
+"checkout.switch.cod" = "Switch to Cash on Delivery";
+
+/* Orders */
+"orders.title" = "My Orders";
+"orders.empty.title" = "No orders yet";
+"orders.empty.message" = "Your orders will appear here after your first purchase";
+"orders.status.pending" = "Pending";
+"orders.status.sent" = "Sent to Supplier";
+"orders.status.delivered" = "Delivered";
+"orders.status.cancelled" = "Cancelled";
+"orders.cancel" = "Cancel Order";
+"orders.active.section" = "Active";
+"orders.past.section" = "Past";
+"orders.placed" = "Order Placed";
+"orders.number" = "Order";
+"orders.confirmation.message" = "We'll text you updates on your order status";
+"orders.view.order" = "View Order";
+"orders.back.to.shop" = "Back to Shop";
+"orders.view.on.map" = "View on Map";
+"orders.cancel.confirm" = "Cancel this order? This cannot be undone.";
+
+/* Account */
+"account.title" = "Account";
+"account.sign.in" = "Sign In";
+"account.sign.out" = "Sign Out";
+"account.business.details" = "Business Details";
+"account.delivery.location" = "Delivery Location";
+"account.order.history" = "Order History";
+"account.help" = "Help & Contact";
+"account.language" = "Language";
+"account.guest.prompt" = "Sign in to manage your account";
+
+/* Auth */
+"auth.phone.title" = "Sign In";
+"auth.phone.subtitle" = "Enter your phone number";
+"auth.send.code" = "Send Code";
+"auth.verify.code" = "Verify";
+"auth.resend" = "Resend";
+"auth.profile.title" = "Business Details";
+"auth.business.name" = "Business Name";
+"auth.contact.name" = "Contact Name";
+"auth.email.optional" = "Email (optional)";
+"auth.continue" = "Continue";
+"auth.phone.required" = "Enter your phone number";
+"auth.code.invalid" = "Invalid or expired code";
+"auth.profile.incomplete" = "Please enter your business name and contact name";
+
+/* General */
+"general.error" = "Something went wrong";
+"general.retry" = "Retry";
+"general.cancel" = "Cancel";
+"general.save" = "Save";
+"general.done" = "Done";
+"general.loading" = "Loading...";
+"general.no.network" = "No Internet Connection";
+"general.no.network.message" = "Check your internet connection and try again";
+
+/* Onboarding */
+"onboarding.title.1" = "Bulk supplies for your cafe";
+"onboarding.body.1" = "Cups, lids, straws, napkins, and printing — everything you need in one place";
+"onboarding.title.2" = "Order in seconds";
+"onboarding.body.2" = "Pick your quantities, set your delivery location, and confirm in a few taps";
+"onboarding.title.3" = "Track your orders";
+"onboarding.body.3" = "Follow your order status in real time until it arrives";
+"onboarding.next" = "Next";
+"onboarding.skip" = "Skip";
+"onboarding.get.started" = "Get Started";
+
+/* Location */
+"location.title" = "Delivery Location";
+"location.drag.hint" = "Move the map to mark your exact building entrance";
+"location.use.current" = "Use my current location";
+"location.permission.denied" = "We couldn't access your location. You can move the map to place the pin manually.";
+"location.confirm" = "Confirm Location";
+"location.district" = "District";

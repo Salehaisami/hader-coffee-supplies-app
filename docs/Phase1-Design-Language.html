@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Language — Coffee Supplies App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* Palette — stone/clay neutrals, NOT cream. One restrained accent. */
+    --stone-50:#F6F4F1;   /* app background — cool warm-grey, not cream */
+    --stone-100:#ECE8E3;  /* cards / surfaces */
+    --stone-200:#DAD3CB;  /* hairlines, dividers */
+    --stone-400:#A89E92;  /* muted captions */
+    --ink:#2B2724;        /* near-black espresso text */
+    --ink-soft:#5C554E;   /* secondary text */
+    --clay:#9C5B3B;       /* THE accent — terracotta-adjacent but earthier/browner */
+    --clay-deep:#7E4730;  /* pressed/active */
+    --sage:#6E7257;       /* rare secondary signal (in-stock/success) */
+
+    --r-card:14px;
+    --r-pill:999px;
+    --shadow:0 1px 2px rgba(43,39,36,.04), 0 8px 24px rgba(43,39,36,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--stone-50);
+    color:var(--ink);
+    font-family:"IBM Plex Sans Arabic",system-ui,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    padding:0 0 80px;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+
+  /* ---- Header / thesis ---- */
+  header{padding:64px 0 40px;border-bottom:1px solid var(--stone-200)}
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--clay);margin-bottom:18px;
+  }
+  h1{
+    font-family:"Fraunces",serif;
+    font-weight:500;
+    font-size:clamp(34px,5vw,56px);
+    line-height:1.05;
+    letter-spacing:-.01em;
+    margin-bottom:16px;
+  }
+  h1 em{font-style:italic;font-weight:400;color:var(--clay)}
+  .lede{max-width:60ch;color:var(--ink-soft);font-size:17px}
+
+  section{padding:48px 0;border-bottom:1px solid var(--stone-200)}
+  .sec-label{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--stone-400);margin-bottom:24px;
+  }
+  h2{font-family:"Fraunces",serif;font-weight:500;font-size:28px;margin-bottom:8px}
+  .sub{color:var(--ink-soft);margin-bottom:28px;max-width:62ch}
+
+  /* ---- Palette ---- */
+  .swatches{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px}
+  .sw{border-radius:12px;overflow:hidden;border:1px solid var(--stone-200);background:#fff}
+  .sw .chip{height:84px}
+  .sw .meta{padding:10px 12px}
+  .sw .nm{font-size:13px;font-weight:600}
+  .sw .hex{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--stone-400)}
+
+  /* ---- Type specimen ---- */
+  .type-row{padding:18px 0;border-bottom:1px solid var(--stone-200)}
+  .type-row:last-child{border-bottom:none}
+  .role{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--stone-400);margin-bottom:6px}
+  .d-xl{font-family:"Fraunces",serif;font-weight:500;font-size:40px;line-height:1.1}
+  .d-l{font-family:"Fraunces",serif;font-weight:500;font-size:26px}
+  .body-l{font-size:17px}
+  .cap{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink-soft)}
+
+  /* ---- Phone mock with live components ---- */
+  .stage{display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start}
+  .phone{
+    width:340px;background:var(--stone-50);
+    border:1px solid var(--stone-200);border-radius:34px;
+    box-shadow:var(--shadow);padding:18px 16px 22px;flex:0 0 auto;
+  }
+  .status{display:flex;justify-content:space-between;align-items:center;padding:4px 6px 14px}
+  .status .ttl{font-family:"Fraunces",serif;font-size:22px;font-weight:500}
+  .avatar{width:34px;height:34px;border-radius:50%;background:var(--stone-100);border:1px solid var(--stone-200);display:grid;place-items:center;color:var(--ink-soft);font-size:14px}
+  .search{background:#fff;border:1px solid var(--stone-200);border-radius:var(--r-pill);padding:11px 16px;color:var(--stone-400);font-size:14px;margin-bottom:16px}
+  .chips{display:flex;gap:8px;margin-bottom:20px;overflow:auto}
+  .chip-cat{flex:0 0 auto;padding:8px 16px;border-radius:var(--r-pill);font-size:14px;border:1px solid var(--stone-200);background:#fff;color:var(--ink-soft)}
+  .chip-cat.on{background:var(--ink);color:var(--stone-50);border-color:var(--ink)}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  /* THE product card */
+  .card{background:#fff;border:1px solid var(--stone-200);border-radius:var(--r-card);overflow:hidden}
+  .card .ph{height:104px;background:linear-gradient(135deg,#E7E0D8,#D9D0C6);position:relative}
+  .card .ph .stock{position:absolute;top:8px;inset-inline-start:8px;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--sage);background:#fff;border:1px solid var(--stone-200);padding:3px 8px;border-radius:var(--r-pill)}
+  .card .body{padding:12px 13px 14px}
+  .card .nm{font-size:15px;font-weight:600;margin-bottom:2px}
+  .card .var{font-size:12px;color:var(--stone-400);margin-bottom:10px}
+  /* signature: price as a "ledger line" with mono figure + hairline rule */
+  .price-line{display:flex;align-items:baseline;justify-content:space-between;border-top:1px solid var(--stone-200);padding-top:9px}
+  .price{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:16px}
+  .price .cur{font-size:11px;color:var(--stone-400)}
+  .unit{font-size:11px;color:var(--ink-soft)}
+  .add{margin-top:11px;width:100%;border:none;background:var(--clay);color:#fff;border-radius:10px;padding:10px;font-family:"IBM Plex Sans Arabic";font-size:14px;font-weight:500;cursor:pointer}
+  .add:active{background:var(--clay-deep)}
+
+  .notes{flex:1;min-width:280px}
+  .notes h3{font-family:"Fraunces",serif;font-weight:500;font-size:20px;margin:18px 0 6px}
+  .notes p{color:var(--ink-soft);font-size:15px;margin-bottom:6px}
+  .notes .k{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--clay)}
+  .pill-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .tag{font-family:"IBM Plex Mono",monospace;font-size:11px;border:1px solid var(--stone-200);border-radius:var(--r-pill);padding:4px 10px;color:var(--ink-soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">دليل الهوية البصرية · Design Language v1</div>
+    <h1>هوية هادئة وراقية<br>لمتاجر القهوة <em>المختصة</em></h1>
+    <p class="lede">حجر دافئ، طين، وحبر داكن — مع خط طباعي أنيق. مساحة واسعة، تفاصيل دقيقة، ولمسة لون واحدة تُستخدم بحساب. <span style="color:var(--stone-400)">(A calm, editorial identity for specialty coffee shops — warm stone, clay, espresso ink, and one restrained accent.)</span></p>
+  </header>
+
+  <!-- PALETTE -->
+  <section>
+    <div class="sec-label">01 · Palette</div>
+    <h2>اللون</h2>
+    <p class="sub">قاعدة من الحجر الدافئ (وليس الكريمي) للتمييز عن القوالب الجاهزة، حبر بلون الإسبريسو للنص، ولون الطين كلمسة وحيدة على الأزرار والروابط. الأخضر الزيتي نادر — للحالات الإيجابية فقط.</p>
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:#F6F4F1"></div><div class="meta"><div class="nm">Stone 50 · الخلفية</div><div class="hex">#F6F4F1</div></div></div>
+      <div class="sw"><div class="chip" style="background:#ECE8E3"></div><div class="meta"><div class="nm">Stone 100 · الأسطح</div><div class="hex">#ECE8E3</div></div></div>
+      <div class="sw"><div class="chip" style="background:#DAD3CB"></div><div class="meta"><div class="nm">Stone 200 · الحدود</div><div class="hex">#DAD3CB</div></div></div>
+      <div class="sw"><div class="chip" style="background:#2B2724"></div><div class="meta"><div class="nm">Ink · النص</div><div class="hex">#2B2724</div></div></div>
+      <div class="sw"><div class="chip" style="background:#9C5B3B"></div><div class="meta"><div class="nm">Clay · اللمسة</div><div class="hex">#9C5B3B</div></div></div>
+      <div class="sw"><div class="chip" style="background:#6E7257"></div><div class="meta"><div class="nm">Sage · إيجابي</div><div class="hex">#6E7257</div></div></div>
+    </div>
+  </section>
+
+  <!-- TYPE -->
+  <section>
+    <div class="sec-label">02 · Typography</div>
+    <h2>الخطوط</h2>
+    <p class="sub">عنوان طباعي أنيق (Fraunces) يُستخدم بحساب للعناوين، ونص عربي واضح (IBM Plex Sans Arabic) للقراءة، وخط أحادي (IBM Plex Mono) للأسعار والأكواد — وهو ما يمنح الأرقام طابع "دفتر الحساب".</p>
+    <div class="type-row"><div class="role">Display / Fraunces · عناوين</div><div class="d-xl">أكواب ورقية للقهوة الساخنة</div></div>
+    <div class="type-row"><div class="role">Heading · ثانوي</div><div class="d-l">Paper Cup (hot) · 12oz</div></div>
+    <div class="type-row"><div class="role">Body / Plex Sans Arabic · نص</div><div class="body-l">توصيل خلال ٢–٤ أيام داخل جدة. الدفع عند الاستلام متاح.</div></div>
+    <div class="type-row"><div class="role">Mono / Plex Mono · أسعار وأكواد</div><div class="cap">SAR 48.00 / dozen · #1042 · 2–4 days</div></div>
+  </section>
+
+  <!-- COMPONENTS -->
+  <section>
+    <div class="sec-label">03 · The product card &amp; catalog (live)</div>
+    <h2>المكوّن الأساسي</h2>
+    <p class="sub">بطاقة المنتج هي العنصر الأكثر تكراراً في التطبيق. هنا نسخة حية بالاتجاه من اليمين لليسار (RTL). لاحظ "سطر السعر" بخط أحادي وخط فاصل رفيع فوقه.</p>
+    <div class="stage">
+      <div class="phone" dir="rtl">
+        <div class="status"><div class="ttl">المستلزمات</div><div class="avatar">👤</div></div>
+        <div class="search">🔍 ابحث عن مستلزمات…</div>
+        <div class="chips">
+          <div class="chip-cat on">الأكواب</div>
+          <div class="chip-cat">الأغطية</div>
+          <div class="chip-cat">الشاليمو</div>
+          <div class="chip-cat">المناديل</div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="ph"><span class="stock">متوفر</span></div>
+            <div class="body">
+              <div class="nm">كوب ورقي</div>
+              <div class="var">ساخن · ٤ مقاسات</div>
+              <div class="price-line"><span class="price"><span class="cur">من</span> 48</span><span class="unit">/ دزينة</span></div>
+              <button class="add">أضف للسلة</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ph"><span class="stock">متوفر</span></div>
+            <div class="body">
+              <div class="nm">كوب بارد</div>
+              <div class="var">٣ مقاسات</div>
+              <div class="price-line"><span class="price"><span class="cur">من</span> 55</span><span class="unit">/ ١٠٠٠</span></div>
+              <button class="add">أضف للسلة</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="notes">
+        <h3>القرارات الأساسية</h3>
+        <p><span class="k">الخلفية</span> حجر دافئ #F6F4F1 — متعمّد الابتعاد عن الكريمي الشائع في القوالب.</p>
+        <p><span class="k">اللمسة</span> الطين #9C5B3B على زر "أضف للسلة" والروابط فقط — لون واحد، يُستخدم بحساب.</p>
+        <p><span class="k">التوقيع</span> "سطر السعر": رقم بخط أحادي فوقه خط فاصل رفيع — يوحي بدفتر الحساب ويميّز التطبيق.</p>
+        <p><span class="k">المقاسات</span> تُعرض كبطاقة واحدة مع "من ٤٨" بدل تكرار البطاقات.</p>
+        <div class="pill-row">
+          <span class="tag">RTL · عربي افتراضي</span>
+          <span class="tag">radius 14px</span>
+          <span class="tag">hairline #DAD3CB</span>
+          <span class="tag">generous whitespace</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,55 @@
+# macOS
+.DS_Store
+*.swp
+.Spotlight-V100
+.Trashes
+
+# Xcode
+CoffeeSuppliesApp/*.xcodeproj/xcuserdata/
+CoffeeSuppliesApp/*.xcodeproj/project.xcworkspace/xcuserdata/
+CoffeeSuppliesApp/DerivedData/
+CoffeeSuppliesApp/build/
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.xccheckout
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+xcuserdata/
+
+# Swift Package Manager
+CoffeeSuppliesApp/.build/
+CoffeeSuppliesApp/Package.resolved
+
+# Node.js (Firebase + Admin Dashboard)
+node_modules/
+CoffeeSuppliesApp/firebase/node_modules/
+CoffeeSuppliesApp/firebase/functions/node_modules/
+CoffeeSuppliesApp/firebase/functions/lib/
+CoffeeSuppliesApp/firebase/tests/node_modules/
+HaderAdmin/node_modules/
+HaderAdmin/.next/
+HaderAdmin/out/
+
+# Environment files
+.env
+.env.local
+.env.production.local
+HaderAdmin/.env.local
+
+# Firebase
+CoffeeSuppliesApp/firebase/firestore-debug.log
+CoffeeSuppliesApp/firebase/ui-debug.log
+CoffeeSuppliesApp/firebase/pubsub-debug.log
+/tmp/gcloud-creds.json
+
+# IDE
+.vscode/
+.idea/
+
+# Misc
+*.log

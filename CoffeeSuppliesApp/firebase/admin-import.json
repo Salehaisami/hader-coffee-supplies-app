@@ -1,0 +1,11 @@
+{
+  "users": [
+    {
+      "localId": "admin-hader-001",
+      "email": "admin@haderapp.com",
+      "emailVerified": true,
+      "displayName": "Admin",
+      "customAttributes": "{\"role\":\"admin\"}"
+    }
+  ]
+}

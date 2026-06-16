@@ -1,0 +1,41 @@
+# Xcode
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+DerivedData/
+*.moved-aside
+*.xcuserstate
+*.xcscmblueprint
+
+# Build
+build/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# SPM
+.build/
+.swiftpm/
+
+# CocoaPods (not used, but just in case)
+Pods/
+
+# Firebase
+# DO NOT commit actual GoogleService-Info.plist with real credentials
+# The placeholder files are safe to commit
+GoogleService-Info.plist
+
+# macOS
+.DS_Store
+*.swp
+*~
+
+# IDE
+.idea/
+*.xcworkspace
+
+# Snapshot reference images (large, track separately or with Git LFS)
+# **/__Snapshots__/
+
+# Environment
+.env
+*.env.local

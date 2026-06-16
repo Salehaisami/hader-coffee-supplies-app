@@ -1,0 +1,124 @@
+/* Tabs */
+"tab.shop" = "المتجر";
+"tab.cart" = "السلة";
+"tab.orders" = "الطلبات";
+"tab.account" = "الحساب";
+
+/* Shop */
+"shop.search.placeholder" = "ابحث عن المنتجات...";
+"shop.all.categories" = "الكل";
+"shop.from.price" = "من";
+"shop.add.to.cart" = "أضف";
+"shop.out.of.stock" = "غير متوفر";
+"shop.in.stock" = "متوفر";
+"shop.no.results" = "لا توجد نتائج";
+"shop.clear.search" = "مسح البحث";
+
+/* Product Detail */
+"product.add.to.cart" = "أضف إلى السلة";
+"product.made.to.order" = "مصنوع حسب الطلب";
+"product.made.to.order.note" = "هذا المنتج يُصنع حسب الطلب وقد يستغرق وقتاً إضافياً";
+"product.select.variant" = "اختر الحجم";
+"product.delivery.estimate" = "التوصيل خلال";
+
+/* Cart */
+"cart.title" = "السلة";
+"cart.empty.title" = "سلة التسوق فارغة";
+"cart.empty.message" = "ابدأ بتصفح المنتجات وإضافتها إلى سلتك";
+"cart.browse.supplies" = "تصفح المنتجات";
+"cart.subtotal" = "المجموع الفرعي";
+"cart.checkout" = "إتمام الطلب";
+"cart.remove" = "حذف";
+
+/* Checkout */
+"checkout.title" = "إتمام الطلب";
+"checkout.delivery.details" = "تفاصيل التوصيل";
+"checkout.payment" = "الدفع";
+"checkout.apple.pay" = "Apple Pay";
+"checkout.cash.on.delivery" = "الدفع عند الاستلام";
+"checkout.place.order" = "تأكيد الطلب";
+"checkout.outside.jeddah" = "نقوم حالياً بالتوصيل داخل جدة فقط";
+"checkout.street" = "الشارع / المبنى";
+"checkout.notes" = "ملاحظات إضافية";
+"checkout.set.location" = "تحديد موقع التوصيل";
+"checkout.location.set" = "تم تحديد الموقع";
+"checkout.select.district" = "اختر الحي";
+"checkout.business.name" = "اسم النشاط التجاري";
+"checkout.phone" = "رقم الهاتف";
+"checkout.edit.location" = "تعديل الموقع";
+"checkout.apple.pay.failed" = "لم يتم إتمام الدفع عبر Apple Pay. يمكنك تقسيم الطلب أو الدفع عند الاستلام.";
+"checkout.switch.cod" = "التحويل إلى الدفع عند الاستلام";
+
+/* Orders */
+"orders.title" = "طلباتي";
+"orders.empty.title" = "لا توجد طلبات بعد";
+"orders.empty.message" = "ستظهر طلباتك هنا بعد إتمام أول طلب";
+"orders.status.pending" = "قيد الانتظار";
+"orders.status.sent" = "تم الإرسال للمورد";
+"orders.status.delivered" = "تم التوصيل";
+"orders.status.cancelled" = "ملغي";
+"orders.cancel" = "إلغاء الطلب";
+"orders.active.section" = "الطلبات النشطة";
+"orders.past.section" = "الطلبات السابقة";
+"orders.placed" = "تم تأكيد الطلب";
+"orders.number" = "طلب رقم";
+"orders.confirmation.message" = "سنرسل لك تحديثات عن حالة طلبك";
+"orders.view.order" = "عرض الطلب";
+"orders.back.to.shop" = "العودة للمتجر";
+"orders.view.on.map" = "عرض على الخريطة";
+"orders.cancel.confirm" = "هل تريد إلغاء هذا الطلب؟ لا يمكن التراجع عن هذا الإجراء.";
+
+/* Account */
+"account.title" = "الحساب";
+"account.sign.in" = "تسجيل الدخول";
+"account.sign.out" = "تسجيل الخروج";
+"account.business.details" = "بيانات النشاط";
+"account.delivery.location" = "موقع التوصيل";
+"account.order.history" = "سجل الطلبات";
+"account.help" = "المساعدة";
+"account.language" = "اللغة";
+"account.guest.prompt" = "سجّل دخولك لإدارة حسابك";
+
+/* Auth */
+"auth.phone.title" = "تسجيل الدخول";
+"auth.phone.subtitle" = "أدخل رقم هاتفك";
+"auth.send.code" = "إرسال الرمز";
+"auth.verify.code" = "التحقق";
+"auth.resend" = "إعادة إرسال";
+"auth.profile.title" = "بيانات النشاط";
+"auth.business.name" = "اسم النشاط التجاري";
+"auth.contact.name" = "اسم جهة الاتصال";
+"auth.email.optional" = "البريد الإلكتروني (اختياري)";
+"auth.continue" = "متابعة";
+"auth.phone.required" = "أدخل رقم هاتفك";
+"auth.code.invalid" = "الرمز غير صحيح أو منتهي الصلاحية";
+"auth.profile.incomplete" = "يرجى إدخال اسم النشاط واسم جهة الاتصال";
+
+/* General */
+"general.error" = "حدث خطأ";
+"general.retry" = "إعادة المحاولة";
+"general.cancel" = "إلغاء";
+"general.save" = "حفظ";
+"general.done" = "تم";
+"general.loading" = "جاري التحميل...";
+"general.no.network" = "لا يوجد اتصال بالإنترنت";
+"general.no.network.message" = "تحقق من اتصالك بالإنترنت وحاول مرة أخرى";
+
+/* Onboarding */
+"onboarding.title.1" = "مستلزمات مقهاك بالجملة";
+"onboarding.body.1" = "أكواب، أغطية، مصاصات، مناديل وطباعة — كل ما تحتاجه في مكان واحد";
+"onboarding.title.2" = "اطلب بسهولة";
+"onboarding.body.2" = "اختر الكمية، حدد موقع التوصيل، وأكّد طلبك في ثوانٍ";
+"onboarding.title.3" = "تابع طلباتك";
+"onboarding.body.3" = "تعرّف على حالة طلبك لحظة بلحظة حتى يصلك";
+"onboarding.next" = "التالي";
+"onboarding.skip" = "تخطي";
+"onboarding.get.started" = "ابدأ الآن";
+
+/* Location */
+"location.title" = "موقع التوصيل";
+"location.drag.hint" = "حرّك الخريطة لتحديد مدخل المبنى بدقة";
+"location.use.current" = "استخدم موقعي الحالي";
+"location.permission.denied" = "لم نتمكن من الوصول إلى موقعك. يمكنك تحريك الخريطة لتحديد الموقع يدوياً.";
+"location.confirm" = "تأكيد الموقع";
+"location.district" = "الحي";

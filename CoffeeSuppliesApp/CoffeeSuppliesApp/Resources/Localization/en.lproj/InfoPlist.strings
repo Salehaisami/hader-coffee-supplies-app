@@ -1,0 +1,3 @@
+CFBundleDisplayName = "Hader";
+CFBundleName = "Hader";
+NSLocationWhenInUseUsageDescription = "We need your location to set your delivery address";
