@@ -1,12 +1,7 @@
-import { type OrderStatus } from "@/lib/types";
+"use client";
 
-/** Human-readable label for each order status. */
-const STATUS_LABELS: Record<OrderStatus, string> = {
-  pending: "Pending",
-  sent_to_supplier: "Sent to Supplier",
-  delivered: "Delivered",
-  cancelled: "Cancelled",
-};
+import { type OrderStatus } from "@/lib/types";
+import { useLocale } from "@/contexts/LocaleContext";
 
 /**
  * Tailwind classes per status, drawn from the Stone/Ink/Clay/Sage tokens:
@@ -24,10 +19,11 @@ const STATUS_CLASSES: Record<OrderStatus, string> = {
 
 /**
  * A small color-coded pill for displaying an order's status. Reused across
- * the orders list and order detail views.
+ * the orders list and order detail views. Renders the localized status label.
  */
 export default function StatusPill({ status }: { status: OrderStatus }) {
-  const label = STATUS_LABELS[status] ?? status;
+  const { t } = useLocale();
+  const label = t.orders.status[status] ?? status;
   const classes = STATUS_CLASSES[status] ?? "bg-stone-100 text-stone-600";
 
   return (

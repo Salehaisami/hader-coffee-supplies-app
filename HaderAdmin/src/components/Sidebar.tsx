@@ -4,11 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type ReactNode } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLocale } from "@/contexts/LocaleContext";
 import { isNavItemActive } from "@/lib/nav";
+import LanguageToggle from "@/components/LanguageToggle";
 
 interface NavItem {
   href: string;
-  label: string;
+  /** Translation key path within nav.* */
+  labelKey: "orders" | "catalog" | "suppliers" | "customers" | "analytics";
   icon: ReactNode;
 }
 
@@ -28,7 +31,7 @@ const iconProps = {
 const NAV_ITEMS: NavItem[] = [
   {
     href: "/orders",
-    label: "Orders",
+    labelKey: "orders",
     icon: (
       <svg {...iconProps}>
         <path
@@ -41,7 +44,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     href: "/catalog",
-    label: "Catalog",
+    labelKey: "catalog",
     icon: (
       <svg {...iconProps}>
         <path
@@ -54,7 +57,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     href: "/suppliers",
-    label: "Suppliers",
+    labelKey: "suppliers",
     icon: (
       <svg {...iconProps}>
         <path
@@ -67,7 +70,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     href: "/customers",
-    label: "Customers",
+    labelKey: "customers",
     icon: (
       <svg {...iconProps}>
         <path
@@ -80,7 +83,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     href: "/analytics",
-    label: "Analytics",
+    labelKey: "analytics",
     icon: (
       <svg {...iconProps}>
         <path
@@ -94,13 +97,13 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 /**
- * Persistent left sidebar for the admin dashboard. Shows the brand, primary
- * navigation with the active route highlighted, and the signed-in admin's
- * email with a sign-out action at the bottom.
+ * Persistent sidebar for the admin dashboard. Renders brand, navigation,
+ * language toggle, and signed-in admin info. Adapts positioning for RTL/LTR.
  */
 export default function Sidebar() {
   const pathname = usePathname();
   const { user, signOut } = useAuth();
+  const { t } = useLocale();
 
   return (
     <aside className="flex h-screen w-64 shrink-0 flex-col bg-stone-900 text-stone-100">
@@ -110,8 +113,8 @@ export default function Sidebar() {
           H
         </span>
         <div className="leading-tight">
-          <p className="font-bold text-white">Hader Admin</p>
-          <p className="text-xs text-stone-400">Coffee Supplies</p>
+          <p className="font-bold text-white">{t.general.appName}</p>
+          <p className="text-xs text-stone-400">{t.general.appTagline}</p>
         </div>
       </div>
 
@@ -131,20 +134,21 @@ export default function Sidebar() {
               }`}
             >
               {item.icon}
-              <span>{item.label}</span>
+              <span>{t.nav[item.labelKey]}</span>
             </Link>
           );
         })}
       </nav>
 
-      {/* Signed-in admin + sign out */}
-      <div className="border-t border-stone-800 px-4 py-4">
+      {/* Language toggle + Signed-in admin + sign out */}
+      <div className="border-t border-stone-800 px-4 py-4 space-y-3">
+        <LanguageToggle variant="sidebar" />
         <p className="truncate text-xs text-stone-400" title={user?.email ?? undefined}>
-          {user?.email ?? "Signed in"}
+          {user?.email ?? t.nav.signedIn}
         </p>
         <button
           onClick={signOut}
-          className="mt-3 flex w-full items-center justify-center gap-2 rounded-md border border-stone-700 px-3 py-2 text-sm font-medium text-stone-200 transition-colors hover:bg-stone-800 hover:text-white"
+          className="flex w-full items-center justify-center gap-2 rounded-md border border-stone-700 px-3 py-2 text-sm font-medium text-stone-200 transition-colors hover:bg-stone-800 hover:text-white"
         >
           <svg {...iconProps} className="h-4 w-4 shrink-0">
             <path
@@ -153,7 +157,7 @@ export default function Sidebar() {
               d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"
             />
           </svg>
-          Sign Out
+          {t.nav.signOut}
         </button>
       </div>
     </aside>

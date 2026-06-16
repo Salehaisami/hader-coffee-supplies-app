@@ -6,15 +6,8 @@ import { db } from "@/lib/firebase";
 import { type Order, type OrderStatus, type Supplier } from "@/lib/types";
 import { computeOrderMetrics, computeTopProducts, computeOrdersBySupplier, computeEstimatedProfit } from "@/lib/analytics";
 import { formatSar, formatNumber } from "@/lib/format";
+import { useLocale } from "@/contexts/LocaleContext";
 import PageHeader from "@/components/PageHeader";
-
-/** Human-readable labels for order statuses. */
-const STATUS_LABELS: Record<OrderStatus, string> = {
-  pending: "Pending",
-  sent_to_supplier: "Sent to Supplier",
-  delivered: "Delivered",
-  cancelled: "Cancelled",
-};
 
 /** Color styles for status breakdown cards. */
 const STATUS_COLORS: Record<OrderStatus, string> = {
@@ -29,6 +22,7 @@ export default function AnalyticsPage() {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useLocale();
 
   useEffect(() => {
     const ordersQuery = query(
@@ -48,13 +42,13 @@ export default function AnalyticsPage() {
       },
       (err) => {
         console.error("Failed to load orders:", err);
-        setError("Could not load orders. Please try again.");
+        setError(t.orders.loadError);
         setLoading(false);
       }
     );
 
     return () => unsubscribe();
-  }, []);
+  }, [t.orders.loadError]);
 
   useEffect(() => {
     const suppliersQuery = query(collection(db, "suppliers"));
@@ -83,26 +77,26 @@ export default function AnalyticsPage() {
   return (
     <div>
       <PageHeader
-        title="Analytics"
-        description="Track revenue, top products, and performance."
+        title={t.analytics.title}
+        description={t.analytics.description}
       />
       <div className="p-8">
-        {loading && <p className="text-ink-soft">Loading analytics…</p>}
+        {loading && <p className="text-ink-soft">{t.general.loading}</p>}
         {error && <p className="text-clay-deep">{error}</p>}
         {!loading && !error && (
           <>
             {/* Summary cards */}
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               <SummaryCard
-                label="Total Orders"
+                label={t.analytics.totalOrders}
                 value={formatNumber(metrics.totalOrders)}
               />
               <SummaryCard
-                label="Total Revenue"
+                label={t.analytics.totalRevenue}
                 value={formatSar(metrics.totalRevenue)}
               />
               <SummaryCard
-                label="Orders by Status"
+                label={t.analytics.ordersByStatus}
                 value=""
                 custom={
                   <div className="mt-2 space-y-1">
@@ -113,10 +107,11 @@ export default function AnalyticsPage() {
                           className="flex items-center justify-between text-sm"
                         >
                           <span className="text-ink-soft">
-                            {STATUS_LABELS[status]}
+                            {t.orders.status[status]}
                           </span>
                           <span
                             className={`font-semibold ${STATUS_COLORS[status]}`}
+                            dir="ltr"
                           >
                             {formatNumber(metrics.ordersByStatus[status])}
                           </span>
@@ -128,26 +123,18 @@ export default function AnalyticsPage() {
               />
             </div>
 
-            {/* Estimated Profit card — only visible when cost data exists */}
+            {/* Estimated Profit card */}
             {profitEstimate.hasCostData && (
               <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 <div className="rounded-lg border border-stone-200 bg-white p-6 shadow-sm">
                   <p className="text-sm font-medium text-ink-soft">
-                    Estimated Profit
+                    {t.analytics.estimatedProfit}
                   </p>
-                  <p className="mt-2 text-3xl font-bold text-clay">
+                  <p className="mt-2 text-3xl font-bold text-clay" dir="ltr">
                     {formatSar(profitEstimate.estimatedProfit)}
                   </p>
                   <p className="mt-2 text-xs text-ink-soft">
-                    Based on {formatNumber(profitEstimate.itemsWithCostData)} of{" "}
-                    {formatNumber(profitEstimate.totalItems)} line item
-                    {profitEstimate.totalItems === 1 ? "" : "s"}
-                    {profitEstimate.isPartial && (
-                      <span className="text-amber-600">
-                        {" "}
-                        — partial (not all items have cost data)
-                      </span>
-                    )}
+                    {formatNumber(profitEstimate.itemsWithCostData)} / {formatNumber(profitEstimate.totalItems)}
                   </p>
                 </div>
               </div>
@@ -155,15 +142,15 @@ export default function AnalyticsPage() {
 
             {/* Top Products section */}
             <section className="mt-10">
-              <h2 className="text-lg font-semibold text-ink">Top Products</h2>
+              <h2 className="text-lg font-semibold text-ink">{t.analytics.topProducts}</h2>
               <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2">
                 {/* By Quantity Sold */}
                 <div className="rounded-lg border border-stone-200 bg-white p-6 shadow-sm">
                   <h3 className="text-sm font-medium text-ink-soft">
-                    By Quantity Sold
+                    {t.analytics.byQuantity}
                   </h3>
                   {topProducts.topByQuantity.length === 0 ? (
-                    <p className="mt-4 text-sm text-ink-soft">No data yet.</p>
+                    <p className="mt-4 text-sm text-ink-soft">{t.analytics.noData}</p>
                   ) : (
                     <ol className="mt-4 space-y-3">
                       {topProducts.topByQuantity.map((product, index) => (
@@ -172,13 +159,13 @@ export default function AnalyticsPage() {
                           className="flex items-center justify-between"
                         >
                           <span className="text-sm text-ink">
-                            <span className="mr-2 font-semibold text-clay">
+                            <span className="me-2 font-semibold text-clay">
                               {index + 1}.
                             </span>
                             {product.name}
                           </span>
-                          <span className="text-sm font-semibold text-ink">
-                            {formatNumber(product.quantity)} units
+                          <span className="text-sm font-semibold text-ink" dir="ltr">
+                            {formatNumber(product.quantity)}
                           </span>
                         </li>
                       ))}
@@ -189,10 +176,10 @@ export default function AnalyticsPage() {
                 {/* By Revenue */}
                 <div className="rounded-lg border border-stone-200 bg-white p-6 shadow-sm">
                   <h3 className="text-sm font-medium text-ink-soft">
-                    By Revenue
+                    {t.analytics.byRevenue}
                   </h3>
                   {topProducts.topByRevenue.length === 0 ? (
-                    <p className="mt-4 text-sm text-ink-soft">No data yet.</p>
+                    <p className="mt-4 text-sm text-ink-soft">{t.analytics.noData}</p>
                   ) : (
                     <ol className="mt-4 space-y-3">
                       {topProducts.topByRevenue.map((product, index) => (
@@ -201,12 +188,12 @@ export default function AnalyticsPage() {
                           className="flex items-center justify-between"
                         >
                           <span className="text-sm text-ink">
-                            <span className="mr-2 font-semibold text-clay">
+                            <span className="me-2 font-semibold text-clay">
                               {index + 1}.
                             </span>
                             {product.name}
                           </span>
-                          <span className="text-sm font-semibold text-ink">
+                          <span className="text-sm font-semibold text-ink" dir="ltr">
                             {formatSar(product.revenue)}
                           </span>
                         </li>
@@ -220,23 +207,23 @@ export default function AnalyticsPage() {
             {/* Orders by Supplier section */}
             <section className="mt-10">
               <h2 className="text-lg font-semibold text-ink">
-                Orders by Supplier
+                {t.analytics.ordersBySupplier}
               </h2>
               <div className="mt-4 rounded-lg border border-stone-200 bg-white shadow-sm">
                 {supplierBreakdown.length === 0 ? (
-                  <p className="p-6 text-sm text-ink-soft">No data yet.</p>
+                  <p className="p-6 text-sm text-ink-soft">{t.analytics.noData}</p>
                 ) : (
-                  <table className="w-full text-left text-sm">
+                  <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-stone-200 bg-stone-50">
-                        <th className="px-6 py-3 font-medium text-ink-soft">
-                          Supplier
+                        <th className="px-6 py-3 font-medium text-ink-soft text-start">
+                          {t.analytics.supplier}
                         </th>
-                        <th className="px-6 py-3 text-right font-medium text-ink-soft">
-                          Orders
+                        <th className="px-6 py-3 font-medium text-ink-soft text-start">
+                          {t.analytics.orderCount}
                         </th>
-                        <th className="px-6 py-3 text-right font-medium text-ink-soft">
-                          Revenue
+                        <th className="px-6 py-3 font-medium text-ink-soft text-start">
+                          {t.analytics.revenue}
                         </th>
                       </tr>
                     </thead>
@@ -249,10 +236,10 @@ export default function AnalyticsPage() {
                           <td className="px-6 py-3 font-medium text-ink">
                             {entry.supplierName}
                           </td>
-                          <td className="px-6 py-3 text-right text-ink">
+                          <td className="px-6 py-3 text-ink" dir="ltr">
                             {formatNumber(entry.orderCount)}
                           </td>
-                          <td className="px-6 py-3 text-right font-semibold text-ink">
+                          <td className="px-6 py-3 font-semibold text-ink" dir="ltr">
                             {formatSar(entry.revenue)}
                           </td>
                         </tr>
@@ -271,7 +258,6 @@ export default function AnalyticsPage() {
 
 /**
  * A single summary card with a label and a large value.
- * Optionally accepts custom content rendered below the label.
  */
 function SummaryCard({
   label,
@@ -286,7 +272,7 @@ function SummaryCard({
     <div className="rounded-lg border border-stone-200 bg-white p-6 shadow-sm">
       <p className="text-sm font-medium text-ink-soft">{label}</p>
       {value && (
-        <p className="mt-2 text-3xl font-bold text-ink">{value}</p>
+        <p className="mt-2 text-3xl font-bold text-ink" dir="ltr">{value}</p>
       )}
       {custom}
     </div>

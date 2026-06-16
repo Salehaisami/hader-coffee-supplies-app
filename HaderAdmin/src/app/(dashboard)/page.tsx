@@ -2,21 +2,24 @@
 
 import Link from "next/link";
 import PageHeader from "@/components/PageHeader";
-
-const SECTIONS = [
-  { href: "/orders", label: "Orders", description: "View and manage incoming orders" },
-  { href: "/catalog", label: "Catalog", description: "Manage products, categories, and variants" },
-  { href: "/suppliers", label: "Suppliers", description: "Manage supplier contacts" },
-  { href: "/customers", label: "Customers", description: "Onboard and approve customers" },
-  { href: "/analytics", label: "Analytics", description: "Track revenue and performance" },
-];
+import { useLocale } from "@/contexts/LocaleContext";
 
 export default function DashboardHome() {
+  const { t } = useLocale();
+
+  const SECTIONS = [
+    { href: "/orders", label: t.nav.orders, description: t.orders.description },
+    { href: "/catalog", label: t.nav.catalog, description: t.catalog.description },
+    { href: "/suppliers", label: t.nav.suppliers, description: t.suppliers.description },
+    { href: "/customers", label: t.nav.customers, description: t.customers.description },
+    { href: "/analytics", label: t.nav.analytics, description: t.analytics.description },
+  ];
+
   return (
     <div>
       <PageHeader
-        title="Dashboard"
-        description="Welcome to the Hader Coffee Supplies admin dashboard."
+        title={t.general.appName}
+        description={t.auth.subtitle}
       />
       <div className="grid grid-cols-1 gap-4 p-8 sm:grid-cols-2 lg:grid-cols-3">
         {SECTIONS.map((section) => (

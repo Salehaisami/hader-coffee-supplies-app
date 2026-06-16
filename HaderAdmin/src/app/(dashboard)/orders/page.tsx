@@ -12,23 +12,12 @@ import {
   googleMapsSearchUrl,
   shortOrderId,
 } from "@/lib/format";
+import { useLocale } from "@/contexts/LocaleContext";
 import PageHeader from "@/components/PageHeader";
 import StatusPill from "@/components/StatusPill";
 
-/** Human-readable labels for payment methods. */
-const PAYMENT_METHOD_LABELS: Record<string, string> = {
-  apple_pay: "Apple Pay",
-  cash_on_delivery: "Cash on Delivery",
-};
-
 /** Filter options for the orders list. */
 type StatusFilter = "all" | "active" | "cancelled";
-
-const STATUS_FILTER_LABELS: Record<StatusFilter, string> = {
-  all: "All",
-  active: "Active",
-  cancelled: "Cancelled",
-};
 
 /** Statuses considered "active" (in-progress, actionable). */
 const ACTIVE_STATUSES: OrderStatus[] = ["pending", "sent_to_supplier"];
@@ -49,6 +38,7 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const { t } = useLocale();
 
   useEffect(() => {
     const ordersQuery = query(
@@ -68,21 +58,27 @@ export default function OrdersPage() {
       },
       (err) => {
         console.error("Failed to load orders:", err);
-        setError("Could not load orders. Please try again.");
+        setError(t.orders.loadError);
         setLoading(false);
       }
     );
 
     return () => unsubscribe();
-  }, []);
+  }, [t.orders.loadError]);
 
   const filteredOrders = filterOrders(orders, statusFilter);
+
+  const STATUS_FILTER_LABELS: Record<StatusFilter, string> = {
+    all: t.orders.filters.all,
+    active: t.orders.filters.active,
+    cancelled: t.orders.filters.cancelled,
+  };
 
   return (
     <div>
       <PageHeader
-        title="Orders"
-        description="View incoming orders and manage their status."
+        title={t.orders.title}
+        description={t.orders.description}
       />
       <div className="p-8">
         {/* Status filter tabs */}
@@ -118,8 +114,10 @@ function OrdersContent({
   loading: boolean;
   error: string | null;
 }) {
+  const { t } = useLocale();
+
   if (loading) {
-    return <p className="text-ink-soft">Loading orders…</p>;
+    return <p className="text-ink-soft">{t.general.loading}</p>;
   }
 
   if (error) {
@@ -129,24 +127,24 @@ function OrdersContent({
   if (orders.length === 0) {
     return (
       <div className="rounded-lg border border-stone-200 bg-white p-12 text-center">
-        <p className="text-ink-soft">No orders yet.</p>
+        <p className="text-ink-soft">{t.orders.empty}</p>
       </div>
     );
   }
 
   return (
     <div className="overflow-hidden rounded-lg border border-stone-200 bg-white">
-      <table className="w-full text-left text-sm">
+      <table className="w-full text-sm" dir="auto">
         <thead className="border-b border-stone-200 bg-stone-50 text-xs uppercase tracking-wide text-ink-soft">
           <tr>
-            <th className="px-4 py-3 font-medium">Order</th>
-            <th className="px-4 py-3 font-medium">Business</th>
-            <th className="px-4 py-3 font-medium">Items</th>
-            <th className="px-4 py-3 font-medium">Total</th>
-            <th className="px-4 py-3 font-medium">Payment</th>
-            <th className="px-4 py-3 font-medium">Status</th>
-            <th className="px-4 py-3 font-medium">Created</th>
-            <th className="px-4 py-3 font-medium">Location</th>
+            <th className="px-4 py-3 font-medium text-start">{t.orders.table.order}</th>
+            <th className="px-4 py-3 font-medium text-start">{t.orders.table.business}</th>
+            <th className="px-4 py-3 font-medium text-start">{t.orders.table.items}</th>
+            <th className="px-4 py-3 font-medium text-start">{t.orders.table.total}</th>
+            <th className="px-4 py-3 font-medium text-start">{t.orders.table.payment}</th>
+            <th className="px-4 py-3 font-medium text-start">{t.orders.table.status}</th>
+            <th className="px-4 py-3 font-medium text-start">{t.orders.table.created}</th>
+            <th className="px-4 py-3 font-medium text-start">{t.orders.table.location}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-stone-100">
@@ -167,23 +165,24 @@ function OrdersContent({
                   <Link
                     href={`/orders/${order.id}`}
                     className="font-mono text-clay hover:text-clay-deep hover:underline"
+                    dir="ltr"
                   >
                     {shortOrderId(order.id)}
                   </Link>
                 </td>
                 <td className="px-4 py-3 text-ink">{order.businessName}</td>
-                <td className="px-4 py-3 text-ink-soft">
+                <td className="px-4 py-3 text-ink-soft" dir="ltr">
                   {formatNumber(itemCount)}
                 </td>
-                <td className="px-4 py-3 text-ink">{formatSar(order.total)}</td>
+                <td className="px-4 py-3 text-ink" dir="ltr">{formatSar(order.total)}</td>
                 <td className="px-4 py-3 text-ink-soft">
-                  {PAYMENT_METHOD_LABELS[order.paymentMethod] ??
+                  {t.orders.payment[order.paymentMethod as keyof typeof t.orders.payment] ??
                     order.paymentMethod}
                 </td>
                 <td className="px-4 py-3">
                   <StatusPill status={order.status} />
                 </td>
-                <td className="px-4 py-3 text-ink-soft">
+                <td className="px-4 py-3 text-ink-soft" dir="ltr">
                   {formatTimestamp(order.createdAt)}
                 </td>
                 <td className="px-4 py-3">
@@ -194,7 +193,7 @@ function OrdersContent({
                     className="text-clay hover:text-clay-deep hover:underline"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    Map
+                    {t.orders.table.map}
                   </a>
                 </td>
               </tr>

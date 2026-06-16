@@ -18,26 +18,15 @@ import {
   googleMapsSearchUrl,
   shortOrderId,
 } from "@/lib/format";
+import { useLocale } from "@/contexts/LocaleContext";
 import PageHeader from "@/components/PageHeader";
 import StatusPill from "@/components/StatusPill";
 import StatusActions from "@/components/StatusActions";
 
-/** Human-readable labels for payment methods. */
-const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
-  apple_pay: "Apple Pay",
-  cash_on_delivery: "Cash on Delivery",
-};
-
-/** Human-readable labels for payment settlement status. */
-const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
-  paid: "Paid",
-  pending: "Pending",
-  cod_unpaid: "Cash on Delivery — Unpaid",
-};
-
 export default function OrderDetailPage() {
   const params = useParams<{ id: string }>();
   const orderId = params?.id;
+  const { t, isRTL } = useLocale();
 
   const [order, setOrder] = useState<Order | null>(null);
   const [customer, setCustomer] = useState<User | null>(null);
@@ -45,7 +34,6 @@ export default function OrderDetailPage() {
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Real-time listener on the single order doc so status changes reflect live.
   useEffect(() => {
     if (!orderId) return;
 
@@ -65,15 +53,14 @@ export default function OrderDetailPage() {
       },
       (err) => {
         console.error("Failed to load order:", err);
-        setError("Could not load this order. Please try again.");
+        setError(t.orders.loadError);
         setLoading(false);
       }
     );
 
     return () => unsubscribe();
-  }, [orderId]);
+  }, [orderId, t.orders.loadError]);
 
-  // Best-effort fetch of the customer doc for contact details (nice to have).
   useEffect(() => {
     const customerId = order?.customerId;
     if (!customerId) return;
@@ -85,7 +72,6 @@ export default function OrderDetailPage() {
         setCustomer({ id: snapshot.id, ...snapshot.data() } as User);
       })
       .catch((err) => {
-        // Contact details are optional; log but don't surface an error.
         console.warn("Could not load customer details:", err);
       });
 
@@ -94,17 +80,18 @@ export default function OrderDetailPage() {
     };
   }, [order?.customerId]);
 
+  const backArrow = isRTL ? "→" : "←";
+
   return (
     <div>
       <PageHeader
-        title="Order Detail"
-        description="Review line items, delivery, and payment for this order."
+        title={t.orders.detail.title}
         action={
           <Link
             href="/orders"
             className="text-sm font-medium text-clay hover:text-clay-deep hover:underline"
           >
-            ← Back to orders
+            {backArrow} {t.orders.detail.backToOrders}
           </Link>
         }
       />
@@ -134,8 +121,11 @@ function OrderDetailContent({
   notFound: boolean;
   error: string | null;
 }) {
+  const { t, isRTL } = useLocale();
+  const backArrow = isRTL ? "→" : "←";
+
   if (loading) {
-    return <p className="text-ink-soft">Loading order…</p>;
+    return <p className="text-ink-soft">{t.general.loading}</p>;
   }
 
   if (error) {
@@ -145,15 +135,12 @@ function OrderDetailContent({
   if (notFound || !order) {
     return (
       <div className="rounded-lg border border-stone-200 bg-white p-12 text-center">
-        <p className="text-ink">This order could not be found.</p>
-        <p className="mt-1 text-sm text-ink-soft">
-          It may have been removed, or the link may be incorrect.
-        </p>
+        <p className="text-ink">{t.general.error}</p>
         <Link
           href="/orders"
           className="mt-4 inline-block text-sm font-medium text-clay hover:text-clay-deep hover:underline"
         >
-          ← Back to orders
+          {backArrow} {t.orders.detail.backToOrders}
         </Link>
       </div>
     );
@@ -169,11 +156,9 @@ function OrderDetailContent({
           role="status"
           data-testid="cancelled-banner"
         >
-          <span className="text-lg" aria-hidden="true">
-            ✕
-          </span>
+          <span className="text-lg" aria-hidden="true">✕</span>
           <p className="text-sm font-medium text-stone-500">
-            This order was cancelled. All details are read-only.
+            {t.orders.status.cancelled}
           </p>
         </div>
       )}
@@ -196,14 +181,7 @@ function OrderDetailContent({
   );
 }
 
-/** Reusable card shell with a heading. */
-function Card({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="overflow-hidden rounded-lg border border-stone-200 bg-white">
       <h2 className="border-b border-stone-200 bg-stone-50 px-5 py-3 text-xs font-medium uppercase tracking-wide text-ink-soft">
@@ -214,14 +192,14 @@ function Card({
   );
 }
 
-/** Header summary: short id, business name, status, and dates + actions slot. */
 function OrderSummaryCard({ order }: { order: Order }) {
+  const { t } = useLocale();
   return (
     <section className="rounded-lg border border-stone-200 bg-white p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
-            <span className="font-mono text-lg text-ink">
+            <span className="font-mono text-lg text-ink" dir="ltr">
               #{shortOrderId(order.id)}
             </span>
             <StatusPill status={order.status} />
@@ -229,21 +207,13 @@ function OrderSummaryCard({ order }: { order: Order }) {
           <p className="mt-1 text-xl font-bold text-ink">{order.businessName}</p>
           <dl className="mt-3 flex flex-wrap gap-x-8 gap-y-1 text-sm">
             <div className="flex gap-2">
-              <dt className="text-ink-soft">Created</dt>
-              <dd className="text-ink">{formatTimestamp(order.createdAt)}</dd>
-            </div>
-            <div className="flex gap-2">
-              <dt className="text-ink-soft">Updated</dt>
-              <dd className="text-ink">{formatTimestamp(order.updatedAt)}</dd>
+              <dt className="text-ink-soft">{t.orders.table.created}</dt>
+              <dd className="text-ink" dir="ltr">{formatTimestamp(order.createdAt)}</dd>
             </div>
           </dl>
         </div>
 
-        <div
-          className="flex items-center gap-2"
-          aria-label="Status actions"
-          data-testid="status-actions"
-        >
+        <div className="flex items-center gap-2" aria-label={t.orders.detail.updateStatus} data-testid="status-actions">
           <StatusActions orderId={order.id} currentStatus={order.status} />
         </div>
       </div>
@@ -251,73 +221,47 @@ function OrderSummaryCard({ order }: { order: Order }) {
   );
 }
 
-/** Line items table with subtotal and total. */
 function LineItemsCard({ order }: { order: Order }) {
+  const { t } = useLocale();
   const items = order.items ?? [];
 
   return (
-    <Card title="Line items">
+    <Card title={t.orders.detail.orderItems}>
       <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm">
+        <table className="w-full text-sm">
           <thead className="border-b border-stone-200 text-xs uppercase tracking-wide text-ink-soft">
             <tr>
-              <th className="py-2 pr-4 font-medium">Item</th>
-              <th className="py-2 pr-4 font-medium">Unit</th>
-              <th className="py-2 pr-4 text-right font-medium">Unit price</th>
-              <th className="py-2 pr-4 text-right font-medium">Qty</th>
-              <th className="py-2 text-right font-medium">Line total</th>
+              <th className="py-2 pe-4 font-medium text-start">{t.catalog.products.title}</th>
+              <th className="py-2 pe-4 font-medium text-start">{t.catalog.products.pricingUnit}</th>
+              <th className="py-2 pe-4 font-medium text-end">{t.orders.detail.unitPrice}</th>
+              <th className="py-2 pe-4 font-medium text-end">{t.orders.detail.quantity}</th>
+              <th className="py-2 font-medium text-end">{t.orders.detail.lineTotal}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-stone-100">
             {items.map((item, index) => (
               <tr key={`${item.productId}-${index}`}>
-                <td className="py-3 pr-4">
+                <td className="py-3 pe-4">
                   <span className="text-ink">{item.name}</span>
                   {item.variantLabel && (
-                    <span className="ml-2 rounded bg-stone-100 px-1.5 py-0.5 text-xs text-ink-soft">
+                    <span className="ms-2 rounded bg-stone-100 px-1.5 py-0.5 text-xs text-ink-soft">
                       {item.variantLabel}
                     </span>
                   )}
                 </td>
-                <td className="py-3 pr-4 text-ink-soft">
-                  {item.pricingUnitLabel}
-                </td>
-                <td className="py-3 pr-4 text-right text-ink">
-                  {formatSar(item.unitPrice)}
-                </td>
-                <td className="py-3 pr-4 text-right text-ink">
-                  {formatNumber(item.quantity)}
-                </td>
-                <td className="py-3 text-right text-ink">
-                  {formatSar(item.lineTotal)}
-                </td>
+                <td className="py-3 pe-4 text-ink-soft">{item.pricingUnitLabel}</td>
+                <td className="py-3 pe-4 text-end text-ink" dir="ltr">{formatSar(item.unitPrice)}</td>
+                <td className="py-3 pe-4 text-end text-ink" dir="ltr">{formatNumber(item.quantity)}</td>
+                <td className="py-3 text-end text-ink" dir="ltr">{formatSar(item.lineTotal)}</td>
               </tr>
             ))}
-            {items.length === 0 && (
-              <tr>
-                <td colSpan={5} className="py-6 text-center text-ink-soft">
-                  No line items on this order.
-                </td>
-              </tr>
-            )}
           </tbody>
           <tfoot className="border-t border-stone-200">
             <tr>
-              <td colSpan={4} className="py-2 pr-4 text-right text-ink-soft">
-                Subtotal
+              <td colSpan={4} className="py-2 pe-4 text-end text-ink-soft">
+                {t.orders.table.total}
               </td>
-              <td className="py-2 text-right text-ink">
-                {formatSar(order.subtotal)}
-              </td>
-            </tr>
-            <tr>
-              <td
-                colSpan={4}
-                className="py-2 pr-4 text-right font-semibold text-ink"
-              >
-                Total
-              </td>
-              <td className="py-2 text-right text-base font-bold text-ink">
+              <td className="py-2 text-end text-base font-bold text-ink" dir="ltr">
                 {formatSar(order.total)}
               </td>
             </tr>
@@ -328,25 +272,24 @@ function LineItemsCard({ order }: { order: Order }) {
   );
 }
 
-/** Delivery address block with a prominent Google Maps deep link. */
 function DeliveryAddressCard({ order }: { order: Order }) {
+  const { t } = useLocale();
   const address = order.deliveryAddress;
 
   if (!address) {
     return (
-      <Card title="Delivery address">
-        <p className="text-sm text-ink-soft">No delivery address on file.</p>
+      <Card title={t.orders.detail.deliveryAddress}>
+        <p className="text-sm text-ink-soft">—</p>
       </Card>
     );
   }
 
   return (
-    <Card title="Delivery address">
+    <Card title={t.orders.detail.deliveryAddress}>
       <dl className="space-y-2 text-sm">
-        <Field label="City" value={address.city} />
-        <Field label="District" value={address.district} />
-        {address.street && <Field label="Street" value={address.street} />}
-        {address.notes && <Field label="Notes" value={address.notes} />}
+        <Field label={t.orders.detail.district} value={address.district} />
+        {address.street && <Field label={t.orders.detail.street} value={address.street} />}
+        {address.notes && <Field label={t.orders.detail.notes} value={address.notes} />}
       </dl>
       <a
         href={googleMapsSearchUrl(address.lat, address.lng)}
@@ -354,73 +297,54 @@ function DeliveryAddressCard({ order }: { order: Order }) {
         rel="noopener noreferrer"
         className="mt-4 inline-flex w-full items-center justify-center rounded-md bg-clay px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-clay-deep"
       >
-        Open in Google Maps
+        {t.orders.detail.viewOnMap}
       </a>
     </Card>
   );
 }
 
-/** Payment method and settlement status. */
 function PaymentInfoCard({ order }: { order: Order }) {
+  const { t } = useLocale();
+
+  const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
+    apple_pay: t.orders.payment.apple_pay,
+    cash_on_delivery: t.orders.payment.cash_on_delivery,
+  };
+
   return (
-    <Card title="Payment">
+    <Card title={t.orders.detail.paymentMethod}>
       <dl className="space-y-2 text-sm">
         <Field
-          label="Method"
-          value={
-            PAYMENT_METHOD_LABELS[order.paymentMethod] ?? order.paymentMethod
-          }
-        />
-        <Field
-          label="Status"
-          value={
-            PAYMENT_STATUS_LABELS[order.paymentStatus] ?? order.paymentStatus
-          }
+          label={t.orders.detail.paymentMethod}
+          value={PAYMENT_METHOD_LABELS[order.paymentMethod] ?? order.paymentMethod}
         />
       </dl>
     </Card>
   );
 }
 
-/** Customer business info plus optional contact details from the user doc. */
-function CustomerInfoCard({
-  order,
-  customer,
-}: {
-  order: Order;
-  customer: User | null;
-}) {
+function CustomerInfoCard({ order, customer }: { order: Order; customer: User | null }) {
+  const { t } = useLocale();
+
   return (
-    <Card title="Customer">
+    <Card title={t.nav.customers}>
       <dl className="space-y-2 text-sm">
-        <Field label="Business" value={order.businessName} />
+        <Field label={t.customers.fields.businessName} value={order.businessName} />
         {customer?.contactName && (
-          <Field label="Contact" value={customer.contactName} />
+          <Field label={t.customers.fields.contactName} value={customer.contactName} />
         )}
-        {customer?.phone && <Field label="Phone" value={customer.phone} />}
-        {customer?.email && <Field label="Email" value={customer.email} />}
-        <Field label="Customer ID" value={order.customerId} mono />
+        {customer?.phone && <Field label={t.customers.fields.phone} value={customer.phone} />}
+        {customer?.email && <Field label={t.customers.fields.email} value={customer.email} />}
       </dl>
     </Card>
   );
 }
 
-/** A label/value row used inside info cards. */
-function Field({
-  label,
-  value,
-  mono,
-}: {
-  label: string;
-  value: string;
-  mono?: boolean;
-}) {
+function Field({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
     <div className="flex justify-between gap-4">
       <dt className="shrink-0 text-ink-soft">{label}</dt>
-      <dd className={`text-right text-ink ${mono ? "font-mono text-xs" : ""}`}>
-        {value}
-      </dd>
+      <dd className={`text-end text-ink ${mono ? "font-mono text-xs" : ""}`}>{value}</dd>
     </div>
   );
 }

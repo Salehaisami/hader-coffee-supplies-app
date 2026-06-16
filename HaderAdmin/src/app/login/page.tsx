@@ -5,7 +5,9 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLocale } from "@/contexts/LocaleContext";
 import { useEffect } from "react";
+import LanguageToggle from "@/components/LanguageToggle";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -15,6 +17,7 @@ export default function LoginPage() {
 
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
+  const { t } = useLocale();
 
   // If already authenticated, redirect to home
   useEffect(() => {
@@ -35,22 +38,22 @@ export default function LoginPage() {
       const errorCode = (err as { code?: string })?.code;
       switch (errorCode) {
         case "auth/invalid-email":
-          setError("Invalid email address.");
+          setError(t.auth.errors.invalidEmail);
           break;
         case "auth/user-not-found":
-          setError("No account found with this email.");
+          setError(t.auth.errors.userNotFound);
           break;
         case "auth/wrong-password":
-          setError("Incorrect password.");
+          setError(t.auth.errors.wrongPassword);
           break;
         case "auth/invalid-credential":
-          setError("Invalid email or password.");
+          setError(t.auth.errors.invalidCredential);
           break;
         case "auth/too-many-requests":
-          setError("Too many attempts. Please try again later.");
+          setError(t.auth.errors.tooManyRequests);
           break;
         default:
-          setError("Sign-in failed. Please try again.");
+          setError(t.auth.errors.generic);
       }
     } finally {
       setLoading(false);
@@ -61,7 +64,7 @@ export default function LoginPage() {
   if (authLoading) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-stone-50">
-        <p className="text-ink-soft">Loading...</p>
+        <p className="text-ink-soft">{t.general.loading}</p>
       </main>
     );
   }
@@ -74,11 +77,14 @@ export default function LoginPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-stone-50 px-4">
       <div className="w-full max-w-sm">
+        {/* Language toggle top-right */}
+        <div className="mb-4 flex justify-end">
+          <LanguageToggle variant="inline" />
+        </div>
+
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold text-ink">Hader Admin</h1>
-          <p className="mt-2 text-sm text-ink-soft">
-            Sign in to manage your coffee supplies
-          </p>
+          <h1 className="text-2xl font-bold text-ink">{t.auth.title}</h1>
+          <p className="mt-2 text-sm text-ink-soft">{t.auth.subtitle}</p>
         </div>
 
         <form
@@ -90,7 +96,7 @@ export default function LoginPage() {
               htmlFor="email"
               className="mb-1 block text-sm font-medium text-ink"
             >
-              Email
+              {t.auth.email}
             </label>
             <input
               id="email"
@@ -99,8 +105,9 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               autoComplete="email"
+              dir="ltr"
               className="w-full rounded-md border border-stone-200 bg-stone-50 px-3 py-2 text-ink placeholder:text-stone-400 focus:border-clay focus:outline-none focus:ring-1 focus:ring-clay"
-              placeholder="admin@hader.sa"
+              placeholder={t.auth.emailPlaceholder}
             />
           </div>
 
@@ -109,7 +116,7 @@ export default function LoginPage() {
               htmlFor="password"
               className="mb-1 block text-sm font-medium text-ink"
             >
-              Password
+              {t.auth.password}
             </label>
             <input
               id="password"
@@ -118,8 +125,9 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               autoComplete="current-password"
+              dir="ltr"
               className="w-full rounded-md border border-stone-200 bg-stone-50 px-3 py-2 text-ink placeholder:text-stone-400 focus:border-clay focus:outline-none focus:ring-1 focus:ring-clay"
-              placeholder="••••••••"
+              placeholder={t.auth.passwordPlaceholder}
             />
           </div>
 
@@ -134,7 +142,7 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full rounded-md bg-clay px-4 py-2 font-medium text-white transition-colors hover:bg-clay-deep disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {loading ? "Signing in..." : "Sign In"}
+            {loading ? t.auth.signingIn : t.auth.signIn}
           </button>
         </form>
       </div>

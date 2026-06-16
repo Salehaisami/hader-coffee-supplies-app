@@ -168,7 +168,7 @@
 		79E1A622ED6E8481E0D0A938 /* CheckoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutView.swift; sourceTree = "<group>"; };
 		7B734F7B4389709F1D89B6CA /* OrdersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrdersView.swift; sourceTree = "<group>"; };
 		7BDB783A1BAC59CC7F89AEE6 /* IBMPlexMono-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexMono-Medium.ttf"; sourceTree = "<group>"; };
-		7F65F6AA1B22ABA6CACB80A1 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
+		7F65F6AA1B22ABA6CACB80A1 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
 		833F424CAD075F2EA39AF4EC /* Fraunces-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fraunces-Regular.ttf"; sourceTree = "<group>"; };
 		85B188CE88941C914F7CE480 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Localizable.strings; sourceTree = "<group>"; };
 		8666B7CC89F46DE005EF565A /* CoffeeSuppliesAppTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = CoffeeSuppliesAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -222,7 +222,7 @@
 		F79D45AC5477DD3A61B65B45 /* LanguageManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageManagerTests.swift; sourceTree = "<group>"; };
 		F90A2E136A7DA291D7A64229 /* ShopView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShopView.swift; sourceTree = "<group>"; };
 		FB9C7D3260FACC263336E298 /* L10n.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = L10n.swift; sourceTree = "<group>"; };
-		FE3DCA735271D6E2CB40A642 /* CoffeeSuppliesApp.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CoffeeSuppliesApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FE3DCA735271D6E2CB40A642 /* CoffeeSuppliesApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CoffeeSuppliesApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -875,6 +875,7 @@
 				CODE_SIGN_ENTITLEMENTS = CoffeeSuppliesApp/App/CoffeeSuppliesApp.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = KHHNUYST98;
 				INFOPLIST_FILE = CoffeeSuppliesApp/App/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -912,6 +913,7 @@
 				CODE_SIGN_ENTITLEMENTS = CoffeeSuppliesApp/App/CoffeeSuppliesApp.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = KHHNUYST98;
 				INFOPLIST_FILE = CoffeeSuppliesApp/App/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

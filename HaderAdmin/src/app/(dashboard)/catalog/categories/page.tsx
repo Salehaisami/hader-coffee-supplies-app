@@ -14,6 +14,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { type Category } from "@/lib/types";
+import { useLocale } from "@/contexts/LocaleContext";
 import PageHeader from "@/components/PageHeader";
 import BilingualInput from "@/components/BilingualInput";
 
@@ -40,6 +41,7 @@ export default function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useLocale();
 
   // Form state
   const [showForm, setShowForm] = useState(false);
@@ -81,13 +83,13 @@ export default function CategoriesPage() {
       },
       (err) => {
         console.error("Failed to load categories:", err);
-        setError("Could not load categories. Please try again.");
+        setError(t.general.error);
         setLoading(false);
       }
     );
 
     return () => unsubscribe();
-  }, []);
+  }, [t.general.error]);
 
   // ---------------------------------------------------------------------------
   // Handlers
@@ -119,8 +121,8 @@ export default function CategoriesPage() {
 
   function validate(): boolean {
     const errors: FormErrors = {};
-    if (!formData.name_ar.trim()) errors.name_ar = "Arabic name is required";
-    if (!formData.name_en.trim()) errors.name_en = "English name is required";
+    if (!formData.name_ar.trim()) errors.name_ar = t.general.required;
+    if (!formData.name_en.trim()) errors.name_en = t.general.required;
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   }
@@ -146,7 +148,7 @@ export default function CategoriesPage() {
       closeForm();
     } catch (err) {
       console.error("Failed to save category:", err);
-      setError("Failed to save. Please try again.");
+      setError(t.general.error);
     } finally {
       setSaving(false);
     }
@@ -157,7 +159,7 @@ export default function CategoriesPage() {
       await deleteDoc(doc(db, "categories", id));
     } catch (err) {
       console.error("Failed to delete category:", err);
-      setError("Failed to delete. Please try again.");
+      setError(t.general.error);
     } finally {
       setDeletingId(null);
     }
@@ -170,15 +172,15 @@ export default function CategoriesPage() {
   return (
     <div>
       <PageHeader
-        title="Categories"
-        description="Manage product categories with bilingual names and display order."
+        title={t.catalog.categories.title}
+        description={t.catalog.categories.description}
         action={
           <button
             type="button"
             onClick={openAddForm}
             className="rounded-md bg-clay px-4 py-2 text-sm font-medium text-white hover:bg-clay-deep transition-colors"
           >
-            Add Category
+            {t.catalog.categories.addCategory}
           </button>
         }
       />
@@ -188,7 +190,7 @@ export default function CategoriesPage() {
         {showForm && (
           <div className="mb-6 rounded-lg border border-stone-200 bg-white p-6">
             <h2 className="mb-4 text-lg font-semibold text-ink">
-              {editingId ? "Edit Category" : "Add Category"}
+              {editingId ? t.catalog.categories.editCategory : t.catalog.categories.addCategory}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <BilingualInput
@@ -203,7 +205,7 @@ export default function CategoriesPage() {
 
               <div className="max-w-xs">
                 <label className="mb-1 block text-sm font-medium text-ink">
-                  Sort Order
+                  {t.catalog.categories.sortOrder}
                 </label>
                 <input
                   type="number"
@@ -224,14 +226,14 @@ export default function CategoriesPage() {
                   disabled={saving}
                   className="rounded-md bg-clay px-4 py-2 text-sm font-medium text-white hover:bg-clay-deep transition-colors disabled:opacity-50"
                 >
-                  {saving ? "Saving…" : editingId ? "Update" : "Create"}
+                  {saving ? t.general.loading : t.general.save}
                 </button>
                 <button
                   type="button"
                   onClick={closeForm}
                   className="rounded-md border border-stone-200 px-4 py-2 text-sm font-medium text-ink hover:bg-stone-50 transition-colors"
                 >
-                  Cancel
+                  {t.general.cancel}
                 </button>
               </div>
             </form>
@@ -281,27 +283,29 @@ function CategoriesList({
   onDeleteConfirm: (id: string) => void;
   onDeleteCancel: () => void;
 }) {
+  const { t } = useLocale();
+
   if (loading) {
-    return <p className="text-ink-soft">Loading categories…</p>;
+    return <p className="text-ink-soft">{t.general.loading}</p>;
   }
 
   if (categories.length === 0) {
     return (
       <div className="rounded-lg border border-stone-200 bg-white p-12 text-center">
-        <p className="text-ink-soft">No categories yet. Add one to get started.</p>
+        <p className="text-ink-soft">{t.catalog.categories.empty}</p>
       </div>
     );
   }
 
   return (
     <div className="overflow-hidden rounded-lg border border-stone-200 bg-white">
-      <table className="w-full text-left text-sm">
+      <table className="w-full text-sm">
         <thead className="border-b border-stone-200 bg-stone-50 text-xs uppercase tracking-wide text-ink-soft">
           <tr>
-            <th className="px-4 py-3 font-medium">Sort</th>
-            <th className="px-4 py-3 font-medium">Name (Arabic)</th>
-            <th className="px-4 py-3 font-medium">Name (English)</th>
-            <th className="px-4 py-3 font-medium text-right">Actions</th>
+            <th className="px-4 py-3 font-medium text-start">{t.catalog.categories.sortOrder}</th>
+            <th className="px-4 py-3 font-medium text-start">{t.catalog.categories.nameAr}</th>
+            <th className="px-4 py-3 font-medium text-start">{t.catalog.categories.nameEn}</th>
+            <th className="px-4 py-3 font-medium text-end">{t.general.actions}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-stone-100">
@@ -314,23 +318,23 @@ function CategoriesList({
                 {cat.name.ar}
               </td>
               <td className="px-4 py-3 text-ink">{cat.name.en}</td>
-              <td className="px-4 py-3 text-right">
+              <td className="px-4 py-3 text-end">
                 {deletingId === cat.id ? (
                   <span className="inline-flex items-center gap-2">
-                    <span className="text-xs text-clay-deep">Delete?</span>
+                    <span className="text-xs text-clay-deep">{t.catalog.categories.deleteConfirm}</span>
                     <button
                       type="button"
                       onClick={() => onDeleteConfirm(cat.id)}
                       className="rounded bg-clay-deep px-2 py-1 text-xs text-white hover:bg-clay-deep/80"
                     >
-                      Yes
+                      {t.general.yes}
                     </button>
                     <button
                       type="button"
                       onClick={onDeleteCancel}
                       className="rounded border border-stone-200 px-2 py-1 text-xs text-ink hover:bg-stone-50"
                     >
-                      No
+                      {t.general.no}
                     </button>
                   </span>
                 ) : (
@@ -340,14 +344,14 @@ function CategoriesList({
                       onClick={() => onEdit(cat)}
                       className="rounded px-2 py-1 text-xs text-clay hover:bg-stone-100"
                     >
-                      Edit
+                      {t.general.edit}
                     </button>
                     <button
                       type="button"
                       onClick={() => onDeleteRequest(cat.id)}
                       className="rounded px-2 py-1 text-xs text-clay-deep hover:bg-stone-100"
                     >
-                      Delete
+                      {t.general.delete}
                     </button>
                   </span>
                 )}

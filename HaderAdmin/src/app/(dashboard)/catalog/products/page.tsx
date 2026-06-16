@@ -7,6 +7,7 @@ import Image from "next/image";
 import { db } from "@/lib/firebase";
 import { type Product, type Category } from "@/lib/types";
 import { formatSar } from "@/lib/format";
+import { useLocale } from "@/contexts/LocaleContext";
 import PageHeader from "@/components/PageHeader";
 
 // ---------------------------------------------------------------------------
@@ -36,6 +37,7 @@ export default function ProductsListPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { t, locale } = useLocale();
 
   // Filter state
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -149,14 +151,14 @@ export default function ProductsListPage() {
   return (
     <div>
       <PageHeader
-        title="Products"
-        description="Manage your product catalog."
+        title={t.catalog.products.title}
+        description={t.catalog.products.description}
         action={
           <Link
             href="/catalog/products/new"
             className="rounded-md bg-clay px-4 py-2 text-sm font-medium text-white hover:bg-clay-deep transition-colors"
           >
-            Add Product
+            {t.catalog.products.addProduct}
           </Link>
         }
       />
@@ -170,10 +172,10 @@ export default function ProductsListPage() {
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="rounded-md border border-stone-200 bg-white px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-clay/40"
           >
-            <option value="all">All Categories</option>
+            <option value="all">{t.catalog.products.allCategories}</option>
             {categories.map((cat) => (
               <option key={cat.id} value={cat.id}>
-                {cat.name.en}
+                {locale === "ar" ? cat.name.ar : cat.name.en}
               </option>
             ))}
           </select>
@@ -183,7 +185,7 @@ export default function ProductsListPage() {
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by name (min 2 chars)…"
+            placeholder={t.catalog.products.searchPlaceholder}
             className="w-full max-w-xs rounded-md border border-stone-200 px-3 py-2 text-sm text-ink placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-clay/40"
           />
         </div>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { LocaleProvider } from "@/contexts/LocaleContext";
 
 export const metadata: Metadata = {
   title: "Hader Admin Dashboard",
@@ -13,9 +14,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    // Default to Arabic RTL; LocaleProvider will hydrate from localStorage on mount
+    <html lang="ar" dir="rtl">
       <body className="antialiased">
-        <AuthProvider>{children}</AuthProvider>
+        <LocaleProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </LocaleProvider>
       </body>
     </html>
   );

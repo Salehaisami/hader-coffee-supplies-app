@@ -27,3 +27,17 @@ body {
   color: var(--color-ink);
   font-family: var(--font-sans);
 }
+
+/* RTL-aware logical properties helpers */
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="ltr"] {
+  text-align: left;
+}
+
+/* Ensure tables and flex containers respect document direction natively */
+table {
+  text-align: start;
+}

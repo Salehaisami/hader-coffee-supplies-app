@@ -3,23 +3,24 @@
 import { useEffect, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLocale } from "@/contexts/LocaleContext";
 
 /**
  * Full-screen loading state shown while auth state and custom claims
  * are being resolved.
  */
 function GuardLoading() {
+  const { t } = useLocale();
   return (
     <main className="flex min-h-screen items-center justify-center bg-stone-50">
-      <p className="text-ink-soft">Loading...</p>
+      <p className="text-ink-soft">{t.general.loading}</p>
     </main>
   );
 }
 
 /**
  * Access Denied screen shown to authenticated users who lack the admin
- * custom claim. Per Phase1-Resolved-Decisions.md §10, non-admins must be
- * clearly blocked (not silently redirected).
+ * custom claim.
  */
 function AccessDenied({
   email,
@@ -28,6 +29,7 @@ function AccessDenied({
   email: string | null;
   onSignOut: () => void;
 }) {
+  const { t } = useLocale();
   return (
     <main className="flex min-h-screen items-center justify-center bg-stone-50 px-4">
       <div className="w-full max-w-md rounded-lg border border-stone-200 bg-white p-8 text-center shadow-sm">
@@ -47,25 +49,16 @@ function AccessDenied({
             />
           </svg>
         </div>
-        <h1 className="text-xl font-bold text-ink">Access Denied</h1>
-        <p className="mt-3 text-sm text-ink-soft">
-          This dashboard is for administrators only. Your account does not have
-          admin access.
-        </p>
+        <h1 className="text-xl font-bold text-ink">{t.auth.notAdmin.split(".")[0]}</h1>
+        <p className="mt-3 text-sm text-ink-soft">{t.auth.notAdmin}</p>
         {email && (
-          <p className="mt-2 text-xs text-stone-600">
-            Signed in as {email}
-          </p>
+          <p className="mt-2 text-xs text-stone-600" dir="ltr">{email}</p>
         )}
-        <p className="mt-4 text-xs text-stone-600">
-          If you believe this is a mistake, contact your administrator to have
-          admin access granted to your account.
-        </p>
         <button
           onClick={onSignOut}
           className="mt-6 w-full rounded-md bg-clay px-4 py-2 font-medium text-white transition-colors hover:bg-clay-deep"
         >
-          Sign Out
+          {t.nav.signOut}
         </button>
       </div>
     </main>
@@ -74,13 +67,6 @@ function AccessDenied({
 
 /**
  * Route protection wrapper for admin-only pages.
- *
- * Behavior:
- * - While auth/claims are resolving: shows a loading state.
- * - Unauthenticated users: redirected to /login.
- * - Authenticated non-admins: shown a clear "Access Denied" message with a
- *   sign-out button (never silently redirected).
- * - Authenticated admins: renders children.
  */
 export default function AdminGuard({ children }: { children: ReactNode }) {
   const { user, loading, isAdmin, signOut } = useAuth();
@@ -92,21 +78,17 @@ export default function AdminGuard({ children }: { children: ReactNode }) {
     }
   }, [user, loading, router]);
 
-  // Still resolving auth state / custom claims.
   if (loading) {
     return <GuardLoading />;
   }
 
-  // Unauthenticated — redirect is in flight, render nothing.
   if (!user) {
     return null;
   }
 
-  // Authenticated but not an admin — block with a clear message.
   if (!isAdmin) {
     return <AccessDenied email={user.email} onSignOut={signOut} />;
   }
 
-  // Authenticated admin — allow access.
   return <>{children}</>;
 }

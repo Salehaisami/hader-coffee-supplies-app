@@ -1,25 +1,33 @@
+"use client";
+
 import Link from "next/link";
 import PageHeader from "@/components/PageHeader";
-
-const CATALOG_SECTIONS = [
-  {
-    title: "Categories",
-    description: "Manage product categories with bilingual names and sort order.",
-    href: "/catalog/categories",
-  },
-  {
-    title: "Products",
-    description: "Add, edit, and manage products with variants and pricing.",
-    href: "/catalog/products",
-  },
-];
+import { useLocale } from "@/contexts/LocaleContext";
 
 export default function CatalogPage() {
+  const { t, isRTL } = useLocale();
+
+  const CATALOG_SECTIONS = [
+    {
+      title: t.catalog.categories.title,
+      description: t.catalog.categories.description,
+      href: "/catalog/categories",
+    },
+    {
+      title: t.catalog.products.title,
+      description: t.catalog.products.description,
+      href: "/catalog/products",
+    },
+  ];
+
+  // RTL arrow points left (←), LTR arrow points right (→)
+  const arrow = isRTL ? "←" : "→";
+
   return (
     <div>
       <PageHeader
-        title="Catalog"
-        description="Manage products, categories, and variants."
+        title={t.catalog.title}
+        description={t.catalog.description}
       />
       <div className="p-8">
         <div className="grid gap-4 sm:grid-cols-2">
@@ -36,7 +44,7 @@ export default function CatalogPage() {
                 {section.description}
               </p>
               <span className="mt-3 inline-block text-sm font-medium text-clay group-hover:text-clay-deep">
-                Manage →
+                {t.general.edit} {arrow}
               </span>
             </Link>
           ))}

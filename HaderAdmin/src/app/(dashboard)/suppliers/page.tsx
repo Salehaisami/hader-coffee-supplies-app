@@ -6,7 +6,6 @@ import {
   onSnapshot,
   orderBy,
   query,
-  addDoc,
   setDoc,
   updateDoc,
   deleteDoc,
@@ -15,6 +14,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { type Product, type Supplier } from "@/lib/types";
+import { useLocale } from "@/contexts/LocaleContext";
 import PageHeader from "@/components/PageHeader";
 
 // ---------------------------------------------------------------------------
@@ -42,6 +42,7 @@ export default function SuppliersPage() {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useLocale();
 
   // Form state
   const [showForm, setShowForm] = useState(false);
@@ -85,15 +86,15 @@ export default function SuppliersPage() {
       },
       (err) => {
         console.error("Failed to load suppliers:", err);
-        setError("Could not load suppliers. Please try again.");
+        setError(t.general.error);
         setLoading(false);
       }
     );
 
     return () => unsubscribe();
-  }, []);
+  }, [t.general.error]);
 
-  // Products listener — fetch products to determine supplier linkage
+  // Products listener
   useEffect(() => {
     const q = query(collection(db, "products"));
 
@@ -114,18 +115,16 @@ export default function SuppliersPage() {
     return () => unsubscribe();
   }, []);
 
-  // Build a map: supplierId -> list of product names (English)
+  // Build a map: supplierId -> list of product names
   const supplierProductMap = useMemo(() => {
     const map: Record<string, string[]> = {};
     for (const product of products) {
       const linkedIds = new Set<string>();
 
-      // Check top-level supplierId
       if (product.supplierId) {
         linkedIds.add(product.supplierId);
       }
 
-      // Check suppliers array if present (some products may have this)
       const suppliersArray = (product as unknown as Record<string, unknown>)["suppliers"];
       if (Array.isArray(suppliersArray)) {
         for (const entry of suppliersArray) {
@@ -139,7 +138,7 @@ export default function SuppliersPage() {
       for (const sid of linkedIds) {
         if (!map[sid]) map[sid] = [];
         const raw = product as unknown as Record<string, unknown>;
-        const name = (raw.name_en as string) || (raw.name as {en?: string})?.en || (raw.name_ar as string) || "Unnamed";
+        const name = (raw.name_en as string) || (raw.name as { en?: string })?.en || (raw.name_ar as string) || "Unnamed";
         map[sid].push(name);
       }
     }
@@ -177,9 +176,9 @@ export default function SuppliersPage() {
 
   function validate(): boolean {
     const errors: FormErrors = {};
-    if (!formData.name.trim()) errors.name = "Name is required";
-    if (!formData.phone.trim()) errors.phone = "Phone is required";
-    if (!formData.email.trim()) errors.email = "Email is required";
+    if (!formData.name.trim()) errors.name = t.general.required;
+    if (!formData.phone.trim()) errors.phone = t.general.required;
+    if (!formData.email.trim()) errors.email = t.general.required;
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   }
@@ -210,7 +209,7 @@ export default function SuppliersPage() {
       closeForm();
     } catch (err) {
       console.error("Failed to save supplier:", err);
-      setError("Failed to save. Please try again.");
+      setError(t.general.error);
     } finally {
       setSaving(false);
     }
@@ -221,7 +220,7 @@ export default function SuppliersPage() {
       await deleteDoc(doc(db, "suppliers", id));
     } catch (err) {
       console.error("Failed to delete supplier:", err);
-      setError("Failed to delete. Please try again.");
+      setError(t.general.error);
     } finally {
       setDeletingId(null);
     }
@@ -234,15 +233,15 @@ export default function SuppliersPage() {
   return (
     <div>
       <PageHeader
-        title="Suppliers"
-        description="Manage supplier contacts and what they handle."
+        title={t.suppliers.title}
+        description={t.suppliers.description}
         action={
           <button
             type="button"
             onClick={openAddForm}
             className="rounded-md bg-clay px-4 py-2 text-sm font-medium text-white hover:bg-clay-deep transition-colors"
           >
-            Add Supplier
+            {t.suppliers.addSupplier}
           </button>
         }
       />
@@ -252,39 +251,33 @@ export default function SuppliersPage() {
         {showForm && (
           <div className="mb-6 rounded-lg border border-stone-200 bg-white p-6">
             <h2 className="mb-4 text-lg font-semibold text-ink">
-              {editingId ? "Edit Supplier" : "Add Supplier"}
+              {editingId ? t.suppliers.editSupplier : t.suppliers.addSupplier}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Name */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-ink">
-                  Name <span className="text-clay-deep">*</span>
+                  {t.suppliers.name} <span className="text-clay-deep">*</span>
                 </label>
                 <input
                   type="text"
                   value={formData.name}
-                  onChange={(e) =>
-                    setFormData((p) => ({ ...p, name: e.target.value }))
-                  }
+                  onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
                   className="w-full rounded-md border border-stone-200 px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-clay/40"
-                  placeholder="Supplier name"
                 />
                 {formErrors.name && (
                   <p className="mt-1 text-xs text-clay-deep">{formErrors.name}</p>
                 )}
               </div>
 
-              {/* Phone */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-ink">
-                  Phone <span className="text-clay-deep">*</span>
+                  {t.suppliers.phone} <span className="text-clay-deep">*</span>
                 </label>
                 <input
                   type="text"
                   value={formData.phone}
-                  onChange={(e) =>
-                    setFormData((p) => ({ ...p, phone: e.target.value }))
-                  }
+                  onChange={(e) => setFormData((p) => ({ ...p, phone: e.target.value }))}
+                  dir="ltr"
                   className="w-full rounded-md border border-stone-200 px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-clay/40"
                   placeholder="+966 5x xxx xxxx"
                 />
@@ -293,38 +286,31 @@ export default function SuppliersPage() {
                 )}
               </div>
 
-              {/* Email */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-ink">
-                  Email <span className="text-clay-deep">*</span>
+                  {t.suppliers.email} <span className="text-clay-deep">*</span>
                 </label>
                 <input
                   type="email"
                   value={formData.email}
-                  onChange={(e) =>
-                    setFormData((p) => ({ ...p, email: e.target.value }))
-                  }
+                  onChange={(e) => setFormData((p) => ({ ...p, email: e.target.value }))}
+                  dir="ltr"
                   className="w-full rounded-md border border-stone-200 px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-clay/40"
-                  placeholder="supplier@example.com"
                 />
                 {formErrors.email && (
                   <p className="mt-1 text-xs text-clay-deep">{formErrors.email}</p>
                 )}
               </div>
 
-              {/* Handles Note */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-ink">
-                  Handles Note
+                  {t.suppliers.handlesNote}
                 </label>
                 <textarea
                   value={formData.handlesNote}
-                  onChange={(e) =>
-                    setFormData((p) => ({ ...p, handlesNote: e.target.value }))
-                  }
+                  onChange={(e) => setFormData((p) => ({ ...p, handlesNote: e.target.value }))}
                   rows={3}
                   className="w-full rounded-md border border-stone-200 px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-clay/40"
-                  placeholder="Categories or products this supplier covers…"
                 />
               </div>
 
@@ -334,28 +320,26 @@ export default function SuppliersPage() {
                   disabled={saving}
                   className="rounded-md bg-clay px-4 py-2 text-sm font-medium text-white hover:bg-clay-deep transition-colors disabled:opacity-50"
                 >
-                  {saving ? "Saving…" : editingId ? "Update" : "Create"}
+                  {saving ? t.general.loading : t.general.save}
                 </button>
                 <button
                   type="button"
                   onClick={closeForm}
                   className="rounded-md border border-stone-200 px-4 py-2 text-sm font-medium text-ink hover:bg-stone-50 transition-colors"
                 >
-                  Cancel
+                  {t.general.cancel}
                 </button>
               </div>
             </form>
           </div>
         )}
 
-        {/* Error banner */}
         {error && (
           <div className="mb-4 rounded-md bg-clay-deep/10 px-4 py-3 text-sm text-clay-deep">
             {error}
           </div>
         )}
 
-        {/* Suppliers list */}
         <SuppliersList
           suppliers={suppliers}
           loading={loading}
@@ -394,62 +378,62 @@ function SuppliersList({
   onDeleteConfirm: (id: string) => void;
   onDeleteCancel: () => void;
 }) {
+  const { t } = useLocale();
+
   if (loading) {
-    return <p className="text-ink-soft">Loading suppliers…</p>;
+    return <p className="text-ink-soft">{t.general.loading}</p>;
   }
 
   if (suppliers.length === 0) {
     return (
       <div className="rounded-lg border border-stone-200 bg-white p-12 text-center">
-        <p className="text-ink-soft">No suppliers yet. Add one to get started.</p>
+        <p className="text-ink-soft">{t.suppliers.empty}</p>
       </div>
     );
   }
 
   return (
     <div className="overflow-hidden rounded-lg border border-stone-200 bg-white">
-      <table className="w-full text-left text-sm">
+      <table className="w-full text-sm">
         <thead className="border-b border-stone-200 bg-stone-50 text-xs uppercase tracking-wide text-ink-soft">
           <tr>
-            <th className="px-4 py-3 font-medium">Name</th>
-            <th className="px-4 py-3 font-medium">Phone</th>
-            <th className="px-4 py-3 font-medium">Email</th>
-            <th className="px-4 py-3 font-medium">Handles</th>
-            <th className="px-4 py-3 font-medium">Linked Products</th>
-            <th className="px-4 py-3 font-medium text-right">Actions</th>
+            <th className="px-4 py-3 font-medium text-start">{t.suppliers.name}</th>
+            <th className="px-4 py-3 font-medium text-start">{t.suppliers.phone}</th>
+            <th className="px-4 py-3 font-medium text-start">{t.suppliers.email}</th>
+            <th className="px-4 py-3 font-medium text-start">{t.suppliers.handlesNote}</th>
+            <th className="px-4 py-3 font-medium text-start">{t.suppliers.linkedProducts}</th>
+            <th className="px-4 py-3 font-medium text-end">{t.general.actions}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-stone-100">
           {suppliers.map((supplier) => (
             <tr key={supplier.id} className="hover:bg-stone-50">
-              <td className="px-4 py-3 font-medium text-ink">
-                {supplier.name}
-              </td>
-              <td className="px-4 py-3 text-ink-soft">{supplier.phone}</td>
-              <td className="px-4 py-3 text-ink-soft">{supplier.email}</td>
+              <td className="px-4 py-3 font-medium text-ink">{supplier.name}</td>
+              <td className="px-4 py-3 text-ink-soft" dir="ltr">{supplier.phone}</td>
+              <td className="px-4 py-3 text-ink-soft" dir="ltr">{supplier.email}</td>
               <td className="px-4 py-3 text-ink-soft max-w-[200px] truncate">
                 {supplier.handlesNote || "—"}
               </td>
               <td className="px-4 py-3 text-ink-soft max-w-[200px]">
                 <LinkedProductsCell names={supplierProductMap[supplier.id] ?? []} />
               </td>
-              <td className="px-4 py-3 text-right">
+              <td className="px-4 py-3 text-end">
                 {deletingId === supplier.id ? (
                   <span className="inline-flex items-center gap-2">
-                    <span className="text-xs text-clay-deep">Delete?</span>
+                    <span className="text-xs text-clay-deep">{t.suppliers.deleteConfirm}</span>
                     <button
                       type="button"
                       onClick={() => onDeleteConfirm(supplier.id)}
                       className="rounded bg-clay-deep px-2 py-1 text-xs text-white hover:bg-clay-deep/80"
                     >
-                      Yes
+                      {t.general.yes}
                     </button>
                     <button
                       type="button"
                       onClick={onDeleteCancel}
                       className="rounded border border-stone-200 px-2 py-1 text-xs text-ink hover:bg-stone-50"
                     >
-                      No
+                      {t.general.no}
                     </button>
                   </span>
                 ) : (
@@ -459,14 +443,14 @@ function SuppliersList({
                       onClick={() => onEdit(supplier)}
                       className="rounded px-2 py-1 text-xs text-clay hover:bg-stone-100"
                     >
-                      Edit
+                      {t.general.edit}
                     </button>
                     <button
                       type="button"
                       onClick={() => onDeleteRequest(supplier.id)}
                       className="rounded px-2 py-1 text-xs text-clay-deep hover:bg-stone-100"
                     >
-                      Delete
+                      {t.general.delete}
                     </button>
                   </span>
                 )}
@@ -480,14 +464,14 @@ function SuppliersList({
 }
 
 // ---------------------------------------------------------------------------
-// Linked products cell — shows count and truncated names
+// Linked products cell
 // ---------------------------------------------------------------------------
 
 const MAX_DISPLAY_NAMES = 2;
 
 function LinkedProductsCell({ names }: { names: string[] }) {
   if (names.length === 0) {
-    return <span className="text-ink-soft/60">None</span>;
+    return <span className="text-ink-soft/60">—</span>;
   }
 
   const displayed = names.slice(0, MAX_DISPLAY_NAMES).join(", ");
@@ -495,10 +479,10 @@ function LinkedProductsCell({ names }: { names: string[] }) {
 
   return (
     <span className="text-ink-soft text-xs" title={names.join(", ")}>
-      <span className="font-medium text-ink">{names.length} product{names.length !== 1 ? "s" : ""}</span>
+      <span className="font-medium text-ink">{names.length}</span>
       <span className="block truncate max-w-[180px]">
         {displayed}
-        {remaining > 0 && `, +${remaining} more`}
+        {remaining > 0 && `, +${remaining}`}
       </span>
     </span>
   );
