@@ -1,0 +1,11 @@
+# Service account keys (sensitive)
+*.json
+!package.json
+!package-lock.json
+
+# Generated images (stored in Firebase Storage, not git)
+regenerated-images/
+.image-work/
+
+# Node modules
+node_modules/
