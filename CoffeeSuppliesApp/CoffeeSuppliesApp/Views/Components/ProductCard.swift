@@ -107,9 +107,9 @@ struct ProductCard: View {
         }
     }
 
-    /// Composite price string rendered LTR: "48 SAR / dozen"
+    /// Composite price string using localized format: "48 SAR / dozen" or "48 ر.س / دزينة"
     private var priceDisplayString: String {
-        "\(NumberFormatting.price(price)) SAR / \(pricingUnitLabel)"
+        L10n.pricePerUnit(price: NumberFormatting.price(price), unit: pricingUnitLabel)
     }
 }
 

@@ -19,7 +19,8 @@
 "product.made.to.order" = "مصنوع حسب الطلب";
 "product.made.to.order.note" = "هذا المنتج يُصنع حسب الطلب وقد يستغرق وقتاً إضافياً";
 "product.select.variant" = "اختر الحجم";
-"product.delivery.estimate" = "التوصيل خلال";
+"product.delivery.estimate" = "التوصيل خلال %@";
+"product.price.per.unit" = "%1$@ ر.س / %2$@";
 
 /* Cart */
 "cart.title" = "السلة";

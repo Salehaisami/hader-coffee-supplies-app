@@ -78,7 +78,7 @@ struct CodeVerificationView: View {
     @ViewBuilder
     private var resendView: some View {
         if viewModel.resendCountdown > 0 {
-            Text("\(L10n.resend) 0:\(String(format: "%02d", viewModel.resendCountdown))")
+            Text("\(L10n.resend) \u{2066}0:\(String(format: "%02d", viewModel.resendCountdown))\u{2069}")
                 .font(.appCaption)
                 .foregroundStyle(Color.secondaryText)
         } else {

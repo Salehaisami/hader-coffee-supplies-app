@@ -19,7 +19,8 @@
 "product.made.to.order" = "Made to Order";
 "product.made.to.order.note" = "This item is made to order and may take additional time";
 "product.select.variant" = "Select size";
-"product.delivery.estimate" = "Delivery in";
+"product.delivery.estimate" = "Delivery in %@";
+"product.price.per.unit" = "%1$@ SAR / %2$@";
 
 /* Cart */
 "cart.title" = "Cart";

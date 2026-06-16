@@ -38,7 +38,7 @@ struct OrderDetailView: View {
             .padding(Spacing.lg)
         }
         .background(Color.appBackground)
-        .navigationTitle("#\(order.id.prefix(8))")
+        .navigationTitle("\u{2066}#\(order.id.prefix(8))\u{2069}")
         .navigationBarTitleDisplayMode(.inline)
         .confirmationDialog(L10n.cancelOrderConfirm, isPresented: $showCancelConfirm, titleVisibility: .visible) {
             Button(L10n.cancelOrder, role: .destructive) { onCancel?() }
@@ -93,6 +93,7 @@ private extension OrderDetailView {
                         Text("×\(item.quantity) · \(item.pricingUnitLabel)")
                             .font(.appCaption)
                             .foregroundStyle(Color.secondaryText)
+                            .environment(\.layoutDirection, .leftToRight)
                     }
                     Spacer()
                     Text(NumberFormatting.priceWithCurrency(item.lineTotal))

@@ -78,7 +78,7 @@ final class ProductDetailViewModelTests: XCTestCase {
 
     func testDeliveryEstimate_ComesFromProduct() {
         let sut = ProductDetailViewModel(product: TestData.paperCupHot)
-        XCTAssertEqual(sut.deliveryEstimate, "2–4 days")
+        XCTAssertEqual(sut.deliveryEstimate, "\u{2068}2–4\u{2069} days")
     }
 
     func testMadeToOrder_FlagReflectsProduct() {

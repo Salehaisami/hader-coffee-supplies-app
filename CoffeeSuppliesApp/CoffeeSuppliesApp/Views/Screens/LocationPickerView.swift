@@ -91,6 +91,7 @@ private extension LocationPickerView {
                     Text("\(L10n.locationDistrict): \(district)")
                         .font(.appSubheadline)
                         .foregroundStyle(Color.secondaryText)
+                        .environment(\.layoutDirection, .rightToLeft)
                     Spacer()
                 }
                 .padding(.horizontal, Spacing.sm)

@@ -99,7 +99,7 @@ struct ProductDetailView: View {
             // Ledger-line price: rendered as a single LTR-isolated line to prevent
             // bidi reordering of numerals, "SAR", slash, and unit labels in RTL.
             VStack(alignment: .leading, spacing: 2) {
-                Text("\(NumberFormatting.price(viewModel.currentPrice)) SAR / \(viewModel.currentPricingUnitLabel)")
+                Text(L10n.pricePerUnit(price: NumberFormatting.price(viewModel.currentPrice), unit: viewModel.currentPricingUnitLabel))
                     .font(.appMonoPrice)
                     .foregroundStyle(Color.primaryText)
                     .environment(\.layoutDirection, .leftToRight)
@@ -138,7 +138,7 @@ struct ProductDetailView: View {
     private var deliveryAndStock: some View {
         HStack(spacing: Spacing.sm) {
             Label {
-                Text("\(L10n.deliveryEstimate) \(viewModel.deliveryEstimate)")
+                Text(L10n.deliveryEstimateFormatted(viewModel.deliveryEstimate))
                     .font(.appSubheadline)
                     .foregroundStyle(Color.secondaryText)
             } icon: {

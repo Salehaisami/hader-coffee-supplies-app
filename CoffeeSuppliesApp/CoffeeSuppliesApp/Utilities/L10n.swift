@@ -26,6 +26,18 @@ enum L10n {
     static var selectVariant: String { localized("product.select.variant") }
     static var deliveryEstimate: String { localized("product.delivery.estimate") }
 
+    /// Formatted delivery estimate: inserts the estimate value into the localized format string.
+    /// Uses String(format:) which respects BiDi ordering in RTL contexts.
+    static func deliveryEstimateFormatted(_ estimate: String) -> String {
+        String(format: localized("product.delivery.estimate"), estimate)
+    }
+
+    /// Formatted price per unit: "48 SAR / dozen" (en) or "48 ر.س / دزينة" (ar)
+    /// Uses positional format specifiers (%1$@, %2$@) for proper RTL/LTR reordering.
+    static func pricePerUnit(price: String, unit: String) -> String {
+        String(format: localized("product.price.per.unit"), price, unit)
+    }
+
     // MARK: - Cart
     static var cartTitle: String { localized("cart.title") }
     static var cartEmptyTitle: String { localized("cart.empty.title") }

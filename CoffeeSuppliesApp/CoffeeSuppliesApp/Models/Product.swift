@@ -112,11 +112,12 @@ struct DeliveryEstimate: Codable, Equatable {
     let unit: DeliveryUnit
 
     /// Localized display string: "2–4 أيام" (ar) or "2–4 days" (en)
+    /// Uses Unicode First Strong Isolate (FSI) to prevent BiDi reordering of the numeric range.
     var localizedString: String {
         if minValue == maxValue {
-            return "\(minValue) \(unit.localizedLabel)"
+            return "\u{2068}\(minValue)\u{2069} \(unit.localizedLabel)"
         }
-        return "\(minValue)–\(maxValue) \(unit.localizedLabel)"
+        return "\u{2068}\(minValue)–\(maxValue)\u{2069} \(unit.localizedLabel)"
     }
 }
 

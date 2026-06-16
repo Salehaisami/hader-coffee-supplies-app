@@ -80,6 +80,7 @@ private struct OrderRow: View {
                 Text("\(order.itemCount) \(itemsLabel) · \(NumberFormatting.priceWithCurrency(order.total))")
                     .font(.appCaption)
                     .foregroundStyle(Color.secondaryText)
+                    .environment(\.layoutDirection, .leftToRight)
             }
             Spacer()
             StatusPill(status: order.status)

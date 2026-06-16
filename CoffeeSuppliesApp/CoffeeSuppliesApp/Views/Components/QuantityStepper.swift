@@ -34,7 +34,8 @@ struct QuantityStepper: View {
                 .font(.appMonoPrice)
                 .foregroundStyle(Color.primaryText)
                 .frame(minWidth: 28)
-                .accessibilityLabel(LanguageManager.shared.resolve(ar: "الكمية: \(quantity)", en: "Quantity: \(quantity)"))
+                .accessibilityLabel(LanguageManager.shared.resolve(ar: "الكمية", en: "Quantity"))
+                .accessibilityValue("\(quantity)")
 
             // Increment
             Button {

@@ -180,8 +180,8 @@ private struct CartRow: View {
                     .foregroundStyle(Color.primaryText)
                     .lineLimit(2)
 
-                // Unit price — rendered LTR to prevent bidi reordering of numerals/slash
-                Text("\(NumberFormatting.price(item.unitPrice)) SAR / \(item.pricingUnitLabel)")
+                // Unit price — localized format handles RTL/LTR correctly
+                Text(L10n.pricePerUnit(price: NumberFormatting.price(item.unitPrice), unit: item.pricingUnitLabel))
                     .font(.appMonoSmall)
                     .foregroundStyle(Color.secondaryText)
                     .environment(\.layoutDirection, .leftToRight)
@@ -205,7 +205,8 @@ private struct CartRow: View {
             }
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(displayName), \(NumberFormatting.quantity(item.quantity))")
+        .accessibilityLabel(displayName)
+        .accessibilityValue("\(NumberFormatting.quantity(item.quantity))")
     }
 
     private var displayName: String {

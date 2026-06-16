@@ -20,7 +20,7 @@ struct OrderConfirmationView: View {
                     .font(.appTitle2)
                     .foregroundStyle(Color.primaryText)
 
-                Text("\(L10n.orderNumber) \(order.id.prefix(8))")
+                Text("\(L10n.orderNumber) \u{2066}\(order.id.prefix(8))\u{2069}")
                     .font(.appMonoSmall)
                     .foregroundStyle(Color.secondaryText)
 
