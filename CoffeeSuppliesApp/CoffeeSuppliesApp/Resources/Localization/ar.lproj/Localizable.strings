@@ -104,6 +104,7 @@
 "general.loading" = "جاري التحميل...";
 "general.no.network" = "لا يوجد اتصال بالإنترنت";
 "general.no.network.message" = "تحقق من اتصالك بالإنترنت وحاول مرة أخرى";
+"general.image.load.failed" = "تعذر تحميل الصورة";
 
 /* Onboarding */
 "onboarding.title.1" = "مستلزمات مقهاك بالجملة";

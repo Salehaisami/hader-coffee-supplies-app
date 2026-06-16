@@ -518,6 +518,7 @@
 				D09D1CAD6E75D290880AC49D /* FirebaseStorage */,
 				57AC5E8EC5B6301559E8CBD3 /* FirebaseFunctions */,
 				FF5AACEC53D5325BC4203CF8 /* FirebaseMessaging */,
+				AABB1122334455667788CCDD /* Kingfisher */,
 			);
 			productName = CoffeeSuppliesApp;
 			productReference = FE3DCA735271D6E2CB40A642 /* CoffeeSuppliesApp.app */;
@@ -588,6 +589,7 @@
 			packageReferences = (
 				63BFD512C53E929D372C62AD /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				8B80F832DB6753BBA57E1988 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
+				A1B2C3D4E5F6789012345678 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = EF6B72AA08A29BE305990DC8 /* Products */;
@@ -1048,6 +1050,14 @@
 				minimumVersion = 1.15.0;
 			};
 		};
+		A1B2C3D4E5F6789012345678 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1080,6 +1090,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 63BFD512C53E929D372C62AD /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseMessaging;
+		};
+		AABB1122334455667788CCDD /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A1B2C3D4E5F6789012345678 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

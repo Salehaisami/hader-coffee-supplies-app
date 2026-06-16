@@ -1,4 +1,5 @@
 import SwiftUI
+import Kingfisher
 
 /// Product detail screen: image, name/description, variant selector (when applicable),
 /// live price/stock/delivery, quantity stepper, made-to-order note, and a sticky add-to-cart bar.
@@ -59,26 +60,23 @@ struct ProductDetailView: View {
     private var productImage: some View {
         Group {
             if let url = viewModel.product.imageUrl, let imageUrl = URL(string: url) {
-                AsyncImage(url: imageUrl) { phase in
-                    switch phase {
-                    case .success(let image):
-                        image.resizable().scaledToFit()
-                    case .failure:
-                        placeholderImage
-                    case .empty:
+                KFImage(imageUrl)
+                    .retry(maxCount: 3, interval: .seconds(2))
+                    .placeholder {
                         ProgressView()
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    @unknown default:
-                        placeholderImage
                     }
-                }
+                    .onFailureImage(nil)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 placeholderImage
             }
         }
-        .frame(height: 240)
+        .frame(height: 280)
         .frame(maxWidth: .infinity)
-        .background(Color.stone100)
+        .clipped()
     }
 
     private var placeholderImage: some View {

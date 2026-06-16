@@ -1,4 +1,5 @@
 import SwiftUI
+import Kingfisher
 
 /// Product card component with image, name, ledger-line price, and add-to-cart button.
 /// Shows "from" prefix for variant items (lowest variant price).
@@ -13,42 +14,48 @@ struct ProductCard: View {
     let onAddToCart: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Spacing.xxs) {
-            // Image
+        VStack(alignment: .leading, spacing: 0) {
+            // Image — edge-to-edge, clipped by the card's rounded corners
             productImage
-                .frame(height: 120)
+                .frame(height: 140)
                 .frame(maxWidth: .infinity)
-                .background(Color.stone100)
-                .clipShape(RoundedRectangle(cornerRadius: Shape.cardRadius))
+                .clipped()
 
-            // Name
-            Text(name)
-                .font(.appSubheadline)
-                .foregroundStyle(Color.primaryText)
-                .lineLimit(2)
-                .multilineTextAlignment(.leading)
+            // Content area with padding
+            VStack(alignment: .leading, spacing: Spacing.xxs) {
+                // Name
+                Text(name)
+                    .font(.appSubheadline)
+                    .foregroundStyle(Color.primaryText)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.leading)
+                    .frame(minHeight: 40, alignment: .topLeading)
 
-            // Ledger price line
-            ledgerPriceLine
+                // Ledger price line
+                ledgerPriceLine
 
-            // Add to cart button or out-of-stock tag
-            if inStock {
-                Button(action: onAddToCart) {
-                    Text(L10n.addToCartShort)
-                        .font(.appCaption)
-                        .fontWeight(.medium)
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, Spacing.xxs)
-                        .background(Color.appAccent)
-                        .clipShape(RoundedRectangle(cornerRadius: Shape.cardRadius))
+                Spacer(minLength: 0)
+
+                // Add to cart button or out-of-stock tag
+                if inStock {
+                    Button(action: onAddToCart) {
+                        Text(L10n.addToCartShort)
+                            .font(.appCaption)
+                            .fontWeight(.medium)
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, Spacing.xxs)
+                            .background(Color.appAccent)
+                            .clipShape(RoundedRectangle(cornerRadius: Shape.cardRadius))
+                    }
+                    .accessibilityLabel(L10n.addToCart)
+                } else {
+                    OutOfStockTag()
                 }
-                .accessibilityLabel(L10n.addToCart)
-            } else {
-                OutOfStockTag()
             }
+            .padding(.horizontal, Spacing.xs)
+            .padding(.vertical, Spacing.xs)
         }
-        .padding(Spacing.xs)
         .background(Color.cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: Shape.cardRadius))
     }
@@ -58,21 +65,17 @@ struct ProductCard: View {
     @ViewBuilder
     private var productImage: some View {
         if let url = imageURL, let imageUrl = URL(string: url) {
-            AsyncImage(url: imageUrl) { phase in
-                switch phase {
-                case .success(let image):
-                    image
-                        .resizable()
-                        .scaledToFit()
-                case .failure:
-                    placeholderImage
-                case .empty:
+            KFImage(imageUrl)
+                .retry(maxCount: 3, interval: .seconds(2))
+                .onFailureImage(nil)
+                .placeholder {
                     ProgressView()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                @unknown default:
-                    placeholderImage
                 }
-            }
+                .onFailure { _ in }
+                .resizable()
+                .scaledToFill()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             placeholderImage
         }

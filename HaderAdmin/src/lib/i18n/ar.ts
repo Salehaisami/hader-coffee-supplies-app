@@ -8,8 +8,8 @@ export const ar: TranslationDictionary = {
   dir: "rtl",
 
   general: {
-    appName: "هادر أدمن",
-    appTagline: "مستلزمات القهوة",
+    appName: "Hader | حاضر",
+    appTagline: "لوحة التحكم",
     loading: "جاري التحميل...",
     error: "حدث خطأ",
     retry: "إعادة المحاولة",
@@ -44,8 +44,8 @@ export const ar: TranslationDictionary = {
   },
 
   auth: {
-    title: "هادر أدمن",
-    subtitle: "تسجيل الدخول لإدارة مستلزمات القهوة",
+    title: "حاضر",
+    subtitle: "تسجيل الدخول إلى لوحة التحكم",
     email: "البريد الإلكتروني",
     emailPlaceholder: "admin@hader.sa",
     password: "كلمة المرور",

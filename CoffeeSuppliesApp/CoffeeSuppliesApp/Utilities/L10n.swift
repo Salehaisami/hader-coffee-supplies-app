@@ -120,6 +120,7 @@ enum L10n {
     static var loading: String { localized("general.loading") }
     static var noNetwork: String { localized("general.no.network") }
     static var noNetworkMessage: String { localized("general.no.network.message") }
+    static var imageLoadFailed: String { localized("general.image.load.failed") }
 
     // MARK: - Onboarding
     static var onboardingTitle1: String { localized("onboarding.title.1") }

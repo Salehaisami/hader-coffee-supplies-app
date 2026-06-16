@@ -104,6 +104,7 @@
 "general.loading" = "Loading...";
 "general.no.network" = "No Internet Connection";
 "general.no.network.message" = "Check your internet connection and try again";
+"general.image.load.failed" = "Image could not be loaded";
 
 /* Onboarding */
 "onboarding.title.1" = "Bulk supplies for your cafe";

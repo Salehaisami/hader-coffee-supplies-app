@@ -7,8 +7,8 @@ export const en: TranslationDictionary = {
   dir: "ltr",
 
   general: {
-    appName: "Hader Admin",
-    appTagline: "Coffee Supplies",
+    appName: "Hader | حاضر",
+    appTagline: "Admin Console",
     loading: "Loading...",
     error: "An error occurred",
     retry: "Retry",
@@ -43,8 +43,8 @@ export const en: TranslationDictionary = {
   },
 
   auth: {
-    title: "Hader Admin",
-    subtitle: "Sign in to manage your coffee supplies",
+    title: "Hader",
+    subtitle: "Sign in to admin console",
     email: "Email",
     emailPlaceholder: "admin@hader.sa",
     password: "Password",

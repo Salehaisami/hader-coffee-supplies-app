@@ -56,6 +56,9 @@ struct ShopView: View {
             }
             .padding(.vertical, Spacing.sm)
         }
+        .refreshable {
+            await viewModel.loadCatalog()
+        }
     }
 
     private var categoryChips: some View {

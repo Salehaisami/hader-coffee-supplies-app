@@ -30,6 +30,7 @@ struct CoffeeSuppliesApp: App {
                 .environment(\.layoutDirection, languageManager.layoutDirection)
                 .environment(\.locale, languageManager.locale)
                 .environment(languageManager)
+                .preferredColorScheme(.light)
         }
     }
 }
