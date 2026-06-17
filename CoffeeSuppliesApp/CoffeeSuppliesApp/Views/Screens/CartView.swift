@@ -96,6 +96,8 @@ struct CartView: View {
 
             checkoutBar
         }
+        .frame(maxWidth: 700)
+        .frame(maxWidth: .infinity)
     }
 
     private func binding(for item: CartItem) -> Binding<Int> {

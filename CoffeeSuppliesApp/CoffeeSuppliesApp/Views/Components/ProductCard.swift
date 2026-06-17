@@ -14,11 +14,17 @@ struct ProductCard: View {
     let onAddToCart: () -> Void
     var onTapCard: (() -> Void)?
 
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
+    private var imageHeight: CGFloat {
+        horizontalSizeClass == .regular ? 220 : 140
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Image — edge-to-edge, clipped by the card's rounded corners
             productImage
-                .frame(height: 140)
+                .frame(height: imageHeight)
                 .frame(maxWidth: .infinity)
                 .clipped()
 

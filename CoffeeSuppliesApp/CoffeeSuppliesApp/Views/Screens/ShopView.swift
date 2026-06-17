@@ -10,8 +10,11 @@ struct ShopView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     private var columns: [GridItem] {
-        let count = horizontalSizeClass == .regular ? 3 : 2
-        return Array(repeating: GridItem(.flexible(), spacing: Spacing.xs), count: count)
+        let spacing: CGFloat = horizontalSizeClass == .regular ? Spacing.md : Spacing.sm
+        return [
+            GridItem(.flexible(), spacing: spacing),
+            GridItem(.flexible(), spacing: spacing),
+        ]
     }
 
     init(firestoreService: FirestoreServiceProtocol) {
@@ -94,7 +97,10 @@ struct ShopView: View {
     }
 
     private var productGrid: some View {
-        LazyVGrid(columns: columns, spacing: Spacing.xs) {
+        let gridSpacing: CGFloat = horizontalSizeClass == .regular ? Spacing.md : Spacing.xs
+        let gridPadding: CGFloat = horizontalSizeClass == .regular ? Spacing.xl : Spacing.sm
+
+        return LazyVGrid(columns: columns, spacing: gridSpacing) {
             ForEach(viewModel.filteredProducts) { product in
                 ProductCard(
                     name: product.localizedName,
@@ -113,7 +119,7 @@ struct ShopView: View {
                 )
             }
         }
-        .padding(.horizontal, Spacing.sm)
+        .padding(.horizontal, gridPadding)
     }
 
     // MARK: - Empty / Error States
