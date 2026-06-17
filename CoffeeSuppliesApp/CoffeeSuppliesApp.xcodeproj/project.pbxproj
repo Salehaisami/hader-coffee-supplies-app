@@ -38,6 +38,7 @@
 		56E8118C3AA54011BD5F23B7 /* OrdersViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90FA80E73FC8B1FB9605D41 /* OrdersViewModelTests.swift */; };
 		59C08E939E275D05B16B5717 /* Order.swift in Sources */ = {isa = PBXBuildFile; fileRef = A86B259EB650BE15930AD560 /* Order.swift */; };
 		5DED6887B0A24C9F521C587C /* PaymentServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 125692FB89FF7335B2303452 /* PaymentServiceProtocol.swift */; };
+		605FC9BAE54C808BCF0CBA13 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BE82DF8BC0BA8AAD68AB69 /* AppDelegate.swift */; };
 		60B78C0D4A1723EBCFEBDE4C /* ProductCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8823D4CCDEAA4838B8388C /* ProductCard.swift */; };
 		620E41B2879C94CC6295FAE4 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464415CAE63A933C2C561C2A /* User.swift */; };
 		624992FBCBEC6B4466C7ACEE /* CoffeeSuppliesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 422A2309C9C2AA4215693E71 /* CoffeeSuppliesApp.swift */; };
@@ -63,13 +64,12 @@
 		9AC071C5BB542030029876C4 /* CoffeeSuppliesAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40363DB9ED92F531EF747B09 /* CoffeeSuppliesAppUITests.swift */; };
 		9CCEDD7C6B91291C29A9F6BF /* CartStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7A2D0443CBFB2E90DBCC25 /* CartStoreTests.swift */; };
 		9EA5128473DD2DF5AD64230A /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = D09D1CAD6E75D290880AC49D /* FirebaseStorage */; };
-		A23C66FC2FE2121800318124 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = AABB1122334455667788CCDD /* Kingfisher */; };
-		A23C66FE2FE2136400318124 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A23C66FD2FE2136400318124 /* Assets.xcassets */; };
 		A4B2757C97D4A3CDEC0A3563 /* OrdersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B734F7B4389709F1D89B6CA /* OrdersView.swift */; };
 		A5D56AD8DBEE55A0D76725D1 /* AuthServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E85F799FA5F2B8CD28E37B /* AuthServiceProtocol.swift */; };
 		A8B2A853B6643F07E745D970 /* MockFirestoreService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476CE83C6EC178FCFE5C5CA7 /* MockFirestoreService.swift */; };
 		AAE68116E96905056A86C895 /* CodeVerificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 447F9DD9917BAFD2CF0F3213 /* CodeVerificationView.swift */; };
 		AB6408E9CCFFA1844B9A5F7C /* NumberFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A82870101D65F3BACEE209F /* NumberFormattingTests.swift */; };
+		AB6E86D04A5F9FFE4C324EE3 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 76450075CAA138280BA41159 /* Kingfisher */; };
 		AB983D71A19D0A53E5C93913 /* OrderTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7371B971B007FFB140C0EED7 /* OrderTracker.swift */; };
 		B0BF5C4D53092C758D9DA914 /* Font+Tokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = F783CC163A2A1529A9D6DA3C /* Font+Tokens.swift */; };
 		B0DA372E98A70957B9051F2E /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 714CE731C8471FE6664A7B9B /* Localizable.strings */; };
@@ -81,6 +81,7 @@
 		BAD8C4286FA57C55CE36123D /* AuthViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34EF8186295CB9C720C930C0 /* AuthViewModelTests.swift */; };
 		BD3FDD8BD8ADA39E85415A63 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A529783DD91F5CB46B018D36 /* OnboardingView.swift */; };
 		BE71F06B75297C82EBECC0EE /* AccountViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12A7E09CE7FCD45CE13608DE /* AccountViewModelTests.swift */; };
+		C2A9099B864C701174459F3D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 990B332A68A03A4D79060049 /* Assets.xcassets */; };
 		C3E6F0918AA65042D610DB82 /* FirestoreServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21AE23435ED55440272F9AB8 /* FirestoreServiceProtocol.swift */; };
 		C4888442F24DE98B08EBB5B5 /* ProductDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E952BB273B126D1415F2EA8 /* ProductDetailView.swift */; };
 		C71DE3A6ACFD4BD2BB52DC9B /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A288727FC8A8A227309CCC70 /* AuthViewModel.swift */; };
@@ -127,6 +128,7 @@
 
 /* Begin PBXFileReference section */
 		0317425441F6D83637820BB9 /* CartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartView.swift; sourceTree = "<group>"; };
+		05BE82DF8BC0BA8AAD68AB69 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		069B13EE5CB1FCAC705F55E0 /* ProductDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDetailViewModel.swift; sourceTree = "<group>"; };
 		081161AB3589C95EFD3EFE80 /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
 		0CDE0A90F25449BDB7D62F30 /* LocationPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPickerView.swift; sourceTree = "<group>"; };
@@ -184,6 +186,7 @@
 		9465729F6B20D519F144A4E2 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
 		9651DB16E7D33D978B0AF8C7 /* StorageServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageServiceProtocol.swift; sourceTree = "<group>"; };
 		96D9D99BE732D660C4F8EFFA /* GoogleService-Info-Dev.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GoogleService-Info-Dev.plist"; sourceTree = "<group>"; };
+		990B332A68A03A4D79060049 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9A02CBFEECE3B825514F1C12 /* JeddahGeofenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JeddahGeofenceTests.swift; sourceTree = "<group>"; };
 		9A5CF35B5128D25D760FEA0C /* FirebaseAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseAuthService.swift; sourceTree = "<group>"; };
 		9A82870101D65F3BACEE209F /* NumberFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberFormattingTests.swift; sourceTree = "<group>"; };
@@ -191,7 +194,6 @@
 		9E0D55933F39C643A34E290C /* PrimaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryButton.swift; sourceTree = "<group>"; };
 		9E952BB273B126D1415F2EA8 /* ProductDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDetailView.swift; sourceTree = "<group>"; };
 		A104C4A4781B368EF2535364 /* MessagingServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagingServiceProtocol.swift; sourceTree = "<group>"; };
-		A23C66FD2FE2136400318124 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A288727FC8A8A227309CCC70 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		A529783DD91F5CB46B018D36 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		A5298B53243CA22725AA44C5 /* OrderModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderModelTests.swift; sourceTree = "<group>"; };
@@ -233,12 +235,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A23C66FC2FE2121800318124 /* Kingfisher in Frameworks */,
 				2082A276F691F8147DF0465B /* FirebaseFirestore in Frameworks */,
 				0781F7BD8C1C90913C353FFC /* FirebaseAuth in Frameworks */,
 				9EA5128473DD2DF5AD64230A /* FirebaseStorage in Frameworks */,
 				3C4B84C21260467B30A34600 /* FirebaseFunctions in Frameworks */,
 				36FBF7667B5D24D49F86BDDC /* FirebaseMessaging in Frameworks */,
+				AB6E86D04A5F9FFE4C324EE3 /* Kingfisher in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -386,7 +388,7 @@
 		4F1148B710DC44E5F0AF142D /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				A23C66FD2FE2136400318124 /* Assets.xcassets */,
+				990B332A68A03A4D79060049 /* Assets.xcassets */,
 				96D9D99BE732D660C4F8EFFA /* GoogleService-Info-Dev.plist */,
 				C353833E1F8CF07C3E1DCCAF /* GoogleService-Info-Prod.plist */,
 				F0921748C5EAD3F4821842CF /* GoogleService-Info.plist */,
@@ -435,6 +437,7 @@
 		926DE31EC6A81C3150F9F443 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				05BE82DF8BC0BA8AAD68AB69 /* AppDelegate.swift */,
 				5BCDE3AD68D99F8DF7D3953D /* CoffeeSuppliesApp.entitlements */,
 				422A2309C9C2AA4215693E71 /* CoffeeSuppliesApp.swift */,
 				5A28C2235CD355597F866FC9 /* ContentView.swift */,
@@ -523,7 +526,7 @@
 				D09D1CAD6E75D290880AC49D /* FirebaseStorage */,
 				57AC5E8EC5B6301559E8CBD3 /* FirebaseFunctions */,
 				FF5AACEC53D5325BC4203CF8 /* FirebaseMessaging */,
-				AABB1122334455667788CCDD /* Kingfisher */,
+				76450075CAA138280BA41159 /* Kingfisher */,
 			);
 			productName = CoffeeSuppliesApp;
 			productReference = FE3DCA735271D6E2CB40A642 /* CoffeeSuppliesApp.app */;
@@ -593,8 +596,8 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				63BFD512C53E929D372C62AD /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				46EAC9C008E8104C20AD393A /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				8B80F832DB6753BBA57E1988 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
-				A1B2C3D4E5F6789012345678 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = EF6B72AA08A29BE305990DC8 /* Products */;
@@ -613,6 +616,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C2A9099B864C701174459F3D /* Assets.xcassets in Resources */,
 				6BF5CDE1129EA8A55C82060A /* Fraunces-Regular.ttf in Resources */,
 				4DFB2B1D7AD50AC307BAC8EE /* GoogleService-Info-Dev.plist in Resources */,
 				490AB4D73CD54CAED9F05B37 /* GoogleService-Info-Prod.plist in Resources */,
@@ -623,7 +627,6 @@
 				B30122A66A02C86912D5D5BD /* IBMPlexSansArabic-Regular.ttf in Resources */,
 				71A978B28BD6806E5DC9676F /* IBMPlexSansArabic-SemiBold.ttf in Resources */,
 				B855C07ECE7B88C6A96BD848 /* InfoPlist.strings in Resources */,
-				A23C66FE2FE2136400318124 /* Assets.xcassets in Resources */,
 				B0DA372E98A70957B9051F2E /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -645,6 +648,7 @@
 			files = (
 				EB1D9FF001779F7D8F6ED021 /* AccountView.swift in Sources */,
 				7F919875E0CB090B8AADFF94 /* AccountViewModel.swift in Sources */,
+				605FC9BAE54C808BCF0CBA13 /* AppDelegate.swift in Sources */,
 				8EB319B379272C34AEFAF753 /* ApplePayService.swift in Sources */,
 				B10FE4C60EC69ACBA04ADA99 /* AuthFlowView.swift in Sources */,
 				A5D56AD8DBEE55A0D76725D1 /* AuthServiceProtocol.swift in Sources */,
@@ -880,7 +884,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = CoffeeSuppliesApp/App/CoffeeSuppliesApp.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
@@ -919,7 +922,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = CoffeeSuppliesApp/App/CoffeeSuppliesApp.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
@@ -1042,6 +1044,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		46EAC9C008E8104C20AD393A /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
 		63BFD512C53E929D372C62AD /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
@@ -1056,14 +1066,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 1.15.0;
-			};
-		};
-		A1B2C3D4E5F6789012345678 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 8.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -1084,9 +1086,9 @@
 			package = 63BFD512C53E929D372C62AD /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAuth;
 		};
-		AABB1122334455667788CCDD /* Kingfisher */ = {
+		76450075CAA138280BA41159 /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A1B2C3D4E5F6789012345678 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			package = 46EAC9C008E8104C20AD393A /* XCRemoteSwiftPackageReference "Kingfisher" */;
 			productName = Kingfisher;
 		};
 		D09D1CAD6E75D290880AC49D /* FirebaseStorage */ = {

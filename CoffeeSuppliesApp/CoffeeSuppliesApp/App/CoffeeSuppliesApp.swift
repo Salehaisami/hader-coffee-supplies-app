@@ -3,6 +3,7 @@ import FirebaseCore
 
 @main
 struct CoffeeSuppliesApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @State private var languageManager = LanguageManager.shared
 
     init() {
