@@ -4,20 +4,22 @@ import SwiftUI
 /// Category chips, product grid with "from" pricing, search, and empty/no-results states.
 struct ShopView: View {
     @State private var viewModel: ShopViewModel
+    @State private var navigationPath = NavigationPath()
     @Environment(LanguageManager.self) private var languageManager
     @Environment(CartStore.self) private var cart
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
-    private let columns = [
-        GridItem(.flexible(), spacing: Spacing.xs),
-        GridItem(.flexible(), spacing: Spacing.xs),
-    ]
+    private var columns: [GridItem] {
+        let count = horizontalSizeClass == .regular ? 3 : 2
+        return Array(repeating: GridItem(.flexible(), spacing: Spacing.xs), count: count)
+    }
 
     init(firestoreService: FirestoreServiceProtocol) {
         _viewModel = State(wrappedValue: ShopViewModel(firestoreService: firestoreService))
     }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationPath) {
             Group {
                 if viewModel.isLoading {
                     ProgressView()
@@ -33,6 +35,15 @@ struct ShopView: View {
             .navigationTitle(L10n.shopTab)
             .background(Color.appBackground)
             .searchable(text: Bindable(viewModel).searchText, prompt: L10n.searchPlaceholder)
+            .navigationDestination(for: String.self) { productId in
+                if let product = viewModel.filteredProducts.first(where: { $0.id == productId })
+                    ?? viewModel.products.first(where: { $0.id == productId }) {
+                    ProductDetailView(viewModel: ProductDetailViewModel(
+                        product: product,
+                        onAddToCart: { cart.add($0) }
+                    ))
+                }
+            }
         }
         .task {
             await viewModel.loadCatalog()
@@ -85,26 +96,21 @@ struct ShopView: View {
     private var productGrid: some View {
         LazyVGrid(columns: columns, spacing: Spacing.xs) {
             ForEach(viewModel.filteredProducts) { product in
-                NavigationLink {
-                    ProductDetailView(viewModel: ProductDetailViewModel(
-                        product: product,
-                        onAddToCart: { cart.add($0) }
-                    ))
-                } label: {
-                    ProductCard(
-                        name: product.localizedName,
-                        imageURL: product.imageUrl,
-                        categoryIcon: nil,
-                        price: product.displayPrice,
-                        pricingUnitLabel: product.localizedPricingUnitLabel,
-                        hasVariants: product.hasVariants,
-                        inStock: product.isAvailable,
-                        onAddToCart: {
-                            cart.add(CartItem(product: product, variant: product.defaultVariant))
-                        }
-                    )
-                }
-                .buttonStyle(.plain)
+                ProductCard(
+                    name: product.localizedName,
+                    imageURL: product.imageUrl,
+                    categoryIcon: nil,
+                    price: product.displayPrice,
+                    pricingUnitLabel: product.localizedPricingUnitLabel,
+                    hasVariants: product.hasVariants,
+                    inStock: product.isAvailable,
+                    onAddToCart: {
+                        cart.add(CartItem(product: product, variant: product.defaultVariant))
+                    },
+                    onTapCard: {
+                        navigationPath.append(product.id)
+                    }
+                )
             }
         }
         .padding(.horizontal, Spacing.sm)

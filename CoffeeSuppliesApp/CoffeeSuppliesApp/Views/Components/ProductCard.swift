@@ -12,6 +12,7 @@ struct ProductCard: View {
     let hasVariants: Bool
     let inStock: Bool
     let onAddToCart: () -> Void
+    var onTapCard: (() -> Void)?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -38,7 +39,9 @@ struct ProductCard: View {
 
                 // Add to cart button or out-of-stock tag
                 if inStock {
-                    Button(action: onAddToCart) {
+                    Button {
+                        onAddToCart()
+                    } label: {
                         Text(L10n.addToCartShort)
                             .font(.appCaption)
                             .fontWeight(.medium)
@@ -48,6 +51,7 @@ struct ProductCard: View {
                             .background(Color.appAccent)
                             .clipShape(RoundedRectangle(cornerRadius: Shape.cardRadius))
                     }
+                    .buttonStyle(.borderless)
                     .accessibilityLabel(L10n.addToCart)
                 } else {
                     OutOfStockTag()
@@ -58,6 +62,10 @@ struct ProductCard: View {
         }
         .background(Color.cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: Shape.cardRadius))
+        .contentShape(RoundedRectangle(cornerRadius: Shape.cardRadius))
+        .onTapGesture {
+            onTapCard?()
+        }
     }
 
     // MARK: - Subviews

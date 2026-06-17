@@ -1,4 +1,5 @@
 import SwiftUI
+import Kingfisher
 
 /// Cart tab: line items with quantity edit/remove, subtotal, and a sticky checkout CTA.
 /// Checkout routes guests through sign-in first. Empty cart shows a directional state.
@@ -165,13 +166,8 @@ private struct CartRow: View {
 
     var body: some View {
         HStack(spacing: Spacing.sm) {
-            // Image placeholder
-            Image(systemName: "cup.and.saucer")
-                .font(.system(size: 24))
-                .foregroundStyle(Color.stone400)
-                .frame(width: 56, height: 56)
-                .background(Color.stone100)
-                .clipShape(RoundedRectangle(cornerRadius: Shape.inputRadius))
+            // Product image
+            cartItemImage
 
             VStack(alignment: .leading, spacing: Spacing.xxxs) {
                 // Name + variant label
@@ -207,6 +203,32 @@ private struct CartRow: View {
         .accessibilityElement(children: .combine)
         .accessibilityLabel(displayName)
         .accessibilityValue("\(NumberFormatting.quantity(item.quantity))")
+    }
+
+    @ViewBuilder
+    private var cartItemImage: some View {
+        if let url = item.imageUrl, let imageUrl = URL(string: url) {
+            KFImage(imageUrl)
+                .retry(maxCount: 2, interval: .seconds(1))
+                .placeholder {
+                    imagePlaceholder
+                }
+                .resizable()
+                .scaledToFill()
+                .frame(width: 56, height: 56)
+                .clipShape(RoundedRectangle(cornerRadius: Shape.inputRadius))
+        } else {
+            imagePlaceholder
+        }
+    }
+
+    private var imagePlaceholder: some View {
+        Image(systemName: "cup.and.saucer")
+            .font(.system(size: 24))
+            .foregroundStyle(Color.stone400)
+            .frame(width: 56, height: 56)
+            .background(Color.stone100)
+            .clipShape(RoundedRectangle(cornerRadius: Shape.inputRadius))
     }
 
     private var displayName: String {

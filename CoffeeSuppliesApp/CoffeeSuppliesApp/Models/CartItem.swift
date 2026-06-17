@@ -11,6 +11,7 @@ struct CartItem: Identifiable, Equatable {
     let unitPrice: Double
     let costPrice: Double?
     let pricingUnitLabel: String
+    let imageUrl: String?
     var quantity: Int
 
     init(
@@ -21,6 +22,7 @@ struct CartItem: Identifiable, Equatable {
         unitPrice: Double,
         costPrice: Double? = nil,
         pricingUnitLabel: String,
+        imageUrl: String? = nil,
         quantity: Int
     ) {
         self.productId = productId
@@ -30,6 +32,7 @@ struct CartItem: Identifiable, Equatable {
         self.unitPrice = unitPrice
         self.costPrice = costPrice
         self.pricingUnitLabel = pricingUnitLabel
+        self.imageUrl = imageUrl
         self.quantity = quantity
     }
 
@@ -58,6 +61,7 @@ extension CartItem {
             unitPrice: variant?.sellPrice ?? product.sellPrice,
             costPrice: variant?.costPrice ?? product.activeSupplier?.costPrice,
             pricingUnitLabel: variant?.localizedPricingUnitLabel ?? product.localizedPricingUnitLabel,
+            imageUrl: product.imageUrl,
             quantity: quantity
         )
     }
