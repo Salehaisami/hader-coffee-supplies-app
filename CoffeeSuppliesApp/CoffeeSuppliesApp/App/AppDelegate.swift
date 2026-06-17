@@ -1,4 +1,5 @@
 import UIKit
+import FirebaseCore
 import FirebaseAuth
 
 /// AppDelegate to handle APNs token forwarding for Firebase Phone Auth.
@@ -8,6 +9,25 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
+        // Configure Firebase before anything else
+        #if DEBUG
+        if let path = Bundle.main.path(forResource: "GoogleService-Info-Dev", ofType: "plist"),
+           let options = FirebaseOptions(contentsOfFile: path) {
+            FirebaseApp.configure(options: options)
+        } else {
+            FirebaseApp.configure()
+        }
+        #else
+        if let path = Bundle.main.path(forResource: "GoogleService-Info-Prod", ofType: "plist"),
+           let options = FirebaseOptions(contentsOfFile: path) {
+            FirebaseApp.configure(options: options)
+        } else {
+            FirebaseApp.configure()
+        }
+        #endif
+
+        // Register for remote notifications so Firebase can receive APNs token for phone auth
+        application.registerForRemoteNotifications()
         return true
     }
 
@@ -16,6 +36,14 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
         Auth.auth().setAPNSToken(deviceToken, type: .unknown)
+    }
+
+    func application(
+        _ application: UIApplication,
+        didFailToRegisterForRemoteNotificationsWithError error: Error
+    ) {
+        // Push registration failed (expected on simulator).
+        // Firebase will fall back to reCAPTCHA verification.
     }
 
     func application(

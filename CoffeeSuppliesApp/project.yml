@@ -36,6 +36,8 @@ targets:
         CURRENT_PROJECT_VERSION: "1"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         CODE_SIGN_ENTITLEMENTS: CoffeeSuppliesApp/App/CoffeeSuppliesApp.entitlements
+        DEVELOPMENT_TEAM: KHHNUYST98
+        CODE_SIGN_STYLE: Automatic
       configs:
         Debug:
           SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
