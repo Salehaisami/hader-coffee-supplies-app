@@ -3,11 +3,16 @@ import SwiftUI
 /// Order detail: 3-step status tracker, line items, delivery address with Google Maps link,
 /// payment info, and cancel button (only for pending orders).
 struct OrderDetailView: View {
-    let order: Order
+    @State private var order: Order
     /// Cancel callback. Nil if cancellation isn't allowed (non-pending orders).
     var onCancel: (() -> Void)?
 
     @State private var showCancelConfirm = false
+
+    init(order: Order, onCancel: (() -> Void)?) {
+        _order = State(initialValue: order)
+        self.onCancel = onCancel
+    }
 
     var body: some View {
         ScrollView {
@@ -41,7 +46,15 @@ struct OrderDetailView: View {
         .navigationTitle("\u{2066}#\(order.id.prefix(8))\u{2069}")
         .navigationBarTitleDisplayMode(.inline)
         .confirmationDialog(L10n.cancelOrderConfirm, isPresented: $showCancelConfirm, titleVisibility: .visible) {
-            Button(L10n.cancelOrder, role: .destructive) { onCancel?() }
+            Button(L10n.cancelOrder, role: .destructive) {
+                onCancel?()
+                order = Order(
+                    id: order.id, customerId: order.customerId, businessName: order.businessName,
+                    deliveryAddress: order.deliveryAddress, items: order.items, subtotal: order.subtotal,
+                    total: order.total, paymentMethod: order.paymentMethod, paymentStatus: order.paymentStatus,
+                    status: .cancelled, supplierId: order.supplierId, createdAt: order.createdAt, updatedAt: Date()
+                )
+            }
             Button(L10n.cancel, role: .cancel) { }
         }
     }

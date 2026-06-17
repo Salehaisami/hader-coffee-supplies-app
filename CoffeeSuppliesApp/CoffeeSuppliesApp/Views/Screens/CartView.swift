@@ -12,17 +12,23 @@ struct CartView: View {
     let firestoreService: FirestoreServiceProtocol?
     let paymentService: PaymentServiceProtocol
     let locationService: LocationServiceProtocol
+    var switchToShop: (() -> Void)?
+    var switchToOrders: (() -> Void)?
 
     init(
         authService: AuthServiceProtocol,
         firestoreService: FirestoreServiceProtocol? = nil,
         paymentService: PaymentServiceProtocol = ApplePayService(),
-        locationService: LocationServiceProtocol = SystemLocationService()
+        locationService: LocationServiceProtocol = SystemLocationService(),
+        switchToShop: (() -> Void)? = nil,
+        switchToOrders: (() -> Void)? = nil
     ) {
         self.authService = authService
         self.firestoreService = firestoreService
         self.paymentService = paymentService
         self.locationService = locationService
+        self.switchToShop = switchToShop
+        self.switchToOrders = switchToOrders
     }
 
     var body: some View {
@@ -66,9 +72,8 @@ struct CartView: View {
                 ),
                 locationService: locationService,
                 onOrderPlaced: { _ in
-                    // Cart is cleared by the view model; return to the (now empty) cart.
-                    // T4.4 replaces this with navigation to the order confirmation screen.
                     showCheckout = false
+                    switchToOrders?()
                 }
             )
         }
@@ -141,8 +146,7 @@ struct CartView: View {
             message: L10n.cartEmptyMessage,
             actionTitle: L10n.browseSupplies,
             action: {
-                // Switch to Shop tab — notify parent via notification or tab binding
-                // For now, the user can tap the Shop tab directly
+                switchToShop?()
             }
         )
     }

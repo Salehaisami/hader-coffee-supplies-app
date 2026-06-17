@@ -31,6 +31,21 @@ struct LocationPickerView: View {
         .navigationTitle(L10n.locationTitle)
         .navigationBarTitleDisplayMode(.inline)
         .task { await viewModel.start() }
+        .onChange(of: viewModel.pinnedCoordinate.latitude) { _, _ in
+            moveCameraToPin()
+        }
+        .onChange(of: viewModel.pinnedCoordinate.longitude) { _, _ in
+            moveCameraToPin()
+        }
+    }
+
+    private func moveCameraToPin() {
+        withAnimation {
+            cameraPosition = .region(MKCoordinateRegion(
+                center: viewModel.pinnedCoordinate,
+                span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+            ))
+        }
     }
 }
 

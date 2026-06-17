@@ -36,6 +36,7 @@ struct AccountView: View {
                 )
             }
         }
+        .id(languageManager.currentLanguage)
     }
 
     // MARK: - Signed In Content
@@ -137,7 +138,9 @@ struct AccountView: View {
                     .font(.appCaption)
                     .foregroundStyle(Color.stone400)
             }
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
         .accessibilityLabel(title)
     }
 
