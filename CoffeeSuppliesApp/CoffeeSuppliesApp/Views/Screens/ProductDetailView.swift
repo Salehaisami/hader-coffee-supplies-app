@@ -66,7 +66,7 @@ struct ProductDetailView: View {
                         ProgressView()
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
-                    .onFailureImage(nil)
+                    
                     .resizable()
                     .scaledToFill()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -261,6 +261,7 @@ private struct VariantChip: View {
     }
 }
 
+#if DEBUG
 #Preview("With Variants") {
     NavigationStack {
         ProductDetailView(viewModel: ProductDetailViewModel(product: .previewWithVariants))
@@ -274,3 +275,4 @@ private struct VariantChip: View {
     }
     .environment(LanguageManager.shared)
 }
+#endif

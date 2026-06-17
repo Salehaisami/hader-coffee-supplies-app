@@ -67,7 +67,7 @@ struct ProductCard: View {
         if let url = imageURL, let imageUrl = URL(string: url) {
             KFImage(imageUrl)
                 .retry(maxCount: 3, interval: .seconds(2))
-                .onFailureImage(nil)
+                
                 .placeholder {
                     ProgressView()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)

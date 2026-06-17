@@ -217,6 +217,7 @@ private struct CartRow: View {
     }
 }
 
+#if DEBUG
 #Preview("With Items") {
     let cart = CartStore()
     cart.add(CartItem(product: .previewWithVariants, variant: Product.previewWithVariants.defaultVariant, quantity: 3))
@@ -231,3 +232,4 @@ private struct CartRow: View {
         .environment(CartStore())
         .environment(LanguageManager.shared)
 }
+#endif
