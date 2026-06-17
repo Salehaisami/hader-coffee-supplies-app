@@ -51,5 +51,12 @@ CoffeeSuppliesApp/firebase/pubsub-debug.log
 .vscode/
 .idea/
 
+# Generated/scratch assets
+scripts/logo-options/
+scripts/regenerated-images/
+
+# Service account keys
+*-adminsdk-*.json
+
 # Misc
 *.log
