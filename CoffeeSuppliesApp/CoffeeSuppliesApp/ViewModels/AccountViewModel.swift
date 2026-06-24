@@ -85,4 +85,9 @@ final class AccountViewModel {
             await fetchUser(userId: userId)
         }
     }
+
+    func refreshUser() async {
+        guard case .signedIn(let userId) = authService.currentState else { return }
+        await fetchUser(userId: userId)
+    }
 }

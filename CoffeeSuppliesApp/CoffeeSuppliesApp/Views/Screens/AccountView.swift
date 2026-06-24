@@ -62,7 +62,14 @@ struct AccountView: View {
             Section {
                 if let user = viewModel.user, let firestoreService {
                     NavigationLink {
-                        BusinessDetailsEditView(user: user, firestoreService: firestoreService)
+                        BusinessDetailsEditView(
+                            user: user,
+                            firestoreService: firestoreService,
+                            onSave: {
+                                // Re-fetch user profile after save so the data stays current
+                                Task { await viewModel.refreshUser() }
+                            }
+                        )
                     } label: {
                         menuLabel(icon: "building.2", title: L10n.businessDetails)
                     }

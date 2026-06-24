@@ -32,7 +32,6 @@ struct LocationPickerView: View {
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await viewModel.start()
-            // After auto-locate or saved location geocode, move camera to the resolved pin
             setCameraToPin()
         }
     }

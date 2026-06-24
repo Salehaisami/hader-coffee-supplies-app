@@ -3,7 +3,7 @@ import MapKit
 import CoreLocation
 
 /// Edit screen for business profile: name, contact, email, and delivery location.
-/// Location shows a static mini-map of the saved address with an option to update.
+/// Location shows a static map snapshot of the saved address with an option to update.
 struct BusinessDetailsEditView: View {
     @State private var businessName: String
     @State private var contactName: String
@@ -18,11 +18,13 @@ struct BusinessDetailsEditView: View {
     private let userId: String
     private let firestoreService: FirestoreServiceProtocol
     private let locationService: LocationServiceProtocol
+    private let onSave: (() -> Void)?
 
-    init(user: AppUser, firestoreService: FirestoreServiceProtocol, locationService: LocationServiceProtocol = SystemLocationService()) {
+    init(user: AppUser, firestoreService: FirestoreServiceProtocol, locationService: LocationServiceProtocol = SystemLocationService(), onSave: (() -> Void)? = nil) {
         self.userId = user.id
         self.firestoreService = firestoreService
         self.locationService = locationService
+        self.onSave = onSave
         _businessName = State(initialValue: user.businessName)
         _contactName = State(initialValue: user.contactName)
         _email = State(initialValue: user.email ?? "")
@@ -67,22 +69,27 @@ struct BusinessDetailsEditView: View {
             // Delivery location section
             Section {
                 if let coordinate = deliveryCoordinate {
-                    // Mini-map showing saved location
-                    Map(initialPosition: .region(MKCoordinateRegion(
-                        center: coordinate,
-                        span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
-                    ))) {
-                        Marker("", coordinate: coordinate)
-                            .tint(Color.appAccent)
-                    }
-                    .frame(height: 150)
-                    .clipShape(RoundedRectangle(cornerRadius: Shape.inputRadius))
-                    .allowsHitTesting(false)
+                    // Static map snapshot showing saved location
+                    MiniMapSnapshotView(coordinate: coordinate)
+                        .frame(height: 150)
+                        .clipShape(RoundedRectangle(cornerRadius: Shape.inputRadius))
 
-                    // Coordinate display
-                    Text("\(coordinate.latitude, specifier: "%.4f"), \(coordinate.longitude, specifier: "%.4f")")
-                        .font(.appMonoSmall)
-                        .foregroundStyle(Color.secondaryText)
+                    // Google Maps link
+                    if let mapsURL = URL(string: "https://www.google.com/maps/search/?api=1&query=\(coordinate.latitude),\(coordinate.longitude)") {
+                        Link(destination: mapsURL) {
+                            HStack(spacing: Spacing.xxs) {
+                                Image(systemName: "map")
+                                    .foregroundStyle(Color.appAccent)
+                                Text(viewOnMapLabel)
+                                    .font(.appSubheadline)
+                                    .foregroundStyle(Color.appAccent)
+                                Spacer()
+                                Image(systemName: "arrow.up.forward")
+                                    .font(.appCaption)
+                                    .foregroundStyle(Color.stone400)
+                            }
+                        }
+                    }
                 } else {
                     Text(noLocationSaved)
                         .font(.appBody)
@@ -126,14 +133,15 @@ struct BusinessDetailsEditView: View {
                 }
             }
         }
-        .navigationDestination(isPresented: $showLocationPicker) {
-            LocationPickerView(
-                viewModel: LocationPickerViewModel(
-                    locationService: locationService,
-                    initialCoordinate: deliveryCoordinate ?? JeddahGeofence.center
-                ),
-                onConfirm: { coordinate, _ in
-                    deliveryCoordinate = coordinate
+        .fullScreenCover(isPresented: $showLocationPicker) {
+            LocationPickerCoverView(
+                locationService: locationService,
+                initialCoordinate: deliveryCoordinate ?? JeddahGeofence.center,
+                onConfirm: { coordinate in
+                    self.deliveryCoordinate = coordinate
+                    showLocationPicker = false
+                },
+                onCancel: {
                     showLocationPicker = false
                 }
             )
@@ -174,6 +182,7 @@ struct BusinessDetailsEditView: View {
                 documentId: userId,
                 fields: fields
             )
+            onSave?()
             dismiss()
         } catch {
             errorMessage = error.localizedDescription
@@ -206,5 +215,8 @@ struct BusinessDetailsEditView: View {
     }
     private var updateLocationLabel: String {
         languageManager.resolve(ar: "تحديث الموقع", en: "Update Location")
+    }
+    private var viewOnMapLabel: String {
+        languageManager.resolve(ar: "عرض على الخريطة", en: "View on Map")
     }
 }
