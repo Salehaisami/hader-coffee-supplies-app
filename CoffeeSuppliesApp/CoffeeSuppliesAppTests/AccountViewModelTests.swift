@@ -94,4 +94,24 @@ final class AccountViewModelTests: XCTestCase {
         XCTAssertNil(sut.user)
         XCTAssertFalse(sut.isLoading)
     }
+
+    // MARK: - Refresh User
+
+    func testRefreshUser_WhenSignedIn_RefetchesProfile() async {
+        mockAuth.currentState = .signedIn(userId: TestData.sampleUser.id)
+        mockFirestore.seedDocument(TestData.sampleUser, collection: "users", documentId: TestData.sampleUser.id)
+
+        await sut.refreshUser()
+
+        XCTAssertNotNil(sut.user)
+        XCTAssertEqual(sut.user?.id, TestData.sampleUser.id)
+    }
+
+    func testRefreshUser_WhenSignedOut_DoesNothing() async {
+        mockAuth.currentState = .signedOut
+
+        await sut.refreshUser()
+
+        XCTAssertNil(sut.user)
+    }
 }

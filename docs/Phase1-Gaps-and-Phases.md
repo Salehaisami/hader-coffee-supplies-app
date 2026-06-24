@@ -2,37 +2,31 @@
 
 ---
 
-## Part 1: Phase 1 Gaps (Must Fix Before/During App Store Review)
+## Part 1: Phase 1 Gaps — ✅ ALL RESOLVED
 
-### 🔴 App Store Blockers
+All App Store blockers and UX gaps have been addressed.
 
-| # | Issue | Risk | Notes |
-|---|---|---|---|
-| 1 | **No account deletion** | Rejection | Apple guideline 5.1.1(v) — any app that creates accounts must offer deletion. Need a "Delete my account" button + backend logic to purge user data. |
-| 2 | **No privacy policy in-app** | Rejection | We have one hosted on GitHub Pages, but there's no link to it from within the app. Apple expects it accessible from the app itself. |
-| 3 | **Dead menu items in Account** | Rejection risk | 4 menu items (Business Details, Delivery Location, Order History, Help) visibly exist but do nothing when tapped. Reviewers test every button. |
-| 4 | **No privacy manifest (PrivacyInfo.xcprivacy)** | Rejection | Required for iOS 17+ apps. Declares what APIs you use and why (UserDefaults, location, etc.). |
+### 🔴 App Store Blockers — FIXED
 
-### 🟡 Incomplete Features (UX Gaps)
-
-| # | Issue | Impact |
+| # | Issue | Resolution |
 |---|---|---|
-| 5 | **No profile edit screen** | User can't update business name, contact name, or email after initial sign-up |
-| 6 | **No delivery location editor** | Can't update saved delivery pin from the account menu (only during checkout) |
-| 7 | **No help/contact screen** | No way for users to reach support |
-| 8 | **Order History menu item** | Redundant with the Orders tab — should either navigate there or be removed |
+| 1 | **No account deletion** | ✅ `DeleteAccountView` — full flow with confirmation, Firestore cleanup, and Auth deletion |
+| 2 | **No privacy policy in-app** | ✅ Accessible from Help screen in Account menu |
+| 3 | **Dead menu items in Account** | ✅ All wired to real screens; Order History removed (redundant with tab) |
+| 4 | **No privacy manifest** | ✅ `PrivacyInfo.xcprivacy` added declaring all API usage reasons |
 
-### Summary of Work Needed
+### 🟡 UX Gaps — FIXED
 
-| Screen / Feature | Effort |
-|---|---|
-| Account Deletion flow (button + confirmation + Firestore/Auth cleanup) | Medium |
-| Privacy Policy link in Account | Small |
-| PrivacyInfo.xcprivacy manifest | Small |
-| Business Details Edit screen | Small-Medium |
-| Delivery Location Edit screen (reuse LocationPicker) | Small |
-| Help/Contact screen (static content + email link) | Small |
-| Wire Order History → Orders tab | Trivial |
+| # | Issue | Resolution |
+|---|---|---|
+| 5 | **No profile edit screen** | ✅ `BusinessDetailsEditView` — edit name, contact, email + delivery location with mini-map |
+| 6 | **No delivery location editor** | ✅ Merged into Business Details screen with `LocationPickerCoverView` + `MiniMapSnapshotView` |
+| 7 | **No help/contact screen** | ✅ `HelpView` — support email link + privacy policy link + app version |
+| 8 | **Order History menu item** | ✅ Removed (redundant with Orders tab) |
+
+### Architecture Note: Location Picker in Modal Context
+
+The location picker uses a `LocationPickerCoverView` wrapper that owns its `LocationPickerViewModel` as `@State`. This prevents SwiftUI's `.fullScreenCover` body re-evaluations from recreating the ViewModel (which would reset the user's pin coordinate). The mini-map uses `MKMapSnapshotter` instead of an interactive `Map` widget to avoid MapKit lifecycle issues in non-interactive contexts.
 
 ---
 
@@ -73,11 +67,7 @@
 
 ## Recommended Execution Order
 
-**Now (before next TestFlight / App Store submission):**
-1. Account deletion
-2. Privacy manifest
-3. Privacy policy link in-app
-4. Wire up or remove dead menu items (Business Details edit, Location edit, Help, Order History)
+**Phase 1 gaps:** ✅ Complete — all items shipped.
 
 **Phase 2 (post-launch, first 3-6 months):**
 - Start with automated routing + WhatsApp confirmations (biggest ops relief)
