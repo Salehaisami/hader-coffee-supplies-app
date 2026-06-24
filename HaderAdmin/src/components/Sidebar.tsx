@@ -100,7 +100,7 @@ const NAV_ITEMS: NavItem[] = [
  * Persistent sidebar for the admin dashboard. Renders brand, navigation,
  * language toggle, and signed-in admin info. Adapts positioning for RTL/LTR.
  */
-export default function Sidebar() {
+export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const { user, signOut } = useAuth();
   const { t } = useLocale();
@@ -126,6 +126,7 @@ export default function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={onNavigate}
               aria-current={active ? "page" : undefined}
               className={`flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${
                 active

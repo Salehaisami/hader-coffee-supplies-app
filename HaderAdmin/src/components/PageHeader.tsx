@@ -14,9 +14,9 @@ export default function PageHeader({
   action?: ReactNode;
 }) {
   return (
-    <header className="flex items-start justify-between gap-4 border-b border-stone-200 bg-white px-8 py-6">
+    <header className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4 border-b border-stone-200 bg-white px-4 sm:px-8 py-4 sm:py-6">
       <div>
-        <h1 className="text-2xl font-bold text-ink">{title}</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-ink">{title}</h1>
         {description && <p className="mt-1 text-sm text-ink-soft">{description}</p>}
       </div>
       {action && <div className="shrink-0">{action}</div>}

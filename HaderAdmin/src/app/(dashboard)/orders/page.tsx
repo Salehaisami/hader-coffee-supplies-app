@@ -80,15 +80,15 @@ export default function OrdersPage() {
         title={t.orders.title}
         description={t.orders.description}
       />
-      <div className="p-8">
+      <div className="p-4 sm:p-8">
         {/* Status filter tabs */}
-        <div className="mb-4 flex gap-1 rounded-lg bg-stone-100 p-1 w-fit">
+        <div className="mb-4 flex gap-1 rounded-lg bg-stone-100 p-1 w-fit overflow-x-auto">
           {(Object.keys(STATUS_FILTER_LABELS) as StatusFilter[]).map((key) => (
             <button
               key={key}
               type="button"
               onClick={() => setStatusFilter(key)}
-              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+              className={`whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                 statusFilter === key
                   ? "bg-white text-ink shadow-sm"
                   : "text-ink-soft hover:text-ink"
@@ -133,8 +133,8 @@ function OrdersContent({
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-stone-200 bg-white">
-      <table className="w-full text-sm" dir="auto">
+    <div className="overflow-x-auto rounded-lg border border-stone-200 bg-white">
+      <table className="w-full min-w-[700px] text-sm" dir="auto">
         <thead className="border-b border-stone-200 bg-stone-50 text-xs uppercase tracking-wide text-ink-soft">
           <tr>
             <th className="px-4 py-3 font-medium text-start">{t.orders.table.order}</th>

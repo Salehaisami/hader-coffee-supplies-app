@@ -45,7 +45,7 @@ The app is the easy part; the manual operation behind it is where most real risk
 *These are outside what's been planned and worth a deliberate look; not legal advice.*
 1. **Payment/business registration in KSA** — you mentioned gateways may need government registration. Confirm what's required to take payments commercially, even via Apple Pay.
 2. **Privacy / PDPL.** Saudi Arabia's Personal Data Protection Law applies to collecting personal data (names, phones, location). A privacy policy and compliant handling/consent are likely needed before launch.
-3. **App Store requirements.** Apple requires a privacy policy, accurate data-use disclosures, and a working account-deletion path — plan for these.
+3. **App Store requirements.** Apple requires a privacy policy, accurate data-use disclosures, and a working account-deletion path — plan for these. *(Privacy policy created and hosted; see Phase1-Deployment-Guide.md §5.)*
 4. **Location data handling.** Capturing precise coordinates raises consent/storage obligations; align with the permission prompts and policy.
 5. **Terms of service / delivery terms** — especially around COD, cancellations, and delivery promises.
 
