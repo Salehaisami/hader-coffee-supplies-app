@@ -88,7 +88,7 @@ export default function CustomersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
 
   // Action state
   const [confirming, setConfirming] = useState<ConfirmingAction | null>(null);
@@ -408,7 +408,7 @@ function CustomersContent({
   onActionConfirm: (customerId: string, targetStatus: UserStatus) => void;
   onActionCancel: () => void;
 }) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
 
   if (loading) {
     return <p className="text-ink-soft">{t.general.loading}</p>;
@@ -455,7 +455,7 @@ function CustomersContent({
                   <CustomerStatusBadge status={customer.status} />
                 </td>
                 <td className="px-4 py-3 text-ink-soft" dir="ltr">
-                  {formatTimestamp(customer.createdAt)}
+                  {formatTimestamp(customer.createdAt, locale)}
                 </td>
                 <td className="px-4 py-3">
                   {!isConfirming && !isUpdating && (

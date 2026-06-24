@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { getNextStatus, getStatusActionLabel, getStatusConfirmMessage } from "./orderStatus";
+import { en } from "./i18n/en";
 
 describe("getNextStatus", () => {
   it("returns sent_to_supplier when current status is pending", () => {
@@ -21,23 +22,23 @@ describe("getNextStatus", () => {
 
 describe("getStatusActionLabel", () => {
   it("returns correct label for sent_to_supplier", () => {
-    expect(getStatusActionLabel("sent_to_supplier")).toBe("Mark Sent to Supplier");
+    expect(getStatusActionLabel("sent_to_supplier", en)).toBe("Mark Sent to Supplier");
   });
 
   it("returns correct label for delivered", () => {
-    expect(getStatusActionLabel("delivered")).toBe("Mark Delivered");
+    expect(getStatusActionLabel("delivered", en)).toBe("Mark Delivered");
   });
 });
 
 describe("getStatusConfirmMessage", () => {
   it("returns confirmation message for sent_to_supplier", () => {
-    expect(getStatusConfirmMessage("sent_to_supplier")).toBe(
+    expect(getStatusConfirmMessage("sent_to_supplier", en)).toBe(
       "Are you sure you want to mark this order as Sent to Supplier?"
     );
   });
 
   it("returns confirmation message for delivered", () => {
-    expect(getStatusConfirmMessage("delivered")).toBe(
+    expect(getStatusConfirmMessage("delivered", en)).toBe(
       "Are you sure you want to mark this order as Delivered?"
     );
   });

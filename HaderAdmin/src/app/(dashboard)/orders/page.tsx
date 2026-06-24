@@ -114,7 +114,7 @@ function OrdersContent({
   loading: boolean;
   error: string | null;
 }) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
 
   if (loading) {
     return <p className="text-ink-soft">{t.general.loading}</p>;
@@ -174,7 +174,7 @@ function OrdersContent({
                 <td className="px-4 py-3 text-ink-soft" dir="ltr">
                   {formatNumber(itemCount)}
                 </td>
-                <td className="px-4 py-3 text-ink" dir="ltr">{formatSar(order.total)}</td>
+                <td className="px-4 py-3 text-ink" dir="ltr">{formatSar(order.total, locale)}</td>
                 <td className="px-4 py-3 text-ink-soft">
                   {t.orders.payment[order.paymentMethod as keyof typeof t.orders.payment] ??
                     order.paymentMethod}
@@ -183,7 +183,7 @@ function OrdersContent({
                   <StatusPill status={order.status} />
                 </td>
                 <td className="px-4 py-3 text-ink-soft" dir="ltr">
-                  {formatTimestamp(order.createdAt)}
+                  {formatTimestamp(order.createdAt, locale)}
                 </td>
                 <td className="px-4 py-3">
                   <a

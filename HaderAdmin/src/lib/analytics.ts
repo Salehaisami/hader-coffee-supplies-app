@@ -110,14 +110,16 @@ export interface SupplierBreakdown {
  * sorted by revenue descending.
  *
  * Orders without a `supplierId` (or with null/empty value) are grouped under
- * "Unassigned".
+ * the provided `unassignedLabel`.
  *
  * @param orders    - The full list of orders to aggregate.
  * @param suppliers - The list of suppliers used to resolve names from IDs.
+ * @param labels    - Localized labels for unassigned/unknown suppliers.
  */
 export function computeOrdersBySupplier(
   orders: Order[],
-  suppliers: Supplier[]
+  suppliers: Supplier[],
+  labels: { unassigned: string; unknownSupplier: string } = { unassigned: "Unassigned", unknownSupplier: "Unknown Supplier" }
 ): SupplierBreakdown[] {
   const supplierNameMap = new Map<string, string>();
   for (const s of suppliers) {
@@ -140,8 +142,8 @@ export function computeOrdersBySupplier(
   for (const [key, data] of aggregation.entries()) {
     const supplierName =
       key === "__unassigned__"
-        ? "Unassigned"
-        : supplierNameMap.get(key) ?? "Unknown Supplier";
+        ? labels.unassigned
+        : supplierNameMap.get(key) ?? labels.unknownSupplier;
     results.push({ supplierName, orderCount: data.orderCount, revenue: data.revenue });
   }
 

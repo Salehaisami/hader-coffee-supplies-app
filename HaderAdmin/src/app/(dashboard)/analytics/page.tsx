@@ -22,7 +22,7 @@ export default function AnalyticsPage() {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
 
   useEffect(() => {
     const ordersQuery = query(
@@ -71,7 +71,10 @@ export default function AnalyticsPage() {
 
   const metrics = computeOrderMetrics(orders);
   const topProducts = computeTopProducts(orders);
-  const supplierBreakdown = computeOrdersBySupplier(orders, suppliers);
+  const supplierBreakdown = computeOrdersBySupplier(orders, suppliers, {
+    unassigned: t.analytics.unassigned,
+    unknownSupplier: t.analytics.unknownSupplier,
+  });
   const profitEstimate = computeEstimatedProfit(orders);
 
   return (
@@ -93,7 +96,7 @@ export default function AnalyticsPage() {
               />
               <SummaryCard
                 label={t.analytics.totalRevenue}
-                value={formatSar(metrics.totalRevenue)}
+                value={formatSar(metrics.totalRevenue, locale)}
               />
               <SummaryCard
                 label={t.analytics.ordersByStatus}
@@ -131,7 +134,7 @@ export default function AnalyticsPage() {
                     {t.analytics.estimatedProfit}
                   </p>
                   <p className="mt-2 text-3xl font-bold text-clay" dir="ltr">
-                    {formatSar(profitEstimate.estimatedProfit)}
+                    {formatSar(profitEstimate.estimatedProfit, locale)}
                   </p>
                   <p className="mt-2 text-xs text-ink-soft">
                     {formatNumber(profitEstimate.itemsWithCostData)} / {formatNumber(profitEstimate.totalItems)}
@@ -194,7 +197,7 @@ export default function AnalyticsPage() {
                             {product.name}
                           </span>
                           <span className="text-sm font-semibold text-ink" dir="ltr">
-                            {formatSar(product.revenue)}
+                            {formatSar(product.revenue, locale)}
                           </span>
                         </li>
                       ))}
@@ -240,7 +243,7 @@ export default function AnalyticsPage() {
                             {formatNumber(entry.orderCount)}
                           </td>
                           <td className="px-6 py-3 font-semibold text-ink" dir="ltr">
-                            {formatSar(entry.revenue)}
+                            {formatSar(entry.revenue, locale)}
                           </td>
                         </tr>
                       ))}

@@ -1,4 +1,5 @@
 import { type OrderStatus } from "./types";
+import { type TranslationDictionary } from "./i18n/types";
 
 /**
  * Returns the next valid status in the order lifecycle, or null if the
@@ -21,25 +22,25 @@ export function getNextStatus(currentStatus: OrderStatus): OrderStatus | null {
 }
 
 /** Human-readable label for a status transition button. */
-export function getStatusActionLabel(nextStatus: OrderStatus): string {
+export function getStatusActionLabel(nextStatus: OrderStatus, t: TranslationDictionary): string {
   switch (nextStatus) {
     case "sent_to_supplier":
-      return "Mark Sent to Supplier";
+      return t.statusActions.markSentToSupplier;
     case "delivered":
-      return "Mark Delivered";
+      return t.statusActions.markDelivered;
     default:
-      return `Mark ${nextStatus}`;
+      return t.orders.status[nextStatus] ?? nextStatus;
   }
 }
 
 /** Confirmation prompt text for advancing to a given status. */
-export function getStatusConfirmMessage(nextStatus: OrderStatus): string {
+export function getStatusConfirmMessage(nextStatus: OrderStatus, t: TranslationDictionary): string {
   switch (nextStatus) {
     case "sent_to_supplier":
-      return "Are you sure you want to mark this order as Sent to Supplier?";
+      return t.statusActions.confirmSentToSupplier;
     case "delivered":
-      return "Are you sure you want to mark this order as Delivered?";
+      return t.statusActions.confirmDelivered;
     default:
-      return `Are you sure you want to change the status to ${nextStatus}?`;
+      return t.orders.confirmStatusChange;
   }
 }

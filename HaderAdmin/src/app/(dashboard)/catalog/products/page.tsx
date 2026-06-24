@@ -15,12 +15,12 @@ import PageHeader from "@/components/PageHeader";
 // ---------------------------------------------------------------------------
 
 /** Resolve the display price for a product. Variant items show lowest variant price. */
-function displayPrice(product: Product): string {
+function displayPrice(product: Product, locale: string, fromLabel: string): string {
   if (product.variants && product.variants.length > 0) {
     const lowest = Math.min(...product.variants.map((v) => v.price));
-    return `From ${formatSar(lowest)}`;
+    return `${fromLabel} ${formatSar(lowest, locale)}`;
   }
-  return formatSar(product.price);
+  return formatSar(product.price, locale);
 }
 
 /** Case-insensitive substring check. */
@@ -221,20 +221,20 @@ function ProductsTable({
   categoryMap: Map<string, string>;
   loading: boolean;
 }) {
+  const { t, locale } = useLocale();
+
   if (loading) {
-    return <p className="text-ink-soft">Loading products…</p>;
+    return <p className="text-ink-soft">{t.general.loading}</p>;
   }
 
   if (products.length === 0) {
     return (
       <div className="rounded-lg border border-stone-200 bg-white p-12 text-center">
         <p className="text-ink-soft">
-          No products match your filters. Try adjusting your search or category
-          selection, or{" "}
+          {t.catalog.products.empty}{" "}
           <Link href="/catalog/products/new" className="text-clay hover:text-clay-deep font-medium">
-            add a new product
+            {t.catalog.products.addProduct}
           </Link>
-          .
         </p>
       </div>
     );
@@ -306,7 +306,7 @@ function ProductsTable({
 
                 {/* Price */}
                 <td className="px-4 py-3 text-ink">
-                  {displayPrice(product)}
+                  {displayPrice(product, locale, t.catalog.products.fromPrice)}
                 </td>
 
                 {/* Stock status */}

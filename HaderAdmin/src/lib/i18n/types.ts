@@ -165,6 +165,7 @@ export interface TranslationDictionary {
       variantStock: string;
       searchPlaceholder: string;
       allCategories: string;
+      fromPrice: string;
     };
   };
 
@@ -230,6 +231,18 @@ export interface TranslationDictionary {
     revenue: string;
     supplier: string;
     orderCount: string;
+    unassigned: string;
+    unknownSupplier: string;
+  };
+
+  // Status actions
+  statusActions: {
+    markSentToSupplier: string;
+    markDelivered: string;
+    confirmSentToSupplier: string;
+    confirmDelivered: string;
+    updating: string;
+    updateFailed: string;
   };
 
   // Language

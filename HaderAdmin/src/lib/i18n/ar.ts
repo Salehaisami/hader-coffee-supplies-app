@@ -158,6 +158,7 @@ export const ar: TranslationDictionary = {
       variantStock: "المخزون",
       searchPlaceholder: "ابحث عن منتج...",
       allCategories: "كل الفئات",
+      fromPrice: "من",
     },
   },
 
@@ -220,6 +221,17 @@ export const ar: TranslationDictionary = {
     revenue: "الإيرادات",
     supplier: "المورد",
     orderCount: "عدد الطلبات",
+    unassigned: "غير مُعيّن",
+    unknownSupplier: "مورد غير معروف",
+  },
+
+  statusActions: {
+    markSentToSupplier: "تم الإرسال للمورد",
+    markDelivered: "تم التوصيل",
+    confirmSentToSupplier: "هل تريد تحديث حالة الطلب إلى «تم الإرسال للمورد»؟",
+    confirmDelivered: "هل تريد تحديث حالة الطلب إلى «تم التوصيل»؟",
+    updating: "جاري التحديث...",
+    updateFailed: "فشل تحديث الحالة. يرجى المحاولة مرة أخرى.",
   },
 
   language: {

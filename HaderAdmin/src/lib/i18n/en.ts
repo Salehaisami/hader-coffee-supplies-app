@@ -158,6 +158,7 @@ export const en: TranslationDictionary = {
       variantStock: "Stock",
       searchPlaceholder: "Search products...",
       allCategories: "All Categories",
+      fromPrice: "From",
     },
   },
 
@@ -220,6 +221,17 @@ export const en: TranslationDictionary = {
     revenue: "Revenue",
     supplier: "Supplier",
     orderCount: "Order Count",
+    unassigned: "Unassigned",
+    unknownSupplier: "Unknown Supplier",
+  },
+
+  statusActions: {
+    markSentToSupplier: "Mark Sent to Supplier",
+    markDelivered: "Mark Delivered",
+    confirmSentToSupplier: "Are you sure you want to mark this order as Sent to Supplier?",
+    confirmDelivered: "Are you sure you want to mark this order as Delivered?",
+    updating: "Updating…",
+    updateFailed: "Failed to update status. Please try again.",
   },
 
   language: {

@@ -3,8 +3,8 @@ import { type Timestamp } from "firebase/firestore";
 /**
  * Formatting helpers shared across dashboard views.
  *
- * All number/currency formatting uses Western (Latin) digits via the
- * "en-US" locale so values render consistently regardless of browser locale.
+ * All number/currency formatting uses Western (Latin) digits.
+ * Currency symbol adapts to locale: "SAR" for English, "ر.س" for Arabic.
  */
 
 /**
@@ -22,13 +22,14 @@ export function googleMapsSearchUrl(lat: number, lng: number): string {
   return `https://www.google.com/maps/search/?api=1&query=${query}`;
 }
 
-/** Formats a number as SAR currency using Western digits (e.g. "SAR 1,250.00"). */
-export function formatSar(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "SAR",
-    currencyDisplay: "code",
+/** Formats a number as SAR currency using Western digits (e.g. "SAR 1,250.00" or "ر.س 1,250.00"). */
+export function formatSar(amount: number, locale: string = "en"): string {
+  const formatted = new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(amount);
+  const symbol = locale === "ar" ? "ر.س" : "SAR";
+  return `${symbol} ${formatted}`;
 }
 
 /** Formats a plain number with grouping using Western digits (e.g. "1,250"). */
@@ -40,9 +41,10 @@ export function formatNumber(value: number): string {
  * Formats a Firestore Timestamp as a short, human-readable date/time.
  * Returns an em dash when the timestamp is missing (e.g. pending server write).
  */
-export function formatTimestamp(timestamp: Timestamp | null | undefined): string {
+export function formatTimestamp(timestamp: Timestamp | null | undefined, locale: string = "en"): string {
   if (!timestamp) return "—";
-  return new Intl.DateTimeFormat("en-US", {
+  const dateLocale = locale === "ar" ? "ar-SA" : "en-US";
+  return new Intl.DateTimeFormat(dateLocale, {
     year: "numeric",
     month: "short",
     day: "numeric",

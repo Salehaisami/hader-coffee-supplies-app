@@ -9,6 +9,7 @@ import {
   getStatusActionLabel,
   getStatusConfirmMessage,
 } from "@/lib/orderStatus";
+import { useLocale } from "@/contexts/LocaleContext";
 
 interface StatusActionsProps {
   orderId: string;
@@ -27,14 +28,15 @@ export default function StatusActions({
   const [confirming, setConfirming] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useLocale();
 
   const nextStatus = getNextStatus(currentStatus);
 
   // Nothing to render for terminal states.
   if (!nextStatus) return null;
 
-  const label = getStatusActionLabel(nextStatus);
-  const confirmMessage = getStatusConfirmMessage(nextStatus);
+  const label = getStatusActionLabel(nextStatus, t);
+  const confirmMessage = getStatusConfirmMessage(nextStatus, t);
 
   async function handleConfirm() {
     setUpdating(true);
@@ -49,7 +51,7 @@ export default function StatusActions({
       setConfirming(false);
     } catch (err) {
       console.error("Failed to update order status:", err);
-      setError("Failed to update status. Please try again.");
+      setError(t.statusActions.updateFailed);
     } finally {
       setUpdating(false);
     }
@@ -72,7 +74,7 @@ export default function StatusActions({
             className="rounded-md border border-stone-300 bg-white px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:bg-stone-50 disabled:opacity-50"
             data-testid="cancel-status-update"
           >
-            Cancel
+            {t.general.cancel}
           </button>
           <button
             type="button"
@@ -81,7 +83,7 @@ export default function StatusActions({
             className="rounded-md bg-clay px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-clay-deep disabled:opacity-50"
             data-testid="confirm-status-update"
           >
-            {updating ? "Updating…" : "Confirm"}
+            {updating ? t.statusActions.updating : t.general.confirm}
           </button>
         </div>
         {error && (
