@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { collection, onSnapshot, query } from "firebase/firestore";
+import { collection, deleteDoc, doc, onSnapshot, query } from "firebase/firestore";
 import Link from "next/link";
 import Image from "next/image";
 import { db } from "@/lib/firebase";
@@ -144,6 +144,17 @@ export default function ProductsListPage() {
     return result;
   }, [products, selectedCategory, searchTerm]);
 
+  // Delete handler
+  async function handleDeleteProduct(id: string, name: string) {
+    if (!window.confirm(`${t.catalog.products.deleteConfirm}\n\n${name}`)) return;
+    try {
+      await deleteDoc(doc(db, "products", id));
+    } catch (err) {
+      console.error("Failed to delete product:", err);
+      setError(t.general.error);
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Render
   // ---------------------------------------------------------------------------
@@ -202,6 +213,7 @@ export default function ProductsListPage() {
           products={filteredProducts}
           categoryMap={categoryMap}
           loading={loading}
+          onDelete={handleDeleteProduct}
         />
       </div>
     </div>
@@ -216,10 +228,12 @@ function ProductsTable({
   products,
   categoryMap,
   loading,
+  onDelete,
 }: {
   products: Product[];
   categoryMap: Map<string, string>;
   loading: boolean;
+  onDelete: (id: string, name: string) => void;
 }) {
   const { t, locale } = useLocale();
 
@@ -333,14 +347,23 @@ function ProductsTable({
                   )}
                 </td>
 
-                {/* Edit action */}
+                {/* Actions */}
                 <td className="px-4 py-3 text-right">
-                  <Link
-                    href={`/catalog/products/${product.id}/edit`}
-                    className="rounded px-2 py-1 text-xs font-medium text-clay hover:bg-stone-100"
-                  >
-                    Edit
-                  </Link>
+                  <div className="flex items-center justify-end gap-2">
+                    <Link
+                      href={`/catalog/products/${product.id}/edit`}
+                      className="rounded px-2 py-1 text-xs font-medium text-clay hover:bg-stone-100"
+                    >
+                      {t.general.edit}
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => onDelete(product.id, product.name.en || product.name.ar)}
+                      className="rounded px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
+                    >
+                      {t.general.delete}
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
