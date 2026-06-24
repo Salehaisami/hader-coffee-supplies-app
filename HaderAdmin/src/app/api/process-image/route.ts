@@ -16,6 +16,7 @@ import sharp from "sharp";
  */
 
 const REMOVEBG_API_KEY = process.env.REMOVEBG_API_KEY || "";
+const WITHOUTBG_API_KEY = process.env.WITHOUTBG_API_KEY || "";
 const OUTPUT_SIZE = 1024;
 
 // Warm sand/peach background color matching the Hader catalog style
@@ -31,9 +32,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    if (!REMOVEBG_API_KEY) {
+    if (!REMOVEBG_API_KEY && !WITHOUTBG_API_KEY) {
       return NextResponse.json(
-        { error: "REMOVEBG_API_KEY not configured" },
+        { error: "No background removal API key configured (REMOVEBG_API_KEY or WITHOUTBG_API_KEY)" },
         { status: 500 }
       );
     }
@@ -59,27 +60,54 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * Calls remove.bg API to get a transparent PNG of the subject.
+ * Removes background using remove.bg (free tier: 50/month).
+ * Falls back to withoutbg.com if remove.bg returns 402 (out of credits).
  */
 async function removeBackground(imageBuffer: Buffer): Promise<Buffer> {
-  const formData = new FormData();
-  formData.append("image_file", new Blob([new Uint8Array(imageBuffer)]), "image.jpg");
-  formData.append("size", "auto");
+  // Try remove.bg first (50 free/month)
+  if (REMOVEBG_API_KEY) {
+    const formData = new FormData();
+    formData.append("image_file", new Blob([new Uint8Array(imageBuffer)]), "image.jpg");
+    formData.append("size", "auto");
 
-  const response = await fetch("https://api.remove.bg/v1.0/removebg", {
-    method: "POST",
-    headers: {
-      "X-Api-Key": REMOVEBG_API_KEY,
-    },
-    body: formData,
-  });
+    const response = await fetch("https://api.remove.bg/v1.0/removebg", {
+      method: "POST",
+      headers: { "X-Api-Key": REMOVEBG_API_KEY },
+      body: formData,
+    });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`remove.bg failed (${response.status}): ${errorText}`);
+    if (response.ok) {
+      return Buffer.from(await response.arrayBuffer());
+    }
+
+    // 402 = out of credits — fall through to withoutbg
+    if (response.status !== 402) {
+      const errorText = await response.text();
+      throw new Error(`remove.bg failed (${response.status}): ${errorText}`);
+    }
+    console.warn("[process-image] remove.bg credits exhausted, falling back to withoutbg.com");
   }
 
-  return Buffer.from(await response.arrayBuffer());
+  // Fallback: withoutbg.com
+  if (WITHOUTBG_API_KEY) {
+    const formData = new FormData();
+    formData.append("image", new Blob([new Uint8Array(imageBuffer)]), "image.jpg");
+
+    const response = await fetch("https://api.withoutbg.com/v1.0/image/remove-background", {
+      method: "POST",
+      headers: { "x-api-key": WITHOUTBG_API_KEY },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`withoutbg.com failed (${response.status}): ${errorText}`);
+    }
+
+    return Buffer.from(await response.arrayBuffer());
+  }
+
+  throw new Error("No background removal API key configured");
 }
 
 /**
