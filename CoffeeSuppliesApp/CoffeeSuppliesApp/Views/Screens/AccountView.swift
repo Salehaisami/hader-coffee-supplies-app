@@ -60,20 +60,28 @@ struct AccountView: View {
 
             // Menu items
             Section {
-                menuRow(icon: "building.2", title: L10n.businessDetails) {
-                    // TODO: Navigate to business details edit
+                if let user = viewModel.user, let firestoreService {
+                    NavigationLink {
+                        BusinessDetailsEditView(user: user, firestoreService: firestoreService)
+                    } label: {
+                        menuLabel(icon: "building.2", title: L10n.businessDetails)
+                    }
+
+                    NavigationLink {
+                        DeliveryLocationEditView(
+                            userId: user.id,
+                            currentAddress: user.deliveryAddress,
+                            firestoreService: firestoreService
+                        )
+                    } label: {
+                        menuLabel(icon: "mappin.and.ellipse", title: L10n.deliveryLocation)
+                    }
                 }
 
-                menuRow(icon: "mappin.and.ellipse", title: L10n.deliveryLocation) {
-                    // TODO: Navigate to delivery location editor
-                }
-
-                menuRow(icon: "list.clipboard", title: L10n.orderHistory) {
-                    // TODO: Navigate to order history
-                }
-
-                menuRow(icon: "questionmark.circle", title: L10n.help) {
-                    // TODO: Navigate to help/contact
+                NavigationLink {
+                    HelpView()
+                } label: {
+                    menuLabel(icon: "questionmark.circle", title: L10n.help)
                 }
             }
 
@@ -95,8 +103,36 @@ struct AccountView: View {
                 }
                 .accessibilityLabel(L10n.signOut)
             }
+
+            // Delete account
+            if let firestoreService, let userId = currentUserId {
+                Section {
+                    NavigationLink {
+                        DeleteAccountView(
+                            userId: userId,
+                            firestoreService: firestoreService,
+                            authService: authService
+                        )
+                    } label: {
+                        HStack {
+                            Image(systemName: "trash")
+                            Text(deleteAccountLabel)
+                        }
+                        .foregroundStyle(.red)
+                    }
+                }
+            }
         }
         .listStyle(.insetGrouped)
+    }
+
+    private var deleteAccountLabel: String {
+        LanguageManager.shared.resolve(ar: "حذف الحساب", en: "Delete Account")
+    }
+
+    private var currentUserId: String? {
+        if case .signedIn(let id) = authService.currentState { return id }
+        return nil
     }
 
     // MARK: - Guest Content
@@ -120,6 +156,18 @@ struct AccountView: View {
     }
 
     // MARK: - Subviews
+
+    private func menuLabel(icon: String, title: String) -> some View {
+        HStack(spacing: Spacing.xs) {
+            Image(systemName: icon)
+                .foregroundStyle(Color.appAccent)
+                .frame(width: 24)
+
+            Text(title)
+                .font(.appBody)
+                .foregroundStyle(Color.primaryText)
+        }
+    }
 
     private func menuRow(icon: String, title: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
