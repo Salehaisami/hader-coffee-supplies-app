@@ -327,11 +327,11 @@ function ProductsTable({
                 <td className="px-4 py-3">
                   {product.available ? (
                     <span className="inline-flex items-center rounded-full bg-sage/15 px-2.5 py-0.5 text-xs font-medium text-sage">
-                      In Stock
+                      {t.catalog.products.inStock}
                     </span>
                   ) : (
                     <span className="inline-flex items-center rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-medium text-stone-600">
-                      Out of Stock
+                      {t.catalog.products.outOfStock}
                     </span>
                   )}
                 </td>
@@ -340,7 +340,7 @@ function ProductsTable({
                 <td className="px-4 py-3 text-center">
                   {product.madeToOrder ? (
                     <span className="inline-flex items-center rounded-full bg-clay/10 px-2.5 py-0.5 text-xs font-medium text-clay-deep">
-                      Made to Order
+                      {t.catalog.products.madeToOrder}
                     </span>
                   ) : (
                     <span className="text-stone-400">—</span>

@@ -14,6 +14,8 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { type Category, type Supplier } from "@/lib/types";
+import { useLocale } from "@/contexts/LocaleContext";
+import { type TranslationDictionary } from "@/lib/i18n/types";
 import BilingualInput from "@/components/BilingualInput";
 import BilingualTextarea from "@/components/BilingualTextarea";
 import VariantEditor, { type VariantData, type VariantErrors } from "@/components/VariantEditor";
@@ -67,35 +69,35 @@ interface FormErrors {
   variants?: Record<string, VariantErrors>;
 }
 
-function validate(data: ProductFormData): FormErrors {
+function validate(data: ProductFormData, t: TranslationDictionary): FormErrors {
   const errors: FormErrors = {};
 
   if (!data.nameAr.trim()) {
-    errors.nameAr = "Arabic name is required.";
+    errors.nameAr = t.productForm.nameArRequired;
   }
   if (!data.nameEn.trim()) {
-    errors.nameEn = "English name is required.";
+    errors.nameEn = t.productForm.nameEnRequired;
   }
   if (!data.descriptionAr.trim()) {
-    errors.descriptionAr = "Arabic description is required.";
+    errors.descriptionAr = t.productForm.descArRequired;
   }
   if (!data.descriptionEn.trim()) {
-    errors.descriptionEn = "English description is required.";
+    errors.descriptionEn = t.productForm.descEnRequired;
   }
   if (!data.categoryId) {
-    errors.categoryId = "Category is required.";
+    errors.categoryId = t.productForm.categoryRequired;
   }
   if (!data.pricingUnit.trim()) {
-    errors.pricingUnit = "Pricing unit is required.";
+    errors.pricingUnit = t.productForm.pricingUnitRequired;
   }
   if (data.price < 0) {
-    errors.price = "Price must be 0 or greater.";
+    errors.price = t.productForm.priceInvalid;
   }
   if (data.deliveryEstimateMin < 1) {
-    errors.deliveryEstimateMin = "Minimum delivery estimate must be at least 1.";
+    errors.deliveryEstimateMin = t.productForm.deliveryMinInvalid;
   }
   if (data.deliveryEstimateMax < data.deliveryEstimateMin) {
-    errors.deliveryEstimateMax = "Maximum must be greater than or equal to minimum.";
+    errors.deliveryEstimateMax = t.productForm.deliveryMaxInvalid;
   }
 
   // Validate variants when hasVariants is enabled
@@ -134,6 +136,7 @@ function validate(data: ProductFormData): FormErrors {
 export default function ProductForm({ initialData, productId }: ProductFormProps) {
   const router = useRouter();
   const isEditMode = !!productId;
+  const { t } = useLocale();
 
   // Categories for dropdown
   const [categories, setCategories] = useState<Category[]>([]);
@@ -235,7 +238,7 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
     e.preventDefault();
     setSubmitError(null);
 
-    const validationErrors = validate(formData);
+    const validationErrors = validate(formData, t);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
@@ -311,7 +314,7 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
       router.push("/catalog/products");
     } catch (err) {
       console.error("Failed to save product:", err);
-      setSubmitError("Failed to save product. Please try again.");
+      setSubmitError(t.productForm.saveFailed);
       setSubmitting(false);
     }
   }
@@ -332,11 +335,11 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
       {/* ---- Names ---- */}
       <section className="space-y-2">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-soft">
-          Product Name
+          {t.productForm.productName}
         </h2>
         <BilingualInput
-          labelAr="Name (Arabic)"
-          labelEn="Name (English)"
+          labelAr={t.productForm.nameAr}
+          labelEn={t.productForm.nameEn}
           valueAr={formData.nameAr}
           valueEn={formData.nameEn}
           onChangeAr={(v) => updateField("nameAr", v)}
@@ -350,11 +353,11 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
       {/* ---- Descriptions ---- */}
       <section className="space-y-2">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-soft">
-          Description
+          {t.productForm.description}
         </h2>
         <BilingualTextarea
-          labelAr="Description (Arabic)"
-          labelEn="Description (English)"
+          labelAr={t.productForm.descriptionAr}
+          labelEn={t.productForm.descriptionEn}
           valueAr={formData.descriptionAr}
           valueEn={formData.descriptionEn}
           onChangeAr={(v) => updateField("descriptionAr", v)}
@@ -368,7 +371,7 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
       {/* ---- Product Image ---- */}
       <section className="space-y-2">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-soft">
-          Product Image
+          {t.productForm.productImage}
         </h2>
         <ImageUpload
           currentImageUrl={formData.imageUrl || undefined}
@@ -380,11 +383,11 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
       {/* ---- Category ---- */}
       <section className="space-y-2">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-soft">
-          Category
+          {t.productForm.category}
         </h2>
         <div className="max-w-sm">
           <label className="mb-1 block text-sm font-medium text-ink">
-            Category<span className="ml-0.5 text-clay">*</span>
+            {t.productForm.category}<span className="ml-0.5 text-clay">*</span>
           </label>
           <select
             value={formData.categoryId}
@@ -393,7 +396,7 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
               errors.categoryId ? "border-clay-deep" : "border-stone-200"
             }`}
           >
-            <option value="">Select a category…</option>
+            <option value="">{t.productForm.selectCategory}</option>
             {categories.map((cat) => (
               <option key={cat.id} value={cat.id}>
                 {cat.name.en} — {cat.name.ar}
@@ -409,13 +412,13 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
       {/* ---- Pricing ---- */}
       <section className="space-y-2">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-soft">
-          Pricing
+          {t.productForm.pricing}
         </h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {/* Pricing Unit */}
           <div>
             <label className="mb-1 block text-sm font-medium text-ink">
-              Pricing Unit<span className="ml-0.5 text-clay">*</span>
+              {t.productForm.pricingUnit}<span className="ml-0.5 text-clay">*</span>
             </label>
             <select
               value={formData.pricingUnit}
@@ -424,16 +427,16 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
                 errors.pricingUnit ? "border-clay-deep" : "border-stone-200"
               }`}
             >
-              <option value="">Select unit…</option>
-              <option value="piece">Piece</option>
-              <option value="dozen">Dozen</option>
-              <option value="case_of_50">Case (50)</option>
-              <option value="case_of_100">Case (100)</option>
-              <option value="pack">Pack</option>
-              <option value="kg">Kilogram</option>
-              <option value="box">Box</option>
-              <option value="roll">Roll</option>
-              <option value="set">Set</option>
+              <option value="">{t.productForm.pricingUnit}</option>
+              <option value="piece">{t.productForm.unitPiece}</option>
+              <option value="dozen">{t.productForm.unitDozen}</option>
+              <option value="case_of_50">{t.productForm.unitCase50}</option>
+              <option value="case_of_100">{t.productForm.unitCase100}</option>
+              <option value="pack">{t.productForm.unitPack}</option>
+              <option value="kg">{t.productForm.unitKg}</option>
+              <option value="box">{t.productForm.unitBox}</option>
+              <option value="roll">{t.productForm.unitRoll}</option>
+              <option value="set">{t.productForm.unitSet}</option>
             </select>
             {errors.pricingUnit && (
               <p className="mt-1 text-xs text-clay-deep">{errors.pricingUnit}</p>
@@ -443,7 +446,7 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
           {/* Sell Price */}
           <div>
             <label className="mb-1 block text-sm font-medium text-ink">
-              Sell Price (SAR)
+              {t.productForm.sellPrice}
             </label>
             <input
               type="number"
@@ -465,13 +468,13 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
       {/* ---- Delivery Estimate ---- */}
       <section className="space-y-2">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-soft">
-          Delivery
+          {t.productForm.delivery}
         </h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {/* Min */}
           <div>
             <label className="mb-1 block text-sm font-medium text-ink">
-              Min<span className="ml-0.5 text-clay">*</span>
+              {t.productForm.deliveryMin}<span className="ml-0.5 text-clay">*</span>
             </label>
             <input
               type="number"
@@ -491,7 +494,7 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
           {/* Max */}
           <div>
             <label className="mb-1 block text-sm font-medium text-ink">
-              Max<span className="ml-0.5 text-clay">*</span>
+              {t.productForm.deliveryMax}<span className="ml-0.5 text-clay">*</span>
             </label>
             <input
               type="number"
@@ -511,17 +514,17 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
           {/* Unit */}
           <div>
             <label className="mb-1 block text-sm font-medium text-ink">
-              Unit
+              {t.productForm.deliveryUnit}
             </label>
             <select
               value={formData.deliveryEstimateUnit}
               onChange={(e) => updateField("deliveryEstimateUnit", e.target.value)}
               className="w-full rounded-md border border-stone-200 px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-clay/40"
             >
-              <option value="hours">Hours</option>
-              <option value="days">Days</option>
-              <option value="weeks">Weeks</option>
-              <option value="months">Months</option>
+              <option value="hours">{t.productForm.hours}</option>
+              <option value="days">{t.productForm.days}</option>
+              <option value="weeks">{t.productForm.weeks}</option>
+              <option value="months">{t.productForm.months}</option>
             </select>
           </div>
         </div>
@@ -530,20 +533,20 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
       {/* ---- Supplier ---- */}
       <section className="space-y-2">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-soft">
-          Supplier
+          {t.productForm.supplier}
         </h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {/* Supplier Dropdown */}
           <div>
             <label className="mb-1 block text-sm font-medium text-ink">
-              Supplier
+              {t.productForm.supplier}
             </label>
             <select
               value={formData.supplierId}
               onChange={(e) => updateField("supplierId", e.target.value)}
               className="w-full rounded-md border border-stone-200 px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-clay/40"
             >
-              <option value="">No supplier</option>
+              <option value="">{t.productForm.noSupplier}</option>
               {suppliers.map((sup) => (
                 <option key={sup.id} value={sup.id}>
                   {sup.name}
@@ -555,8 +558,8 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
           {/* Cost Price */}
           <div>
             <label className="mb-1 block text-sm font-medium text-ink">
-              Cost Price (SAR)
-              <span className="ml-1 text-xs font-normal text-ink-soft">(optional)</span>
+              {t.productForm.costPrice}
+              <span className="ml-1 text-xs font-normal text-ink-soft">{t.productForm.costPriceOptional}</span>
             </label>
             <input
               type="number"
@@ -577,7 +580,7 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
       {/* ---- Toggles ---- */}
       <section className="space-y-2">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-soft">
-          Options
+          {t.productForm.options}
         </h2>
         <div className="space-y-4">
           {/* In Stock */}
@@ -588,7 +591,7 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
               onChange={(e) => updateField("available", e.target.checked)}
               className="h-4 w-4 rounded border-stone-300 text-clay focus:ring-clay/40"
             />
-            <span className="text-sm text-ink">In Stock (available for purchase)</span>
+            <span className="text-sm text-ink">{t.productForm.inStockLabel}</span>
           </label>
 
           {/* Made to Order */}
@@ -599,7 +602,7 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
               onChange={(e) => updateField("madeToOrder", e.target.checked)}
               className="h-4 w-4 rounded border-stone-300 text-clay focus:ring-clay/40"
             />
-            <span className="text-sm text-ink">Made to Order (printing / custom items)</span>
+            <span className="text-sm text-ink">{t.productForm.madeToOrderLabel}</span>
           </label>
 
           {/* Has Variants */}
@@ -610,7 +613,7 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
               onChange={(e) => updateField("hasVariants", e.target.checked)}
               className="h-4 w-4 rounded border-stone-300 text-clay focus:ring-clay/40"
             />
-            <span className="text-sm text-ink">Has Variants (sizes, grinds, etc.)</span>
+            <span className="text-sm text-ink">{t.productForm.hasVariantsLabel}</span>
           </label>
         </div>
       </section>
@@ -619,7 +622,7 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
       {formData.hasVariants && (
         <section className="space-y-2">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-soft">
-            Variant Configuration
+            {t.productForm.variantConfig}
           </h2>
           <VariantEditor
             variants={formData.variants}
@@ -646,14 +649,14 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
           disabled={submitting}
           className="rounded-md bg-clay px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-clay-deep disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {submitting ? "Saving…" : isEditMode ? "Update Product" : "Create Product"}
+          {submitting ? t.productForm.saving : isEditMode ? t.productForm.updateProduct : t.productForm.createProduct}
         </button>
         <button
           type="button"
           onClick={() => router.push("/catalog/products")}
           className="rounded-md border border-stone-200 bg-white px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-stone-50"
         >
-          Cancel
+          {t.productForm.cancel}
         </button>
       </div>
     </form>

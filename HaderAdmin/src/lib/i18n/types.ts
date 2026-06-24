@@ -251,4 +251,70 @@ export interface TranslationDictionary {
     arabic: string;
     english: string;
   };
+
+  // Product Form
+  productForm: {
+    // Section headers
+    productName: string;
+    description: string;
+    productImage: string;
+    category: string;
+    pricing: string;
+    delivery: string;
+    supplier: string;
+    options: string;
+    variantConfig: string;
+    // Labels
+    nameAr: string;
+    nameEn: string;
+    descriptionAr: string;
+    descriptionEn: string;
+    selectCategory: string;
+    pricingUnit: string;
+    sellPrice: string;
+    deliveryMin: string;
+    deliveryMax: string;
+    deliveryUnit: string;
+    selectSupplier: string;
+    noSupplier: string;
+    costPrice: string;
+    costPriceOptional: string;
+    inStockLabel: string;
+    madeToOrderLabel: string;
+    hasVariantsLabel: string;
+    // Units
+    unitPiece: string;
+    unitDozen: string;
+    unitCase50: string;
+    unitCase100: string;
+    unitPack: string;
+    unitKg: string;
+    unitBox: string;
+    unitRoll: string;
+    unitSet: string;
+    // Delivery units
+    hours: string;
+    days: string;
+    weeks: string;
+    months: string;
+    // Actions
+    saving: string;
+    createProduct: string;
+    updateProduct: string;
+    cancel: string;
+    // Errors
+    nameArRequired: string;
+    nameEnRequired: string;
+    descArRequired: string;
+    descEnRequired: string;
+    categoryRequired: string;
+    pricingUnitRequired: string;
+    priceInvalid: string;
+    deliveryMinInvalid: string;
+    deliveryMaxInvalid: string;
+    saveFailed: string;
+    // New product page
+    newProductTitle: string;
+    newProductDescription: string;
+  };
 }
