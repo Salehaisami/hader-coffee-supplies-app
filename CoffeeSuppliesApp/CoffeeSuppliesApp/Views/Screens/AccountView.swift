@@ -66,16 +66,6 @@ struct AccountView: View {
                     } label: {
                         menuLabel(icon: "building.2", title: L10n.businessDetails)
                     }
-
-                    NavigationLink {
-                        DeliveryLocationEditView(
-                            userId: user.id,
-                            currentAddress: user.deliveryAddress,
-                            firestoreService: firestoreService
-                        )
-                    } label: {
-                        menuLabel(icon: "mappin.and.ellipse", title: L10n.deliveryLocation)
-                    }
                 }
 
                 NavigationLink {
