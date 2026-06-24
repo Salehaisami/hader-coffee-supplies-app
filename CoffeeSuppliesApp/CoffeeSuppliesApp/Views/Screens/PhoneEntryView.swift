@@ -56,7 +56,7 @@ struct PhoneEntryView: View {
             PrimaryButton(
                 L10n.sendCode,
                 isLoading: viewModel.step == .sendingCode,
-                isDisabled: viewModel.phoneNumber.isEmpty
+                isDisabled: !viewModel.canSendCode
             ) {
                 Task { await viewModel.sendCode() }
             }

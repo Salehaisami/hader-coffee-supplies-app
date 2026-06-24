@@ -61,7 +61,7 @@ final class AuthViewModel {
 
     /// Send OTP verification code to the entered phone number.
     func sendCode() async {
-        guard !phoneNumber.isEmpty else {
+        guard canSendCode else {
             errorMessage = L10n.authPhoneRequired
             return
         }
@@ -180,7 +180,11 @@ final class AuthViewModel {
 
     var canSendCode: Bool {
         let digits = phoneNumber.filter(\.isNumber)
-        return digits.count >= 9 && step == .phoneEntry
+        // Saudi mobile: 9 digits starting with 50, 53, 54, 55, 56, 57, 58, 59
+        guard digits.count == 9, digits.hasPrefix("5") else { return false }
+        let prefix = String(digits.prefix(2))
+        let validPrefixes: Set<String> = ["50", "53", "54", "55", "56", "57", "58", "59"]
+        return validPrefixes.contains(prefix) && step == .phoneEntry
     }
 
     var canVerify: Bool {

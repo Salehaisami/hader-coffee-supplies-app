@@ -23,6 +23,7 @@ final class LocationPickerViewModel {
     @ObservationIgnored private let locationService: LocationServiceProtocol
     @ObservationIgnored private var geocodeTask: Task<Void, Never>?
     @ObservationIgnored private let geocodeDebounce: Duration
+    @ObservationIgnored private let hasSavedLocation: Bool
 
     // MARK: - Init
 
@@ -35,18 +36,33 @@ final class LocationPickerViewModel {
         self.pinnedCoordinate = initialCoordinate
         self.geocodeDebounce = geocodeDebounce
         self.authStatus = locationService.authorizationStatus
+        // If a non-default coordinate was provided, we have a saved location
+        self.hasSavedLocation = (initialCoordinate.latitude != JeddahGeofence.center.latitude
+            || initialCoordinate.longitude != JeddahGeofence.center.longitude)
     }
 
     // MARK: - Lifecycle
 
     /// Called when the picker appears. Requests permission if needed and auto-locates.
+    /// Skips auto-locate if a saved location was provided (user can still tap "use my location").
     func start() async {
         authStatus = locationService.authorizationStatus
+
+        // If we already have a saved location, just geocode it and skip auto-locate
+        if hasSavedLocation {
+            scheduleGeocode()
+            return
+        }
 
         switch authStatus {
         case .notDetermined:
             locationService.requestWhenInUseAuthorization()
-            authStatus = locationService.authorizationStatus
+            // Wait for the user to respond to the permission dialog
+            for _ in 0..<20 {
+                try? await Task.sleep(for: .milliseconds(500))
+                authStatus = locationService.authorizationStatus
+                if authStatus != .notDetermined { break }
+            }
             if authStatus == .authorizedWhenInUse || authStatus == .authorizedAlways {
                 await locate()
             }

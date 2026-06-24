@@ -18,7 +18,7 @@ struct LocationPickerView: View {
         self.onConfirm = onConfirm
         _cameraPosition = State(initialValue: .region(MKCoordinateRegion(
             center: viewModel.pinnedCoordinate,
-            span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
+            span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
         )))
     }
 
@@ -30,22 +30,19 @@ struct LocationPickerView: View {
         .background(Color.appBackground)
         .navigationTitle(L10n.locationTitle)
         .navigationBarTitleDisplayMode(.inline)
-        .task { await viewModel.start() }
-        .onChange(of: viewModel.pinnedCoordinate.latitude) { _, _ in
-            moveCameraToPin()
-        }
-        .onChange(of: viewModel.pinnedCoordinate.longitude) { _, _ in
-            moveCameraToPin()
+        .task {
+            await viewModel.start()
+            // After auto-locate or saved location geocode, move camera to the resolved pin
+            setCameraToPin()
         }
     }
 
-    private func moveCameraToPin() {
-        withAnimation {
-            cameraPosition = .region(MKCoordinateRegion(
-                center: viewModel.pinnedCoordinate,
-                span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
-            ))
-        }
+    /// Moves the camera to the current pin location without animation to avoid jitter.
+    private func setCameraToPin() {
+        cameraPosition = .region(MKCoordinateRegion(
+            center: viewModel.pinnedCoordinate,
+            span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+        ))
     }
 }
 
@@ -123,7 +120,10 @@ private extension LocationPickerView {
 
             // Use my location
             Button {
-                Task { await viewModel.locate() }
+                Task {
+                    await viewModel.locate()
+                    setCameraToPin()
+                }
             } label: {
                 HStack(spacing: Spacing.xxs) {
                     if viewModel.isLocating {
