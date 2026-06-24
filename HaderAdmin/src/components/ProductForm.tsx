@@ -19,7 +19,7 @@ import { type TranslationDictionary } from "@/lib/i18n/types";
 import BilingualInput from "@/components/BilingualInput";
 import BilingualTextarea from "@/components/BilingualTextarea";
 import VariantEditor, { type VariantData, type VariantErrors } from "@/components/VariantEditor";
-import ImageUpload from "@/components/ImageUpload";
+import ProductImageManager from "@/components/ProductImageManager";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -373,10 +373,10 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
         <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-soft">
           {t.productForm.productImage}
         </h2>
-        <ImageUpload
+        <ProductImageManager
           currentImageUrl={formData.imageUrl || undefined}
-          storagePath={`products/${productId || `temp-${Date.now()}`}`}
-          onUploadComplete={(url) => updateField("imageUrl", url)}
+          productId={productId || `temp-${Date.now()}`}
+          onImageReady={(url) => updateField("imageUrl", url)}
         />
       </section>
 
