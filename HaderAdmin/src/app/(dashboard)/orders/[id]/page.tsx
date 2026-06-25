@@ -171,7 +171,7 @@ function OrderDetailContent({
             <LineItemsCard order={order} />
           </div>
           <div className="space-y-6">
-            <DeliveryAddressCard order={order} customer={customer} />
+            <DeliveryAddressCard order={order} />
             <PaymentInfoCard order={order} />
             <CustomerInfoCard order={order} customer={customer} />
           </div>
@@ -272,12 +272,9 @@ function LineItemsCard({ order }: { order: Order }) {
   );
 }
 
-function DeliveryAddressCard({ order, customer }: { order: Order; customer: User | null }) {
+function DeliveryAddressCard({ order }: { order: Order }) {
   const { t } = useLocale();
-
-  // Prefer customer's current profile location over the order's snapshot
-  // (order may have stale default coordinates from before the location fix)
-  const address = customer?.deliveryAddress ?? order.deliveryAddress;
+  const address = order.deliveryAddress;
 
   if (!address) {
     return (
