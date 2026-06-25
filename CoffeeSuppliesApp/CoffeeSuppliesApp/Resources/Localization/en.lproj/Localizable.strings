@@ -124,3 +124,4 @@
 "location.permission.denied" = "We couldn't access your location. You can move the map to place the pin manually.";
 "location.confirm" = "Confirm Location";
 "location.district" = "District";
+"checkout.account.suspended" = "Your account is suspended. Contact support for assistance.";

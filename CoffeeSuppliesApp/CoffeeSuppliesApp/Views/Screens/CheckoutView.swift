@@ -23,6 +23,17 @@ struct CheckoutView: View {
     var body: some View {
         VStack(spacing: 0) {
             Form {
+                if viewModel.isSuspended {
+                    Section {
+                        HStack(spacing: Spacing.xs) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundStyle(Color.clay)
+                            Text(L10n.accountSuspended)
+                                .font(.appSubheadline)
+                                .foregroundStyle(Color.clay)
+                        }
+                    }
+                }
                 deliverySection
                 businessSection
                 paymentSection

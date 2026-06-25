@@ -65,6 +65,7 @@ enum L10n {
     static var checkoutEditLocation: String { localized("checkout.edit.location") }
     static var applePayFailed: String { localized("checkout.apple.pay.failed") }
     static var switchToCOD: String { localized("checkout.switch.cod") }
+    static var accountSuspended: String { localized("checkout.account.suspended") }
 
     // MARK: - Orders
     static var ordersTitle: String { localized("orders.title") }

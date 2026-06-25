@@ -124,3 +124,4 @@
 "location.permission.denied" = "لم نتمكن من الوصول إلى موقعك. يمكنك تحريك الخريطة لتحديد الموقع يدوياً.";
 "location.confirm" = "تأكيد الموقع";
 "location.district" = "الحي";
+"checkout.account.suspended" = "حسابك موقوف. تواصل مع الدعم للمساعدة.";

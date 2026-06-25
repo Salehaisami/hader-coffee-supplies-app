@@ -18,6 +18,9 @@ final class CheckoutViewModel {
     var businessName: String = ""
     var phone: String = ""
 
+    /// Whether the user's account is suspended (blocks ordering).
+    var isSuspended: Bool = false
+
     // MARK: - Payment State
 
     var selectedPaymentMethod: PaymentMethod = .cashOnDelivery
@@ -61,6 +64,7 @@ final class CheckoutViewModel {
             let user: AppUser = try await firestoreService.getDocument(collection: "users", documentId: customerId)
             businessName = user.businessName
             phone = user.phone
+            isSuspended = user.status == .suspended
             if let saved = user.deliveryAddress {
                 deliveryCoordinate = CLLocationCoordinate2D(latitude: saved.lat, longitude: saved.lng)
                 selectedDistrict = JeddahDistricts.all.first { $0.localizedName == saved.district }
@@ -88,7 +92,7 @@ final class CheckoutViewModel {
 
     /// Whether the order can be placed: non-empty cart, a valid in-zone location, and not already in progress.
     var canPlaceOrder: Bool {
-        !cart.isEmpty && deliveryCoordinate != nil && isInJeddah && !businessName.isEmpty && !isPlacingOrder
+        !cart.isEmpty && deliveryCoordinate != nil && isInJeddah && !businessName.isEmpty && !isPlacingOrder && !isSuspended
     }
 
     /// Message shown when the pin is outside Jeddah.
