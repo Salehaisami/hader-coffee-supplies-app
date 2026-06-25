@@ -1,56 +1,14 @@
 import Foundation
 
-/// Pricing unit for products — controls how the price is displayed.
-/// Stored as a raw string in Firestore; the localized display label is derived on the client.
-enum PricingUnit: String, Codable, CaseIterable {
-    case piece
-    case dozen
-    case caseOf50 = "case_of_50"
-    case caseOf100 = "case_of_100"
-    case pack
-    case kg
-    case box
-    case roll
-    case set
-
-    /// Localized display label: "per dozen", "لكل دزينة", etc.
-    var localizedLabel: String {
-        switch self {
-        case .piece: return LanguageManager.shared.resolve(ar: "للحبة", en: "per piece")
-        case .dozen: return LanguageManager.shared.resolve(ar: "للدزينة", en: "per dozen")
-        case .caseOf50: return LanguageManager.shared.resolve(ar: "للكرتون (٥٠)", en: "per case (50)")
-        case .caseOf100: return LanguageManager.shared.resolve(ar: "للكرتون (١٠٠)", en: "per case (100)")
-        case .pack: return LanguageManager.shared.resolve(ar: "للعبوة", en: "per pack")
-        case .kg: return LanguageManager.shared.resolve(ar: "للكيلو", en: "per kg")
-        case .box: return LanguageManager.shared.resolve(ar: "للصندوق", en: "per box")
-        case .roll: return LanguageManager.shared.resolve(ar: "للرول", en: "per roll")
-        case .set: return LanguageManager.shared.resolve(ar: "للطقم", en: "per set")
-        }
-    }
-
-    /// Short label for ledger-line display (without "per").
-    var shortLabel: String {
-        switch self {
-        case .piece: return LanguageManager.shared.resolve(ar: "حبة", en: "piece")
-        case .dozen: return LanguageManager.shared.resolve(ar: "دزينة", en: "dozen")
-        case .caseOf50: return LanguageManager.shared.resolve(ar: "كرتون (٥٠)", en: "case (50)")
-        case .caseOf100: return LanguageManager.shared.resolve(ar: "كرتون (١٠٠)", en: "case (100)")
-        case .pack: return LanguageManager.shared.resolve(ar: "عبوة", en: "pack")
-        case .kg: return LanguageManager.shared.resolve(ar: "كيلو", en: "kg")
-        case .box: return LanguageManager.shared.resolve(ar: "صندوق", en: "box")
-        case .roll: return LanguageManager.shared.resolve(ar: "رول", en: "roll")
-        case .set: return LanguageManager.shared.resolve(ar: "طقم", en: "set")
-        }
-    }
-}
-
 /// Variant within a product (e.g., different cup sizes).
 struct ProductVariant: Codable, Equatable, Identifiable {
     let variantId: String
     let labelAr: String
     let labelEn: String
     let sellPrice: Double
-    let pricingUnit: PricingUnit
+    let pricingUnit: String
+    let pricingUnitLabelAr: String?
+    let pricingUnitLabelEn: String?
     let inStock: Bool
     let costPrice: Double?
 
@@ -61,9 +19,13 @@ struct ProductVariant: Codable, Equatable, Identifiable {
         LanguageManager.shared.resolve(ar: labelAr, en: labelEn)
     }
 
-    /// Localized pricing unit label derived from the enum.
+    /// Localized pricing unit label from denormalized Firestore fields.
     var localizedPricingUnitLabel: String {
-        pricingUnit.shortLabel
+        let label = LanguageManager.shared.resolve(
+            ar: pricingUnitLabelAr ?? "",
+            en: pricingUnitLabelEn ?? ""
+        )
+        return label.isEmpty ? pricingUnit : label
     }
 
     enum CodingKeys: String, CodingKey {
@@ -72,6 +34,8 @@ struct ProductVariant: Codable, Equatable, Identifiable {
         case labelEn = "label_en"
         case sellPrice
         case pricingUnit
+        case pricingUnitLabelAr = "pricingUnitLabel_ar"
+        case pricingUnitLabelEn = "pricingUnitLabel_en"
         case inStock
         case costPrice
     }
@@ -82,7 +46,7 @@ struct ProductSupplier: Codable, Equatable {
     let supplierId: String
     let costPrice: Double?
     let sellPrice: Double
-    let pricingUnit: PricingUnit
+    let pricingUnit: String
     let deliveryEstimate: DeliveryEstimate
 }
 
@@ -131,7 +95,13 @@ struct Product: Codable, Identifiable, Equatable {
     let descriptionEn: String
     let imageUrl: String?
     let categoryId: String
-    let pricingUnit: PricingUnit
+    /// Raw pricing unit key (e.g. "dozen", "case_of_50"). Kept for Firestore schema alignment
+    /// and potential future use (filtering/grouping by unit). Display uses the label fields below.
+    let pricingUnit: String
+    /// Denormalized display labels written by the admin dashboard at save time.
+    /// Preferred for display; falls back to `pricingUnit` raw string for older products.
+    let pricingUnitLabelAr: String?
+    let pricingUnitLabelEn: String?
     let hasVariants: Bool
     let sellPrice: Double
     let deliveryEstimate: DeliveryEstimate
@@ -153,9 +123,14 @@ struct Product: Codable, Identifiable, Equatable {
         LanguageManager.shared.resolve(ar: descriptionAr, en: descriptionEn)
     }
 
-    /// Localized pricing unit label derived from the enum.
+    /// Localized pricing unit label — prefers denormalized Firestore labels,
+    /// falls back to the raw pricingUnit string for older products.
     var localizedPricingUnitLabel: String {
-        pricingUnit.shortLabel
+        let label = LanguageManager.shared.resolve(
+            ar: pricingUnitLabelAr ?? "",
+            en: pricingUnitLabelEn ?? ""
+        )
+        return label.isEmpty ? pricingUnit : label
     }
 
     /// Display price: lowest variant price if has variants, otherwise base price.
@@ -196,6 +171,8 @@ struct Product: Codable, Identifiable, Equatable {
         case imageUrl
         case categoryId
         case pricingUnit
+        case pricingUnitLabelAr = "pricingUnitLabel_ar"
+        case pricingUnitLabelEn = "pricingUnitLabel_en"
         case hasVariants
         case sellPrice
         case deliveryEstimate

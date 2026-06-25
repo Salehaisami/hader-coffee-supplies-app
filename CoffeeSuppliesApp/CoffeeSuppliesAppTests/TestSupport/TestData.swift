@@ -92,7 +92,9 @@ enum TestData {
         descriptionEn: "Paper cups for hot beverages",
         imageUrl: "https://example.com/paper-cup.jpg",
         categoryId: "cat-cups",
-        pricingUnit: .dozen,
+        pricingUnit: "dozen",
+        pricingUnitLabelAr: "دزينة",
+        pricingUnitLabelEn: "Dozen",
         hasVariants: true,
         sellPrice: 48,
         deliveryEstimate: DeliveryEstimate(minValue: 2, maxValue: 4, unit: .days),
@@ -104,15 +106,15 @@ enum TestData {
                 supplierId: "supplier-001",
                 costPrice: 30,
                 sellPrice: 48,
-                pricingUnit: .dozen,
+                pricingUnit: "dozen",
                 deliveryEstimate: DeliveryEstimate(minValue: 2, maxValue: 4, unit: .days)
             )
         ],
         variants: [
-            ProductVariant(variantId: "4oz", labelAr: "4 أونص", labelEn: "4oz", sellPrice: 35, pricingUnit: .dozen, inStock: true, costPrice: 22),
-            ProductVariant(variantId: "8oz", labelAr: "8 أونص", labelEn: "8oz", sellPrice: 48, pricingUnit: .dozen, inStock: true, costPrice: 30),
-            ProductVariant(variantId: "12oz", labelAr: "12 أونص", labelEn: "12oz", sellPrice: 55, pricingUnit: .dozen, inStock: true, costPrice: 35),
-            ProductVariant(variantId: "16oz", labelAr: "16 أونص", labelEn: "16oz", sellPrice: 62, pricingUnit: .dozen, inStock: false, costPrice: 40),
+            ProductVariant(variantId: "4oz", labelAr: "4 أونص", labelEn: "4oz", sellPrice: 35, pricingUnit: "dozen", pricingUnitLabelAr: "دزينة", pricingUnitLabelEn: "Dozen", inStock: true, costPrice: 22),
+            ProductVariant(variantId: "8oz", labelAr: "8 أونص", labelEn: "8oz", sellPrice: 48, pricingUnit: "dozen", pricingUnitLabelAr: "دزينة", pricingUnitLabelEn: "Dozen", inStock: true, costPrice: 30),
+            ProductVariant(variantId: "12oz", labelAr: "12 أونص", labelEn: "12oz", sellPrice: 55, pricingUnit: "dozen", pricingUnitLabelAr: "دزينة", pricingUnitLabelEn: "Dozen", inStock: true, costPrice: 35),
+            ProductVariant(variantId: "16oz", labelAr: "16 أونص", labelEn: "16oz", sellPrice: 62, pricingUnit: "dozen", pricingUnitLabelAr: "دزينة", pricingUnitLabelEn: "Dozen", inStock: false, costPrice: 40),
         ],
         createdAt: Date(timeIntervalSince1970: 1700000000),
         updatedAt: nil
@@ -127,7 +129,9 @@ enum TestData {
         descriptionEn: "Cups printed with your cafe logo",
         imageUrl: "https://example.com/custom-cup.jpg",
         categoryId: "cat-cups",
-        pricingUnit: .caseOf50,
+        pricingUnit: "case_of_50",
+        pricingUnitLabelAr: "كرتون ٥٠ حبة",
+        pricingUnitLabelEn: "Case of 50",
         hasVariants: false,
         sellPrice: 450,
         deliveryEstimate: DeliveryEstimate(minValue: 7, maxValue: 10, unit: .days),
@@ -139,7 +143,7 @@ enum TestData {
                 supplierId: "supplier-002",
                 costPrice: 300,
                 sellPrice: 450,
-                pricingUnit: .caseOf50,
+                pricingUnit: "case_of_50",
                 deliveryEstimate: DeliveryEstimate(minValue: 7, maxValue: 10, unit: .days)
             )
         ],
@@ -157,7 +161,9 @@ enum TestData {
         descriptionEn: "Paper napkins",
         imageUrl: nil,
         categoryId: "cat-supplies",
-        pricingUnit: .pack,
+        pricingUnit: "pack",
+        pricingUnitLabelAr: "عبوة",
+        pricingUnitLabelEn: "Pack",
         hasVariants: false,
         sellPrice: 25,
         deliveryEstimate: DeliveryEstimate(minValue: 2, maxValue: 4, unit: .days),
@@ -169,7 +175,7 @@ enum TestData {
                 supplierId: "supplier-001",
                 costPrice: 15,
                 sellPrice: 25,
-                pricingUnit: .pack,
+                pricingUnit: "pack",
                 deliveryEstimate: DeliveryEstimate(minValue: 2, maxValue: 4, unit: .days)
             )
         ],

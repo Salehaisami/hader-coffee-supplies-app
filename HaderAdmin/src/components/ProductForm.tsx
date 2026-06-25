@@ -136,12 +136,14 @@ function validate(data: ProductFormData, t: TranslationDictionary): FormErrors {
 export default function ProductForm({ initialData, productId }: ProductFormProps) {
   const router = useRouter();
   const isEditMode = !!productId;
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
 
   // Categories for dropdown
   const [categories, setCategories] = useState<Category[]>([]);
   // Suppliers for dropdown
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  // Pricing units for dropdown
+  const [pricingUnits, setPricingUnits] = useState<{ id: string; label_ar: string; label_en: string; value?: string }[]>([]);
 
   // Form state
   const [formData, setFormData] = useState<ProductFormData>(
@@ -211,6 +213,26 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
     return () => unsubscribe();
   }, []);
 
+  // Load pricing units for dropdown
+  useEffect(() => {
+    const q = query(collection(db, "pricingUnits"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const items = snapshot.docs.map((d) => {
+        const data = d.data();
+        return {
+          id: d.id,
+          label_ar: data.label_ar ?? "",
+          label_en: data.label_en ?? "",
+          value: data.value ?? d.id,
+          sortOrder: data.sortOrder ?? 0,
+        };
+      });
+      items.sort((a, b) => a.sortOrder - b.sortOrder);
+      setPricingUnits(items);
+    });
+    return () => unsubscribe();
+  }, []);
+
   // Sync initialData when it arrives (edit mode async load)
   useEffect(() => {
     if (initialData) {
@@ -274,6 +296,8 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
       description_en: formData.descriptionEn.trim(),
       categoryId: formData.categoryId,
       pricingUnit: formData.pricingUnit,
+      pricingUnitLabel_ar: pricingUnits.find((u) => (u.value ?? u.id) === formData.pricingUnit)?.label_ar ?? formData.pricingUnit,
+      pricingUnitLabel_en: pricingUnits.find((u) => (u.value ?? u.id) === formData.pricingUnit)?.label_en ?? formData.pricingUnit,
       sellPrice: formData.price,
       deliveryEstimate: deliveryEstimateObj,
       inStock: formData.available,
@@ -285,15 +309,20 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
       activeSupplierIndex: 0,
       suppliers: supplierEntry,
       variants: formData.hasVariants
-        ? formData.variants.map((v) => ({
-            variantId: v.variantId,
-            label_ar: v.label_ar.trim(),
-            label_en: v.label_en.trim(),
-            sellPrice: v.sellPrice,
-            pricingUnit: v.pricingUnit,
-            inStock: v.inStock,
-            ...(v.costPrice !== undefined ? { costPrice: v.costPrice } : {}),
-          }))
+        ? formData.variants.map((v) => {
+            const variantUnit = pricingUnits.find((u) => (u.value ?? u.id) === v.pricingUnit);
+            return {
+              variantId: v.variantId,
+              label_ar: v.label_ar.trim(),
+              label_en: v.label_en.trim(),
+              sellPrice: v.sellPrice,
+              pricingUnit: v.pricingUnit,
+              pricingUnitLabel_ar: variantUnit?.label_ar ?? v.pricingUnit,
+              pricingUnitLabel_en: variantUnit?.label_en ?? v.pricingUnit,
+              inStock: v.inStock,
+              ...(v.costPrice !== undefined ? { costPrice: v.costPrice } : {}),
+            };
+          })
         : [],
     };
 
@@ -428,15 +457,11 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
               }`}
             >
               <option value="">{t.productForm.pricingUnit}</option>
-              <option value="piece">{t.productForm.unitPiece}</option>
-              <option value="dozen">{t.productForm.unitDozen}</option>
-              <option value="case_of_50">{t.productForm.unitCase50}</option>
-              <option value="case_of_100">{t.productForm.unitCase100}</option>
-              <option value="pack">{t.productForm.unitPack}</option>
-              <option value="kg">{t.productForm.unitKg}</option>
-              <option value="box">{t.productForm.unitBox}</option>
-              <option value="roll">{t.productForm.unitRoll}</option>
-              <option value="set">{t.productForm.unitSet}</option>
+              {pricingUnits.map((unit) => (
+                <option key={unit.id} value={unit.value ?? unit.id}>
+                  {locale === "ar" ? unit.label_ar : unit.label_en}
+                </option>
+              ))}
             </select>
             {errors.pricingUnit && (
               <p className="mt-1 text-xs text-clay-deep">{errors.pricingUnit}</p>
