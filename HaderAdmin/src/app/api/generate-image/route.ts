@@ -1,15 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
+import { adminStorage } from "@/lib/firebase-admin";
 
 /**
  * POST /api/generate-image
  *
  * Generates an AI product image via Together.ai FLUX 1.1 Pro with a
- * consistent warm studio background matching the Hader catalog style.
+ * consistent warm studio background matching the Hader catalog style,
+ * uploads it to Firebase Storage, and returns the public URL.
  *
  * Body: JSON with:
- *   - prompt: description of the product (e.g. "A glass jar of honey")
+ *   - prompt: description of the product
+ *   - productId: Firestore product document ID (for storage path)
  *
- * Returns: JPEG image blob (1024x1024)
+ * Returns: JSON { url: string }
  */
 
 const TOGETHER_API_KEY = process.env.TOGETHER_API_KEY || "";
@@ -22,11 +25,18 @@ const BG_SUFFIX =
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { prompt } = body;
+    const { prompt, productId } = body;
 
     if (!prompt || typeof prompt !== "string") {
       return NextResponse.json(
         { error: "A prompt description is required" },
+        { status: 400 }
+      );
+    }
+
+    if (!productId || typeof productId !== "string") {
+      return NextResponse.json(
+        { error: "productId is required" },
         { status: 400 }
       );
     }
@@ -78,12 +88,19 @@ export async function POST(request: NextRequest) {
       throw new Error("No image data returned from Together.ai");
     }
 
-    return new NextResponse(new Uint8Array(imageBuffer), {
-      headers: {
-        "Content-Type": "image/jpeg",
-        "Content-Disposition": "inline; filename=generated.jpg",
-      },
+    // Upload to Firebase Storage (server-side, bypasses rules)
+    const storagePath = `products/${productId}/image_${Date.now()}.jpg`;
+    const bucket = adminStorage.bucket();
+    const fileRef = bucket.file(storagePath);
+    await fileRef.save(imageBuffer, {
+      contentType: "image/jpeg",
+      metadata: { cacheControl: "public, max-age=86400" },
     });
+    await fileRef.makePublic();
+
+    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${storagePath}`;
+
+    return NextResponse.json({ url: publicUrl });
   } catch (error) {
     console.error("[generate-image] Error:", error);
     const message = error instanceof Error ? error.message : "Generation failed";

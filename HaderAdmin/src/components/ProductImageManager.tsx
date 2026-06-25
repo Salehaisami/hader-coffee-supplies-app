@@ -1,8 +1,6 @@
 "use client";
 
 import { useCallback, useState, useRef } from "react";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from "@/lib/firebase";
 import Image from "next/image";
 import { useLocale } from "@/contexts/LocaleContext";
 
@@ -61,6 +59,9 @@ export default function ProductImageManager({
     generateHint: isAr
       ? "اكتب وصف المنتج وسنولّد صورة احترافية بالذكاء الاصطناعي"
       : "Describe the product and we'll generate a professional catalog image",
+    generateNote: isAr
+      ? "⚠️ التوليد مناسب للمنتجات العامة فقط. للمنتجات ذات العلامات التجارية (مثل المراعي، لوازم...)، ارفع صورة حقيقية وسنزيل الخلفية تلقائياً."
+      : "⚠️ Generation works for generic products only. For branded items (e.g. Almarai, specific packaging), upload a real photo instead — we'll remove the background automatically.",
     noApiKey: isAr ? "مفتاح API غير مهيأ" : "API key not configured",
   };
 
@@ -79,37 +80,24 @@ export default function ProductImageManager({
 
       setProcessing(true);
       try {
-        // Send to our processing API
+        // Send to server-side processing API (handles bg removal + upload)
         const formData = new FormData();
         formData.append("file", file);
+        formData.append("productId", productId);
 
         const res = await fetch("/api/process-image", { method: "POST", body: formData });
+        const json = await res.json();
 
         if (!res.ok) {
-          const err = await res.json();
-          throw new Error(err.error || "Processing failed");
+          throw new Error(json.error || "Processing failed");
         }
 
-        // Get the processed image blob
-        const blob = await res.blob();
-        const localPreview = URL.createObjectURL(blob);
-        setPreviewUrl(localPreview);
-
-        // Upload processed image to Firebase Storage
-        const storagePath = `products/${productId}/image.jpg`;
-        const storageRef = ref(storage, storagePath);
-        await uploadBytes(storageRef, blob, {
-          contentType: "image/jpeg",
-          customMetadata: { cacheControl: "public, max-age=31536000" },
-        });
-
-        const downloadUrl = await getDownloadURL(storageRef);
-        onImageReady(downloadUrl);
+        setPreviewUrl(json.url);
+        onImageReady(json.url);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Processing failed");
       } finally {
         setProcessing(false);
-        // Reset the input so the same file can be re-selected
         if (fileInputRef.current) fileInputRef.current.value = "";
       }
     },
@@ -127,28 +115,16 @@ export default function ProductImageManager({
       const res = await fetch("/api/generate-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: prompt.trim() }),
+        body: JSON.stringify({ prompt: prompt.trim(), productId }),
       });
+      const json = await res.json();
 
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Generation failed");
+        throw new Error(json.error || "Generation failed");
       }
 
-      const blob = await res.blob();
-      const localPreview = URL.createObjectURL(blob);
-      setPreviewUrl(localPreview);
-
-      // Upload generated image to Firebase Storage
-      const storagePath = `products/${productId}/image.jpg`;
-      const storageRef = ref(storage, storagePath);
-      await uploadBytes(storageRef, blob, {
-        contentType: "image/jpeg",
-        customMetadata: { cacheControl: "public, max-age=31536000" },
-      });
-
-      const downloadUrl = await getDownloadURL(storageRef);
-      onImageReady(downloadUrl);
+      setPreviewUrl(json.url);
+      onImageReady(json.url);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Generation failed");
     } finally {
@@ -230,6 +206,7 @@ export default function ProductImageManager({
       {activeTab === "generate" && (
         <div className="space-y-3">
           <p className="text-xs text-ink-soft">{labels.generateHint}</p>
+          <p className="text-xs text-amber-700 bg-amber-50 rounded-md px-3 py-2">{labels.generateNote}</p>
           <textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}

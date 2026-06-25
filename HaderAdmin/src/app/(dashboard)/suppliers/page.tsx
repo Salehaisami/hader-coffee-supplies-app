@@ -42,7 +42,7 @@ export default function SuppliersPage() {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
 
   // Form state
   const [showForm, setShowForm] = useState(false);
@@ -177,7 +177,18 @@ export default function SuppliersPage() {
   function validate(): boolean {
     const errors: FormErrors = {};
     if (!formData.name.trim()) errors.name = t.general.required;
-    if (!formData.phone.trim()) errors.phone = t.general.required;
+    if (!formData.phone.trim()) {
+      errors.phone = t.general.required;
+    } else {
+      // Validate international phone format: +CountryCode followed by digits
+      // Accepts: +966501234567, +1234567890, +44 7911 123456 (spaces stripped)
+      const stripped = formData.phone.replace(/[\s\-()]/g, "");
+      if (!/^\+[1-9]\d{6,14}$/.test(stripped)) {
+        errors.phone = locale === "ar"
+          ? "يجب أن يبدأ الرقم بـ + متبوعاً برمز الدولة (مثال: +966501234567)"
+          : "Must start with + and country code (e.g. +966501234567)";
+      }
+    }
     if (!formData.email.trim()) errors.email = t.general.required;
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -393,8 +404,8 @@ function SuppliersList({
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-stone-200 bg-white">
-      <table className="w-full text-sm">
+    <div className="overflow-x-auto rounded-lg border border-stone-200 bg-white">
+      <table className="w-full min-w-[600px] text-sm">
         <thead className="border-b border-stone-200 bg-stone-50 text-xs uppercase tracking-wide text-ink-soft">
           <tr>
             <th className="px-4 py-3 font-medium text-start">{t.suppliers.name}</th>

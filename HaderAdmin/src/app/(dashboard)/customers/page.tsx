@@ -427,8 +427,8 @@ function CustomersContent({
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-stone-200 bg-white">
-      <table className="w-full text-sm">
+    <div className="overflow-x-auto rounded-lg border border-stone-200 bg-white">
+      <table className="w-full min-w-[600px] text-sm">
         <thead className="border-b border-stone-200 bg-stone-50 text-xs uppercase tracking-wide text-ink-soft">
           <tr>
             <th className="px-4 py-3 font-medium text-start">{t.customers.fields.businessName}</th>

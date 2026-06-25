@@ -1,18 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import sharp from "sharp";
+import { adminStorage } from "@/lib/firebase-admin";
 
 /**
  * POST /api/process-image
  *
  * Accepts a raw product photo, removes its background via remove.bg,
  * composites it onto a warm studio background with a subtle shadow,
- * and returns the processed image as a JPEG blob.
+ * uploads the result to Firebase Storage, and returns the public URL.
  *
  * Body: FormData with:
  *   - file: the raw image file
+ *   - productId: Firestore product document ID (for storage path)
  *   - productScale (optional): 0-1, default 0.72
  *
- * Returns: JPEG image blob (1024x1024)
+ * Returns: JSON { url: string } with the public download URL
  */
 
 const REMOVEBG_API_KEY = process.env.REMOVEBG_API_KEY || "";
@@ -26,10 +28,15 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
+    const productId = formData.get("productId") as string | null;
     const productScale = parseFloat(formData.get("productScale") as string) || 0.72;
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
+    }
+
+    if (!productId) {
+      return NextResponse.json({ error: "productId is required" }, { status: 400 });
     }
 
     if (!REMOVEBG_API_KEY && !WITHOUTBG_API_KEY) {
@@ -39,19 +46,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Step 1: Remove background via remove.bg
+    // Step 1: Remove background
     const fileBuffer = Buffer.from(await file.arrayBuffer());
     const transparentPng = await removeBackground(fileBuffer);
 
     // Step 2: Composite onto studio background
     const processed = await compositeStudioImage(transparentPng, productScale);
 
-    return new NextResponse(new Uint8Array(processed), {
-      headers: {
-        "Content-Type": "image/jpeg",
-        "Content-Disposition": "inline; filename=processed.jpg",
-      },
+    // Step 3: Upload to Firebase Storage (server-side, bypasses rules)
+    const storagePath = `products/${productId}/image_${Date.now()}.jpg`;
+    const bucket = adminStorage.bucket();
+    const fileRef = bucket.file(storagePath);
+    await fileRef.save(processed, {
+      contentType: "image/jpeg",
+      metadata: { cacheControl: "public, max-age=86400" },
     });
+    await fileRef.makePublic();
+
+    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${storagePath}`;
+
+    return NextResponse.json({ url: publicUrl });
   } catch (error) {
     console.error("[process-image] Error:", error);
     const message = error instanceof Error ? error.message : "Processing failed";
@@ -135,18 +149,9 @@ async function compositeStudioImage(
   const xOff = Math.round((OUTPUT_SIZE - pw) / 2);
   const yOff = Math.round((OUTPUT_SIZE - ph) / 2) + 10;
 
-  // Create shadow layer
-  const shadow = await createShadow(product, pw, ph);
-
-  // Composite: background → shadow → product
+  // Composite: background → product (no shadow — matches catalog style)
   const result = await sharp(background)
     .composite([
-      {
-        input: shadow,
-        left: xOff - 5,
-        top: yOff + Math.round(ph * 0.4),
-        blend: "multiply",
-      },
       {
         input: product,
         left: xOff,
@@ -160,17 +165,16 @@ async function compositeStudioImage(
 }
 
 /**
- * Creates a warm sand/peach gradient background (1024x1024).
- * Lighter at top-right (simulating key light), darker at bottom-left.
+ * Creates a warm sand/beige background (1024x1024).
+ * Very subtle gradient — nearly uniform, matching the Hader catalog style.
  */
 async function createStudioBackground(): Promise<Buffer> {
-  // Create a solid base color, then overlay a subtle gradient via SVG
   const svg = `
     <svg width="${OUTPUT_SIZE}" height="${OUTPUT_SIZE}">
       <defs>
         <linearGradient id="grad" x1="100%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" style="stop-color:rgb(245,230,205);stop-opacity:1" />
-          <stop offset="100%" style="stop-color:rgb(215,195,168);stop-opacity:1" />
+          <stop offset="0%" style="stop-color:rgb(240,228,200);stop-opacity:1" />
+          <stop offset="100%" style="stop-color:rgb(230,218,190);stop-opacity:1" />
         </linearGradient>
       </defs>
       <rect width="${OUTPUT_SIZE}" height="${OUTPUT_SIZE}" fill="url(#grad)" />
@@ -180,21 +184,4 @@ async function createStudioBackground(): Promise<Buffer> {
   return sharp(Buffer.from(svg)).png().toBuffer();
 }
 
-/**
- * Creates a blurred, semi-transparent shadow from the product silhouette.
- */
-async function createShadow(
-  productBuffer: Buffer,
-  width: number,
-  height: number
-): Promise<Buffer> {
-  // Squash vertically to simulate ground shadow
-  const squashedHeight = Math.round(height * 0.3);
 
-  return sharp(productBuffer)
-    .resize(width, squashedHeight, { fit: "fill" })
-    .blur(25)
-    .modulate({ brightness: 0.2 })
-    .ensureAlpha(0.4)
-    .toBuffer();
-}

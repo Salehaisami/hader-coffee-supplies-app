@@ -38,6 +38,7 @@ export const en: TranslationDictionary = {
     suppliers: "Suppliers",
     customers: "Customers",
     analytics: "Analytics",
+    settings: "Settings",
     signOut: "Sign Out",
     signedIn: "Signed in",
   },

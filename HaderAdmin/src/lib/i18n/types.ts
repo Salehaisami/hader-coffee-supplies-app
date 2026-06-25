@@ -43,6 +43,7 @@ export interface TranslationDictionary {
     suppliers: string;
     customers: string;
     analytics: string;
+    settings: string;
     signOut: string;
     signedIn: string;
   };

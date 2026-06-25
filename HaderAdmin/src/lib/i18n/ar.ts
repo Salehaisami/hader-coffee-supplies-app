@@ -39,6 +39,7 @@ export const ar: TranslationDictionary = {
     suppliers: "الموردين",
     customers: "العملاء",
     analytics: "التحليلات",
+    settings: "الإعدادات",
     signOut: "تسجيل الخروج",
     signedIn: "تم تسجيل الدخول",
   },
