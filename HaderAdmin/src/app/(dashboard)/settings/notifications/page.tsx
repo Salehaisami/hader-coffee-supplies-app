@@ -65,7 +65,7 @@ export default function NotificationsPage() {
 
   const [config, setConfig] = useState<NotificationsConfig>(DEFAULT_CONFIG);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [savingKey, setSavingKey] = useState<string | null>(null);
 
   useEffect(() => {
     loadConfig();
@@ -75,7 +75,7 @@ export default function NotificationsPage() {
     try {
       const snap = await getDoc(doc(db, "config", "notifications"));
       if (snap.exists()) {
-        setConfig(snap.data() as NotificationsConfig);
+        setConfig({ ...DEFAULT_CONFIG, ...snap.data() } as NotificationsConfig);
       }
     } catch (err) {
       console.error("Failed to load notifications config:", err);
@@ -84,48 +84,67 @@ export default function NotificationsPage() {
   }
 
   async function handleToggle(key: keyof NotificationsConfig) {
-    setSaving(true);
-    const updated = { ...config, [key]: !config[key] };
+    setSavingKey(key);
+    const newValue = !config[key];
+    // Optimistically update UI
+    setConfig((prev) => ({ ...prev, [key]: newValue }));
     try {
-      await setDoc(doc(db, "config", "notifications"), updated, { merge: true });
-      setConfig(updated);
+      await setDoc(doc(db, "config", "notifications"), { [key]: newValue }, { merge: true });
     } catch (err) {
+      // Revert on failure
+      setConfig((prev) => ({ ...prev, [key]: !newValue }));
       console.error("Failed to update notification setting:", err);
     }
-    setSaving(false);
+    setSavingKey(null);
   }
-
-  const labels = {
-    title: isAr ? "الإشعارات" : "Notifications",
-    description: isAr ? "إعدادات إشعارات الطلبات والتنبيهات" : "Order notifications and alert preferences",
-    loading: isAr ? "جاري التحميل..." : "Loading...",
-  };
 
   return (
     <div>
-      <PageHeader title={labels.title} description={labels.description} />
+      <PageHeader
+        title={isAr ? "الإشعارات" : "Notifications"}
+        description={isAr ? "إعدادات إشعارات الطلبات والتنبيهات" : "Order notifications and alert preferences"}
+      />
       <div className="mx-auto max-w-2xl p-8">
         {loading ? (
-          <p className="text-sm text-ink-soft">{labels.loading}</p>
+          <p className="text-sm text-ink-soft">{isAr ? "جاري التحميل..." : "Loading..."}</p>
         ) : (
-          <div className="rounded-lg border border-stone-200 bg-white">
-            <div className="divide-y divide-stone-100">
-              {NOTIFICATION_ITEMS.map((item) => (
-                <div key={item.key} className="flex items-center justify-between px-4 py-4">
-                  <div>
-                    <p className="text-sm font-medium text-ink">{isAr ? item.labelAr : item.labelEn}</p>
-                    <p className="text-xs text-ink-soft">{isAr ? item.descriptionAr : item.descriptionEn}</p>
-                  </div>
-                  <button
-                    onClick={() => handleToggle(item.key)}
-                    disabled={saving}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors disabled:opacity-50 ${config[item.key] ? "bg-green-500" : "bg-stone-300"}`}
-                  >
-                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${config[item.key] ? "translate-x-6" : "translate-x-1"}`} />
-                  </button>
+          <div className="rounded-lg border border-stone-200 bg-white divide-y divide-stone-100">
+            {NOTIFICATION_ITEMS.map((item) => (
+              <label
+                key={item.key}
+                className="flex items-center justify-between px-5 py-4 cursor-pointer hover:bg-stone-50 transition-colors"
+              >
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-ink">{isAr ? item.labelAr : item.labelEn}</p>
+                  <p className="mt-0.5 text-xs text-ink-soft">{isAr ? item.descriptionAr : item.descriptionEn}</p>
                 </div>
-              ))}
-            </div>
+                <div className="shrink-0 ms-4">
+                  <input
+                    type="checkbox"
+                    checked={config[item.key]}
+                    onChange={() => handleToggle(item.key)}
+                    disabled={savingKey === item.key}
+                    className="sr-only peer"
+                  />
+                  <div
+                    onClick={() => handleToggle(item.key)}
+                    className={`
+                      relative w-[51px] h-[31px] rounded-full transition-colors duration-200 ease-in-out
+                      ${config[item.key] ? "bg-[#34C759]" : "bg-[#E9E9EA]"}
+                      ${savingKey === item.key ? "opacity-50" : ""}
+                    `}
+                  >
+                    <div
+                      className={`
+                        absolute top-[2px] w-[27px] h-[27px] rounded-full bg-white shadow-md
+                        transition-transform duration-200 ease-in-out
+                        ${config[item.key] ? "translate-x-[22px]" : "translate-x-[2px]"}
+                      `}
+                    />
+                  </div>
+                </div>
+              </label>
+            ))}
           </div>
         )}
       </div>

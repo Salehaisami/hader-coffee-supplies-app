@@ -201,9 +201,12 @@ export default function DeliveryZonesPage() {
                     <td className="px-3 py-2">{zone.label_en}</td>
                     <td className="px-3 py-2">{(zone.radiusMeters / 1000).toFixed(0)} km</td>
                     <td className="px-3 py-2 text-center">
-                      <button onClick={() => handleToggle(zone.id)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${zone.enabled ? "bg-green-500" : "bg-stone-300"}`}>
-                        <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${zone.enabled ? "translate-x-4" : "translate-x-1"}`} />
-                      </button>
+                      <div
+                        onClick={() => handleToggle(zone.id)}
+                        className={`relative inline-block w-[51px] h-[31px] rounded-full transition-colors duration-200 ease-in-out cursor-pointer ${zone.enabled ? "bg-[#34C759]" : "bg-[#E9E9EA]"}`}
+                      >
+                        <div className={`absolute top-[2px] w-[27px] h-[27px] rounded-full bg-white shadow-md transition-transform duration-200 ease-in-out ${zone.enabled ? "translate-x-[22px]" : "translate-x-[2px]"}`} />
+                      </div>
                     </td>
                     <td className="px-3 py-2 text-end">
                       <button onClick={() => startEdit(zone)} className="text-xs text-clay hover:underline">{labels.edit}</button>

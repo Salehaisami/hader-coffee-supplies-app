@@ -77,18 +77,27 @@ export default function PaymentMethodsPage() {
             <div className="rounded-lg border border-stone-200 bg-white">
               <div className="divide-y divide-stone-100">
                 {methods.map((method) => (
-                  <div key={method.id} className="flex items-center justify-between px-4 py-3">
+                  <div key={method.id} className="flex items-center justify-between px-5 py-4">
                     <div>
                       <p className="text-sm font-medium text-ink">{isAr ? method.label_ar : method.label_en}</p>
-                      <p className="text-xs text-ink-soft">{isAr ? method.label_en : method.label_ar}</p>
+                      <p className="mt-0.5 text-xs text-ink-soft">{isAr ? method.label_en : method.label_ar}</p>
                     </div>
-                    <button
-                      onClick={() => handleToggle(method.id)}
-                      disabled={saving}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors disabled:opacity-50 ${method.enabled ? "bg-green-500" : "bg-stone-300"}`}
+                    <div
+                      onClick={() => !saving && handleToggle(method.id)}
+                      className={`
+                        relative w-[51px] h-[31px] rounded-full transition-colors duration-200 ease-in-out cursor-pointer
+                        ${method.enabled ? "bg-[#34C759]" : "bg-[#E9E9EA]"}
+                        ${saving ? "opacity-50 cursor-not-allowed" : ""}
+                      `}
                     >
-                      <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${method.enabled ? "translate-x-6" : "translate-x-1"}`} />
-                    </button>
+                      <div
+                        className={`
+                          absolute top-[2px] w-[27px] h-[27px] rounded-full bg-white shadow-md
+                          transition-transform duration-200 ease-in-out
+                          ${method.enabled ? "translate-x-[22px]" : "translate-x-[2px]"}
+                        `}
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
