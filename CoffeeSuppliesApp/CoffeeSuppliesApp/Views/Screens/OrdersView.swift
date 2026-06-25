@@ -77,9 +77,16 @@ private struct OrderRow: View {
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: Spacing.xxxs) {
-                Text("#\(order.id.prefix(8))")
-                    .font(.appMonoSmall)
-                    .foregroundStyle(Color.primaryText)
+                HStack(spacing: Spacing.xxs) {
+                    Text("#\(order.id.prefix(8))")
+                        .font(.appMonoSmall)
+                        .foregroundStyle(Color.primaryText)
+                    Text("·")
+                        .foregroundStyle(Color.placeholder)
+                    Text(formattedDate)
+                        .font(.appCaption)
+                        .foregroundStyle(Color.placeholder)
+                }
                 Text("\(order.itemCount) \(itemsLabel) · \(NumberFormatting.priceWithCurrency(order.total))")
                     .font(.appCaption)
                     .foregroundStyle(Color.secondaryText)
@@ -94,5 +101,26 @@ private struct OrderRow: View {
 
     private var itemsLabel: String {
         LanguageManager.shared.resolve(ar: "منتجات", en: "items")
+    }
+
+    private var formattedDate: String {
+        let calendar = Calendar.current
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: LanguageManager.shared.currentLanguage == .arabic ? "ar" : "en")
+
+        if calendar.isDateInToday(order.createdAt) {
+            formatter.dateFormat = "h:mm a"
+            let timeStr = formatter.string(from: order.createdAt)
+            let todayLabel = LanguageManager.shared.resolve(ar: "اليوم", en: "Today")
+            return "\(todayLabel), \(timeStr)"
+        } else if calendar.isDateInYesterday(order.createdAt) {
+            formatter.dateFormat = "h:mm a"
+            let timeStr = formatter.string(from: order.createdAt)
+            let yesterdayLabel = LanguageManager.shared.resolve(ar: "أمس", en: "Yesterday")
+            return "\(yesterdayLabel), \(timeStr)"
+        } else {
+            formatter.dateFormat = "MMM d, h:mm a"
+            return formatter.string(from: order.createdAt)
+        }
     }
 }

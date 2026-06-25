@@ -68,6 +68,11 @@ private extension OrderDetailView {
         VStack(spacing: Spacing.sm) {
             StatusPill(status: order.status)
 
+            // Order date & time
+            Text(orderDateFormatted)
+                .font(.appCaption)
+                .foregroundStyle(Color.secondaryText)
+
             HStack(spacing: 0) {
                 ForEach(0..<3) { step in
                     Circle()
@@ -94,6 +99,25 @@ private extension OrderDetailView {
     }
 
     var currentStep: Int { OrderTracker.currentStep(for: order.status) }
+
+    var orderDateFormatted: String {
+        let calendar = Calendar.current
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: LanguageManager.shared.currentLanguage == .arabic ? "ar" : "en")
+
+        if calendar.isDateInToday(order.createdAt) {
+            formatter.dateFormat = "h:mm a"
+            let todayLabel = LanguageManager.shared.resolve(ar: "اليوم", en: "Today")
+            return "\(todayLabel), \(formatter.string(from: order.createdAt))"
+        } else if calendar.isDateInYesterday(order.createdAt) {
+            formatter.dateFormat = "h:mm a"
+            let yesterdayLabel = LanguageManager.shared.resolve(ar: "أمس", en: "Yesterday")
+            return "\(yesterdayLabel), \(formatter.string(from: order.createdAt))"
+        } else {
+            formatter.dateFormat = "MMM d, yyyy · h:mm a"
+            return formatter.string(from: order.createdAt)
+        }
+    }
 
     var itemsSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
