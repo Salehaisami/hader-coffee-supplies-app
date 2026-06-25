@@ -21,6 +21,24 @@ export function getNextStatus(currentStatus: OrderStatus): OrderStatus | null {
   }
 }
 
+/**
+ * Returns the previous status (for reverting), or null if already at the start.
+ */
+export function getPreviousStatus(currentStatus: OrderStatus): OrderStatus | null {
+  switch (currentStatus) {
+    case "sent_to_supplier":
+      return "pending";
+    case "delivered":
+      return "sent_to_supplier";
+    case "cancelled":
+      return "pending";
+    case "pending":
+      return null;
+    default:
+      return null;
+  }
+}
+
 /** Human-readable label for a status transition button. */
 export function getStatusActionLabel(nextStatus: OrderStatus, t: TranslationDictionary): string {
   switch (nextStatus) {
