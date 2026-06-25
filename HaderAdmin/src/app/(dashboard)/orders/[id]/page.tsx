@@ -273,8 +273,59 @@ function LineItemsCard({ order }: { order: Order }) {
 }
 
 function DeliveryAddressCard({ order }: { order: Order }) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
+  const isAr = locale === "ar";
   const address = order.deliveryAddress;
+  const [editing, setEditing] = useState(false);
+  const [mapsLink, setMapsLink] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  function extractCoordinates(url: string): { lat: number; lng: number } | null {
+    // Google Maps: @21.5216,39.2372 or ?q=21.5216,39.2372 or /place/21.5216,39.2372
+    const googleAt = url.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+    if (googleAt) return { lat: parseFloat(googleAt[1]), lng: parseFloat(googleAt[2]) };
+
+    const googleQ = url.match(/[?&]q=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+    if (googleQ) return { lat: parseFloat(googleQ[1]), lng: parseFloat(googleQ[2]) };
+
+    const googleQuery = url.match(/query=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+    if (googleQuery) return { lat: parseFloat(googleQuery[1]), lng: parseFloat(googleQuery[2]) };
+
+    // Apple Maps: ?ll=21.5216,39.2372 or &ll=
+    const appleLl = url.match(/[?&]ll=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+    if (appleLl) return { lat: parseFloat(appleLl[1]), lng: parseFloat(appleLl[2]) };
+
+    // Raw coordinates: 21.5216, 39.2372 or 21.5216,39.2372
+    const raw = url.trim().match(/^(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)$/);
+    if (raw) return { lat: parseFloat(raw[1]), lng: parseFloat(raw[2]) };
+
+    return null;
+  }
+
+  async function handleSave() {
+    setError(null);
+    const coords = extractCoordinates(mapsLink);
+    if (!coords) {
+      setError(isAr ? "لم نتمكن من استخراج الإحداثيات من الرابط" : "Could not extract coordinates from link");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      await updateDoc(doc(db, "orders", order.id), {
+        "deliveryAddress.lat": coords.lat,
+        "deliveryAddress.lng": coords.lng,
+        updatedAt: serverTimestamp(),
+      });
+      setEditing(false);
+      setMapsLink("");
+    } catch (err) {
+      console.error("Failed to update delivery location:", err);
+      setError(isAr ? "فشل الحفظ" : "Save failed");
+    }
+    setSaving(false);
+  }
 
   if (!address) {
     return (
@@ -286,20 +337,56 @@ function DeliveryAddressCard({ order }: { order: Order }) {
 
   return (
     <Card title={t.orders.detail.deliveryAddress}>
-      {address.street && (
-        <p className="text-sm text-ink mb-3">{address.street}</p>
+      {editing ? (
+        <div className="space-y-3">
+          <div>
+            <label className="mb-1 block text-xs text-ink-soft">
+              {isAr ? "رابط خرائط جوجل أو أبل" : "Google Maps or Apple Maps link"}
+            </label>
+            <input
+              type="text"
+              value={mapsLink}
+              onChange={(e) => setMapsLink(e.target.value)}
+              placeholder="https://maps.google.com/..."
+              dir="ltr"
+              className="w-full rounded-md border border-stone-200 px-3 py-2 text-sm"
+            />
+          </div>
+          {error && <p className="text-xs text-red-600">{error}</p>}
+          <div className="flex gap-2">
+            <button
+              onClick={handleSave}
+              disabled={saving || !mapsLink.trim()}
+              className="rounded-md bg-clay px-3 py-1.5 text-xs font-medium text-white hover:bg-clay-deep disabled:opacity-50"
+            >
+              {saving ? "..." : (isAr ? "حفظ" : "Save")}
+            </button>
+            <button
+              onClick={() => { setEditing(false); setMapsLink(""); setError(null); }}
+              className="rounded-md border border-stone-200 px-3 py-1.5 text-xs text-ink hover:bg-stone-50"
+            >
+              {isAr ? "إلغاء" : "Cancel"}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <>
+          <a
+            href={googleMapsSearchUrl(address.lat, address.lng)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex w-full items-center justify-center rounded-md bg-clay px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-clay-deep"
+          >
+            {t.orders.detail.viewOnMap}
+          </a>
+          <button
+            onClick={() => setEditing(true)}
+            className="mt-2 w-full text-center text-xs text-clay hover:underline"
+          >
+            {isAr ? "تعديل الموقع" : "Edit Location"}
+          </button>
+        </>
       )}
-      {address.notes && (
-        <p className="text-sm text-ink-soft mb-3">{address.notes}</p>
-      )}
-      <a
-        href={googleMapsSearchUrl(address.lat, address.lng)}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex w-full items-center justify-center rounded-md bg-clay px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-clay-deep"
-      >
-        {t.orders.detail.viewOnMap}
-      </a>
     </Card>
   );
 }
@@ -376,7 +463,53 @@ function PaymentInfoCard({ order }: { order: Order }) {
 }
 
 function CustomerInfoCard({ order, customer }: { order: Order; customer: User | null }) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
+  const isAr = locale === "ar";
+  const [editingLocation, setEditingLocation] = useState(false);
+  const [mapsLink, setMapsLink] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  function extractCoordinates(url: string): { lat: number; lng: number } | null {
+    const googleAt = url.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+    if (googleAt) return { lat: parseFloat(googleAt[1]), lng: parseFloat(googleAt[2]) };
+    const googleQ = url.match(/[?&]q=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+    if (googleQ) return { lat: parseFloat(googleQ[1]), lng: parseFloat(googleQ[2]) };
+    const googleQuery = url.match(/query=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+    if (googleQuery) return { lat: parseFloat(googleQuery[1]), lng: parseFloat(googleQuery[2]) };
+    const appleLl = url.match(/[?&]ll=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+    if (appleLl) return { lat: parseFloat(appleLl[1]), lng: parseFloat(appleLl[2]) };
+    const raw = url.trim().match(/^(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)$/);
+    if (raw) return { lat: parseFloat(raw[1]), lng: parseFloat(raw[2]) };
+    return null;
+  }
+
+  async function handleSaveProfileLocation() {
+    setError(null);
+    const coords = extractCoordinates(mapsLink);
+    if (!coords || !customer) {
+      setError(isAr ? "لم نتمكن من استخراج الإحداثيات من الرابط" : "Could not extract coordinates from link");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      await updateDoc(doc(db, "users", customer.id), {
+        deliveryAddress: {
+          city: "Jeddah",
+          district: "—",
+          lat: coords.lat,
+          lng: coords.lng,
+        },
+      });
+      setEditingLocation(false);
+      setMapsLink("");
+    } catch (err) {
+      console.error("Failed to update customer location:", err);
+      setError(isAr ? "فشل الحفظ" : "Save failed");
+    }
+    setSaving(false);
+  }
 
   return (
     <Card title={t.nav.customers}>
@@ -388,6 +521,64 @@ function CustomerInfoCard({ order, customer }: { order: Order; customer: User | 
         {customer?.phone && <Field label={t.customers.fields.phone} value={customer.phone} />}
         {customer?.email && <Field label={t.customers.fields.email} value={customer.email} />}
       </dl>
+
+      {/* Customer profile location */}
+      {customer && (
+        <div className="mt-4 border-t border-stone-100 pt-3">
+          <p className="text-xs font-medium text-ink-soft mb-2">
+            {isAr ? "موقع العميل المحفوظ" : "Saved Customer Location"}
+          </p>
+          {editingLocation ? (
+            <div className="space-y-2">
+              <input
+                type="text"
+                value={mapsLink}
+                onChange={(e) => setMapsLink(e.target.value)}
+                placeholder={isAr ? "رابط خرائط جوجل أو أبل" : "Google/Apple Maps link"}
+                dir="ltr"
+                className="w-full rounded-md border border-stone-200 px-2 py-1.5 text-xs"
+              />
+              {error && <p className="text-xs text-red-600">{error}</p>}
+              <div className="flex gap-2">
+                <button
+                  onClick={handleSaveProfileLocation}
+                  disabled={saving || !mapsLink.trim()}
+                  className="rounded-md bg-clay px-2 py-1 text-xs font-medium text-white hover:bg-clay-deep disabled:opacity-50"
+                >
+                  {saving ? "..." : (isAr ? "حفظ" : "Save")}
+                </button>
+                <button
+                  onClick={() => { setEditingLocation(false); setMapsLink(""); setError(null); }}
+                  className="rounded-md border border-stone-200 px-2 py-1 text-xs text-ink hover:bg-stone-50"
+                >
+                  {isAr ? "إلغاء" : "Cancel"}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between">
+              {customer.deliveryAddress ? (
+                <a
+                  href={googleMapsSearchUrl(customer.deliveryAddress.lat, customer.deliveryAddress.lng)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-clay hover:underline"
+                >
+                  {t.orders.detail.viewOnMap}
+                </a>
+              ) : (
+                <span className="text-xs text-ink-soft">{isAr ? "لم يُحدد بعد" : "Not set"}</span>
+              )}
+              <button
+                onClick={() => setEditingLocation(true)}
+                className="text-xs text-clay hover:underline"
+              >
+                {isAr ? "تعديل" : "Edit"}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </Card>
   );
 }
