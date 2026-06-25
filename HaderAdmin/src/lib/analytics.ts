@@ -45,16 +45,20 @@ export function computeOrderMetrics(orders: Order[]): OrderMetrics {
   };
 
   let totalRevenue = 0;
+  let totalOrders = 0;
 
   for (const order of orders) {
-    totalRevenue += order.total ?? 0;
-    if (order.status && order.status in ordersByStatus) {
-      ordersByStatus[order.status] += 1;
+    ordersByStatus[order.status] = (ordersByStatus[order.status] ?? 0) + 1;
+
+    // Exclude cancelled orders from revenue and order count
+    if (order.status !== "cancelled") {
+      totalRevenue += order.total ?? 0;
+      totalOrders += 1;
     }
   }
 
   return {
-    totalOrders: orders.length,
+    totalOrders,
     totalRevenue,
     ordersByStatus,
   };
@@ -78,6 +82,7 @@ export function computeTopProducts(
   const revenueMap = new Map<string, number>();
 
   for (const order of orders) {
+    if (order.status === "cancelled") continue;
     for (const item of order.items) {
       const name = item.name;
       quantityMap.set(name, (quantityMap.get(name) ?? 0) + item.quantity);
@@ -129,6 +134,7 @@ export function computeOrdersBySupplier(
   const aggregation = new Map<string, { orderCount: number; revenue: number }>();
 
   for (const order of orders) {
+    if (order.status === "cancelled") continue;
     const supplierId = order.supplierId ?? null;
     const key = supplierId || "__unassigned__";
 

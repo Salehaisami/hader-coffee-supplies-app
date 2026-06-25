@@ -88,13 +88,14 @@ describe("computeOrderMetrics", () => {
 
   it("counts total orders correctly", () => {
     const result = computeOrderMetrics(fixtureOrders);
-    expect(result.totalOrders).toBe(4);
+    // Excludes cancelled orders (3 non-cancelled out of 4 total)
+    expect(result.totalOrders).toBe(3);
   });
 
   it("sums total revenue correctly", () => {
     const result = computeOrderMetrics(fixtureOrders);
-    // 500 + 300 + 150 + 200 = 1150
-    expect(result.totalRevenue).toBe(1150);
+    // 500 + 300 + 200 = 1000 (cancelled order-3's 150 excluded)
+    expect(result.totalRevenue).toBe(1000);
   });
 
   it("breaks down orders by status", () => {
@@ -159,8 +160,9 @@ describe("computeOrdersBySupplier", () => {
 
     const alJazeera = result.find((r) => r.supplierName === "Al-Jazeera Coffee Co.");
     expect(alJazeera).toBeDefined();
-    expect(alJazeera!.orderCount).toBe(2); // order-1 and order-3
-    expect(alJazeera!.revenue).toBe(650); // 500 + 150
+    // order-1 only (order-3 is cancelled, excluded)
+    expect(alJazeera!.orderCount).toBe(1);
+    expect(alJazeera!.revenue).toBe(500);
 
     const premium = result.find((r) => r.supplierName === "Premium Imports Ltd.");
     expect(premium).toBeDefined();
