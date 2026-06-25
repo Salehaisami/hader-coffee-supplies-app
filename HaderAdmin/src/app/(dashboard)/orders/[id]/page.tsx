@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { doc, getDoc, onSnapshot, updateDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import {
   type Order,
@@ -308,21 +308,72 @@ function DeliveryAddressCard({ order, customer }: { order: Order; customer: User
 }
 
 function PaymentInfoCard({ order }: { order: Order }) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
+  const isAr = locale === "ar";
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [selectedMethod, setSelectedMethod] = useState(order.paymentMethod);
 
   const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
     apple_pay: t.orders.payment.apple_pay,
     cash_on_delivery: t.orders.payment.cash_on_delivery,
   };
 
+  async function handleSave() {
+    setSaving(true);
+    try {
+      await updateDoc(doc(db, "orders", order.id), {
+        paymentMethod: selectedMethod,
+        updatedAt: serverTimestamp(),
+      });
+      setEditing(false);
+    } catch (err) {
+      console.error("Failed to update payment method:", err);
+    }
+    setSaving(false);
+  }
+
   return (
     <Card title={t.orders.detail.paymentMethod}>
-      <dl className="space-y-2 text-sm">
-        <Field
-          label={t.orders.detail.paymentMethod}
-          value={PAYMENT_METHOD_LABELS[order.paymentMethod] ?? order.paymentMethod}
-        />
-      </dl>
+      {editing ? (
+        <div className="space-y-3">
+          <select
+            value={selectedMethod}
+            onChange={(e) => setSelectedMethod(e.target.value as PaymentMethod)}
+            className="w-full rounded-md border border-stone-200 px-3 py-2 text-sm"
+          >
+            <option value="apple_pay">{PAYMENT_METHOD_LABELS.apple_pay}</option>
+            <option value="cash_on_delivery">{PAYMENT_METHOD_LABELS.cash_on_delivery}</option>
+          </select>
+          <div className="flex gap-2">
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="rounded-md bg-clay px-3 py-1.5 text-xs font-medium text-white hover:bg-clay-deep disabled:opacity-50"
+            >
+              {saving ? "..." : (isAr ? "حفظ" : "Save")}
+            </button>
+            <button
+              onClick={() => { setEditing(false); setSelectedMethod(order.paymentMethod); }}
+              className="rounded-md border border-stone-200 px-3 py-1.5 text-xs text-ink hover:bg-stone-50"
+            >
+              {isAr ? "إلغاء" : "Cancel"}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-ink">
+            {PAYMENT_METHOD_LABELS[order.paymentMethod] ?? order.paymentMethod}
+          </p>
+          <button
+            onClick={() => setEditing(true)}
+            className="text-xs text-clay hover:underline"
+          >
+            {isAr ? "تعديل" : "Edit"}
+          </button>
+        </div>
+      )}
     </Card>
   );
 }
