@@ -17,7 +17,6 @@ import PageHeader from "@/components/PageHeader";
 
 interface PricingUnit {
   id: string;
-  value: string;
   label_ar: string;
   label_en: string;
   sortOrder: number;
@@ -31,7 +30,7 @@ export default function PricingUnitsPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({ value: "", label_ar: "", label_en: "" });
+  const [formData, setFormData] = useState({ label_ar: "", label_en: "" });
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -46,19 +45,17 @@ export default function PricingUnitsPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!formData.value.trim() || !formData.label_ar.trim() || !formData.label_en.trim()) return;
+    if (!formData.label_ar.trim() || !formData.label_en.trim()) return;
 
     setSaving(true);
     try {
       if (editingId) {
         await updateDoc(doc(db, "pricingUnits", editingId), {
-          value: formData.value.trim(),
           label_ar: formData.label_ar.trim(),
           label_en: formData.label_en.trim(),
         });
       } else {
         await addDoc(collection(db, "pricingUnits"), {
-          value: formData.value.trim(),
           label_ar: formData.label_ar.trim(),
           label_en: formData.label_en.trim(),
           sortOrder: units.length,
@@ -77,13 +74,13 @@ export default function PricingUnitsPage() {
   }
 
   function resetForm() {
-    setFormData({ value: "", label_ar: "", label_en: "" });
+    setFormData({ label_ar: "", label_en: "" });
     setEditingId(null);
     setShowForm(false);
   }
 
   function startEdit(unit: PricingUnit) {
-    setFormData({ value: unit.value, label_ar: unit.label_ar, label_en: unit.label_en });
+    setFormData({ label_ar: unit.label_ar, label_en: unit.label_en });
     setEditingId(unit.id);
     setShowForm(true);
   }
@@ -92,7 +89,6 @@ export default function PricingUnitsPage() {
     title: isAr ? "وحدات التسعير" : "Pricing Units",
     description: isAr ? "إدارة وحدات التسعير المتاحة للمنتجات" : "Manage available pricing units for products",
     addNew: isAr ? "إضافة وحدة جديدة" : "Add New Unit",
-    value: isAr ? "القيمة (بالإنجليزية، بدون مسافات)" : "Value (English, no spaces)",
     labelAr: isAr ? "الاسم بالعربي" : "Arabic Label",
     labelEn: isAr ? "الاسم بالإنجليزي" : "English Label",
     save: isAr ? "حفظ" : "Save",
@@ -120,18 +116,7 @@ export default function PricingUnitsPage() {
         {/* Form */}
         {showForm && (
           <form onSubmit={handleSubmit} className="mb-6 space-y-3 rounded-lg border border-stone-200 bg-white p-4">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <div>
-                <label className="mb-1 block text-xs font-medium text-ink-soft">{labels.value}</label>
-                <input
-                  type="text"
-                  value={formData.value}
-                  onChange={(e) => setFormData((p) => ({ ...p, value: e.target.value.replace(/\s/g, "_").toLowerCase() }))}
-                  placeholder="e.g. case_of_24"
-                  className="w-full rounded-md border border-stone-200 px-3 py-2 text-sm"
-                  dir="ltr"
-                />
-              </div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
                 <label className="mb-1 block text-xs font-medium text-ink-soft">{labels.labelAr}</label>
                 <input
@@ -180,29 +165,28 @@ export default function PricingUnitsPage() {
         ) : units.length === 0 ? (
           <p className="text-sm text-ink-soft">{labels.empty}</p>
         ) : (
-          <div className="overflow-x-auto rounded-lg border border-stone-200 bg-white">
+          <div className="overflow-x-auto rounded-lg border border-stone-200 bg-white max-w-md">
             <table className="w-full text-sm">
               <thead className="border-b border-stone-200 bg-stone-50 text-xs uppercase tracking-wide text-ink-soft">
                 <tr>
-                  <th className="px-4 py-3 text-start font-medium">{labels.value}</th>
-                  <th className="px-4 py-3 text-start font-medium">{labels.labelAr}</th>
-                  <th className="px-4 py-3 text-start font-medium">{labels.labelEn}</th>
-                  <th className="px-4 py-3 text-end font-medium">{isAr ? "إجراءات" : "Actions"}</th>
+                  <th className="px-3 py-2.5 font-medium text-start">{labels.labelAr}</th>
+                  <th className="px-3 py-2.5 font-medium text-start">{labels.labelEn}</th>
+                  <th className="px-3 py-2.5 font-medium text-end">{isAr ? "إجراءات" : "Actions"}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100">
                 {units.map((unit) => (
                   <tr key={unit.id} className="hover:bg-stone-50">
-                    <td className="px-4 py-3 font-mono text-xs" dir="ltr">{unit.value}</td>
-                    <td className="px-4 py-3" dir="rtl">{unit.label_ar}</td>
-                    <td className="px-4 py-3" dir="ltr">{unit.label_en}</td>
-                    <td className="px-4 py-3 text-end">
+                    <td className="px-3 py-2">{unit.label_ar}</td>
+                    <td className="px-3 py-2">{unit.label_en}</td>
+                    <td className="px-3 py-2 text-end whitespace-nowrap">
                       <button
                         onClick={() => startEdit(unit)}
-                        className="mr-2 text-xs text-clay hover:underline"
+                        className="text-xs text-clay hover:underline"
                       >
                         {labels.edit}
                       </button>
+                      <span className="mx-2 text-stone-300">|</span>
                       <button
                         onClick={() => handleDelete(unit.id)}
                         className="text-xs text-red-500 hover:underline"
