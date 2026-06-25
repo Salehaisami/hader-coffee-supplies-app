@@ -86,9 +86,9 @@ final class CheckoutViewModel {
         return JeddahGeofence.contains(coordinate)
     }
 
-    /// Whether the order can be placed: non-empty cart, a valid in-zone location, a district, and not already in progress.
+    /// Whether the order can be placed: non-empty cart, a valid in-zone location, and not already in progress.
     var canPlaceOrder: Bool {
-        !cart.isEmpty && deliveryCoordinate != nil && isInJeddah && selectedDistrict != nil && !businessName.isEmpty && !isPlacingOrder
+        !cart.isEmpty && deliveryCoordinate != nil && isInJeddah && !businessName.isEmpty && !isPlacingOrder
     }
 
     /// Message shown when the pin is outside Jeddah.
@@ -166,7 +166,7 @@ final class CheckoutViewModel {
         let coordinate = deliveryCoordinate!  // Safe: canPlaceOrder guarantees non-nil
         let address = DeliveryAddress(
             city: "Jeddah",
-            district: selectedDistrict?.localizedName ?? JeddahDistricts.other.localizedName,
+            district: selectedDistrict?.localizedName ?? "—",
             street: street.isEmpty ? nil : street,
             notes: notes.isEmpty ? nil : notes,
             lat: coordinate.latitude,

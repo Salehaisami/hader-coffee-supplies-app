@@ -1,9 +1,8 @@
 import SwiftUI
 import CoreLocation
 
-/// Checkout: delivery details (location pin + district + street/notes), business info,
-/// payment selector (Apple Pay / Cash on Delivery), and place-order with order assembly.
-/// Routes a confirmed order to `onOrderPlaced` (confirmation screen lands in T4.4).
+/// Checkout: delivery pin location, business info, payment selector,
+/// and place-order with order assembly.
 struct CheckoutView: View {
     @Bindable var viewModel: CheckoutViewModel
     @State private var showLocationPicker = false
@@ -34,18 +33,15 @@ struct CheckoutView: View {
         .navigationTitle(L10n.checkoutTitle)
         .navigationBarTitleDisplayMode(.inline)
         .task { await viewModel.loadUserProfile() }
-        .navigationDestination(isPresented: $showLocationPicker) {
-            LocationPickerView(
-                viewModel: LocationPickerViewModel(
-                    locationService: locationService,
-                    initialCoordinate: viewModel.deliveryCoordinate ?? JeddahGeofence.center
-                ),
-                onConfirm: { coordinate, district in
+        .fullScreenCover(isPresented: $showLocationPicker) {
+            LocationPickerCoverView(
+                locationService: locationService,
+                initialCoordinate: viewModel.deliveryCoordinate ?? JeddahGeofence.center,
+                onConfirm: { coordinate in
                     viewModel.deliveryCoordinate = coordinate
-                    if let district,
-                       let match = JeddahDistricts.all.first(where: { $0.nameEn == district || $0.nameAr == district }) {
-                        viewModel.selectedDistrict = match
-                    }
+                    showLocationPicker = false
+                },
+                onCancel: {
                     showLocationPicker = false
                 }
             )
@@ -86,17 +82,6 @@ private extension CheckoutView {
                     .font(.appCaption)
                     .foregroundStyle(Color.clay)
             }
-
-            Picker(L10n.checkoutSelectDistrict, selection: $viewModel.selectedDistrict) {
-                Text(L10n.checkoutSelectDistrict).tag(District?.none)
-                ForEach(JeddahDistricts.all) { district in
-                    Text(district.localizedName).tag(District?.some(district))
-                }
-            }
-
-            TextField(L10n.checkoutStreet, text: $viewModel.street)
-            TextField(L10n.checkoutNotes, text: $viewModel.notes, axis: .vertical)
-                .lineLimit(2...4)
         }
     }
 
