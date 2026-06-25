@@ -95,7 +95,7 @@ const NAV_ITEMS: NavItem[] = [
     ),
   },
   {
-    href: "/settings/pricing-units",
+    href: "/settings",
     labelKey: "settings",
     icon: (
       <svg {...iconProps}>
