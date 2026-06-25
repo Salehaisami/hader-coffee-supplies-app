@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import {
   collection,
+  deleteDoc,
   doc,
   onSnapshot,
   orderBy,
@@ -88,6 +89,7 @@ export default function CustomersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const { t, locale } = useLocale();
 
   // Action state
@@ -127,6 +129,11 @@ export default function CustomersPage() {
     return () => unsubscribe();
   }, [t.general.error]);
 
+  // Clear selection when filter changes
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [statusFilter]);
+
   async function handleStatusUpdate(customerId: string, newStatus: UserStatus) {
     setUpdatingId(customerId);
     setConfirming(null);
@@ -137,6 +144,26 @@ export default function CustomersPage() {
       setError(t.general.error);
     } finally {
       setUpdatingId(null);
+    }
+  }
+
+  /** Bulk delete selected customers. */
+  async function handleBulkDelete() {
+    if (selectedIds.size === 0) return;
+    const confirmMsg = locale === "ar"
+      ? `هل أنت متأكد من حذف ${selectedIds.size} عميل؟ لا يمكن التراجع عن هذا الإجراء.`
+      : `Are you sure you want to delete ${selectedIds.size} customer(s)? This cannot be undone.`;
+
+    if (!window.confirm(confirmMsg)) return;
+
+    try {
+      await Promise.all(
+        Array.from(selectedIds).map((id) => deleteDoc(doc(db, "users", id)))
+      );
+      setSelectedIds(new Set());
+    } catch (err) {
+      console.error("Bulk delete failed:", err);
+      setError(locale === "ar" ? "فشل الحذف الجماعي" : "Bulk delete failed");
     }
   }
 
@@ -383,8 +410,39 @@ export default function CustomersPage() {
             handleStatusUpdate(customerId, targetStatus)
           }
           onActionCancel={() => setConfirming(null)}
+          selectedIds={selectedIds}
+          setSelectedIds={setSelectedIds}
         />
       </div>
+
+      {/* Bulk action bar */}
+      {selectedIds.size > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-stone-200 shadow-lg p-4">
+          <div className="flex items-center justify-between max-w-7xl mx-auto">
+            <span className="text-sm font-medium text-ink">
+              {locale === "ar"
+                ? `${selectedIds.size} محدد`
+                : `${selectedIds.size} selected`}
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleBulkDelete}
+                className="rounded-md bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700 transition-colors"
+              >
+                {locale === "ar" ? "حذف المحدد" : "Delete Selected"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedIds(new Set())}
+                className="rounded-md border border-stone-200 px-3 py-2 text-sm font-medium text-ink hover:bg-stone-50 transition-colors"
+              >
+                {locale === "ar" ? "إلغاء التحديد" : "Clear"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -398,6 +456,8 @@ function CustomersContent({
   onActionRequest,
   onActionConfirm,
   onActionCancel,
+  selectedIds,
+  setSelectedIds,
 }: {
   customers: User[];
   loading: boolean;
@@ -407,8 +467,32 @@ function CustomersContent({
   onActionRequest: (customerId: string, targetStatus: UserStatus) => void;
   onActionConfirm: (customerId: string, targetStatus: UserStatus) => void;
   onActionCancel: () => void;
+  selectedIds: Set<string>;
+  setSelectedIds: React.Dispatch<React.SetStateAction<Set<string>>>;
 }) {
   const { t, locale } = useLocale();
+
+  const allSelected = customers.length > 0 && customers.every((c) => selectedIds.has(c.id));
+
+  function toggleSelectAll() {
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(customers.map((c) => c.id)));
+    }
+  }
+
+  function toggleSelect(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }
 
   if (loading) {
     return <p className="text-ink-soft">{t.general.loading}</p>;
@@ -431,6 +515,14 @@ function CustomersContent({
       <table className="w-full min-w-[600px] text-sm">
         <thead className="border-b border-stone-200 bg-stone-50 text-xs uppercase tracking-wide text-ink-soft">
           <tr>
+            <th className="px-4 py-3 font-medium text-start">
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={toggleSelectAll}
+                className="h-4 w-4 rounded border-stone-300 text-clay focus:ring-clay/40"
+              />
+            </th>
             <th className="px-4 py-3 font-medium text-start">{t.customers.fields.businessName}</th>
             <th className="px-4 py-3 font-medium text-start">{t.customers.fields.contactName}</th>
             <th className="px-4 py-3 font-medium text-start">{t.customers.fields.phone}</th>
@@ -446,7 +538,15 @@ function CustomersContent({
             const isUpdating = updatingId === customer.id;
 
             return (
-              <tr key={customer.id} className="hover:bg-stone-50">
+              <tr key={customer.id} className={`hover:bg-stone-50 ${selectedIds.has(customer.id) ? "bg-clay/5" : ""}`}>
+                <td className="px-4 py-3">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.has(customer.id)}
+                    onChange={() => toggleSelect(customer.id)}
+                    className="h-4 w-4 rounded border-stone-300 text-clay focus:ring-clay/40"
+                  />
+                </td>
                 <td className="px-4 py-3 font-medium text-ink">{customer.businessName}</td>
                 <td className="px-4 py-3 text-ink">{customer.contactName || "—"}</td>
                 <td className="px-4 py-3 text-ink-soft" dir="ltr">{customer.phone || "—"}</td>

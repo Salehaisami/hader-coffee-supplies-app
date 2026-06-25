@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { collection, deleteDoc, doc, onSnapshot, query } from "firebase/firestore";
+import { collection, deleteDoc, doc, onSnapshot, query, updateDoc } from "firebase/firestore";
 import Link from "next/link";
 import Image from "next/image";
 import { db } from "@/lib/firebase";
@@ -37,6 +37,7 @@ export default function ProductsListPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const { t, locale } = useLocale();
 
   // Filter state
@@ -144,7 +145,12 @@ export default function ProductsListPage() {
     return result;
   }, [products, selectedCategory, searchTerm]);
 
-  // Delete handler
+  // Clear selection when filters change
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [selectedCategory, searchTerm]);
+
+  // Delete handler (single)
   async function handleDeleteProduct(id: string, name: string) {
     if (!window.confirm(`${t.catalog.products.deleteConfirm}\n\n${name}`)) return;
     try {
@@ -152,6 +158,48 @@ export default function ProductsListPage() {
     } catch (err) {
       console.error("Failed to delete product:", err);
       setError(t.general.error);
+    }
+  }
+
+  // Bulk delete handler
+  async function handleBulkDelete() {
+    if (selectedIds.size === 0) return;
+    const confirmMsg = locale === "ar"
+      ? `هل أنت متأكد من حذف ${selectedIds.size} منتج؟ لا يمكن التراجع عن هذا الإجراء.`
+      : `Are you sure you want to delete ${selectedIds.size} product(s)? This cannot be undone.`;
+
+    if (!window.confirm(confirmMsg)) return;
+
+    try {
+      await Promise.all(
+        Array.from(selectedIds).map((id) => deleteDoc(doc(db, "products", id)))
+      );
+      setSelectedIds(new Set());
+    } catch (err) {
+      console.error("Bulk delete failed:", err);
+      setError(locale === "ar" ? "فشل الحذف الجماعي" : "Bulk delete failed");
+    }
+  }
+
+  // Bulk stock update handler
+  async function handleBulkStockUpdate(available: boolean) {
+    if (selectedIds.size === 0) return;
+    const confirmMsg = locale === "ar"
+      ? `هل تريد تحديث حالة المخزون لـ ${selectedIds.size} منتج؟`
+      : `Update stock status of ${selectedIds.size} product(s)?`;
+
+    if (!window.confirm(confirmMsg)) return;
+
+    try {
+      await Promise.all(
+        Array.from(selectedIds).map((id) =>
+          updateDoc(doc(db, "products", id), { available, inStock: available })
+        )
+      );
+      setSelectedIds(new Set());
+    } catch (err) {
+      console.error("Bulk stock update failed:", err);
+      setError(locale === "ar" ? "فشل التحديث الجماعي" : "Bulk update failed");
     }
   }
 
@@ -214,8 +262,53 @@ export default function ProductsListPage() {
           categoryMap={categoryMap}
           loading={loading}
           onDelete={handleDeleteProduct}
+          selectedIds={selectedIds}
+          setSelectedIds={setSelectedIds}
         />
       </div>
+
+      {/* Bulk action bar */}
+      {selectedIds.size > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-stone-200 shadow-lg p-4">
+          <div className="flex items-center justify-between max-w-7xl mx-auto">
+            <span className="text-sm font-medium text-ink">
+              {locale === "ar"
+                ? `${selectedIds.size} محدد`
+                : `${selectedIds.size} selected`}
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => handleBulkStockUpdate(false)}
+                className="rounded-md bg-stone-600 px-3 py-2 text-sm font-medium text-white hover:bg-stone-700 transition-colors"
+              >
+                {locale === "ar" ? "تحديد غير متوفر" : "Mark Out of Stock"}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleBulkStockUpdate(true)}
+                className="rounded-md bg-sage px-3 py-2 text-sm font-medium text-white hover:bg-sage/90 transition-colors"
+              >
+                {locale === "ar" ? "تحديد متوفر" : "Mark In Stock"}
+              </button>
+              <button
+                type="button"
+                onClick={handleBulkDelete}
+                className="rounded-md bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700 transition-colors"
+              >
+                {locale === "ar" ? "حذف المحدد" : "Delete Selected"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedIds(new Set())}
+                className="rounded-md border border-stone-200 px-3 py-2 text-sm font-medium text-ink hover:bg-stone-50 transition-colors"
+              >
+                {locale === "ar" ? "إلغاء التحديد" : "Clear"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -229,13 +322,39 @@ function ProductsTable({
   categoryMap,
   loading,
   onDelete,
+  selectedIds,
+  setSelectedIds,
 }: {
   products: Product[];
   categoryMap: Map<string, string>;
   loading: boolean;
   onDelete: (id: string, name: string) => void;
+  selectedIds: Set<string>;
+  setSelectedIds: React.Dispatch<React.SetStateAction<Set<string>>>;
 }) {
   const { t, locale } = useLocale();
+
+  const allSelected = products.length > 0 && products.every((p) => selectedIds.has(p.id));
+
+  function toggleSelectAll() {
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(products.map((p) => p.id)));
+    }
+  }
+
+  function toggleSelect(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }
 
   if (loading) {
     return <p className="text-ink-soft">{t.general.loading}</p>;
@@ -260,6 +379,14 @@ function ProductsTable({
         <table className="w-full text-left text-sm">
           <thead className="border-b border-stone-200 bg-stone-50 text-xs uppercase tracking-wide text-ink-soft">
             <tr>
+              <th className="px-4 py-3 font-medium">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={toggleSelectAll}
+                  className="h-4 w-4 rounded border-stone-300 text-clay focus:ring-clay/40"
+                />
+              </th>
               <th className="px-4 py-3 font-medium">Image</th>
               <th className="px-4 py-3 font-medium">Name (English)</th>
               <th className="px-4 py-3 font-medium">Name (Arabic)</th>
@@ -272,7 +399,17 @@ function ProductsTable({
           </thead>
           <tbody className="divide-y divide-stone-100">
             {products.map((product) => (
-              <tr key={product.id} className="hover:bg-stone-50">
+              <tr key={product.id} className={`hover:bg-stone-50 ${selectedIds.has(product.id) ? "bg-clay/5" : ""}`}>
+                {/* Checkbox */}
+                <td className="px-4 py-3">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.has(product.id)}
+                    onChange={() => toggleSelect(product.id)}
+                    className="h-4 w-4 rounded border-stone-300 text-clay focus:ring-clay/40"
+                  />
+                </td>
+
                 {/* Thumbnail */}
                 <td className="px-4 py-3">
                   {product.imageUrl ? (
