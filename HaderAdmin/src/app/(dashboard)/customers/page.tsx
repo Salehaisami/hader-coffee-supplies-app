@@ -177,15 +177,18 @@ export default function CustomersPage() {
 
   function openEditForm(customer: User) {
     setEditingCustomerId(customer.id);
+    const existingLocation = customer.deliveryAddress
+      ? `${customer.deliveryAddress.lat}, ${customer.deliveryAddress.lng}`
+      : "";
     setFormData({
       businessName: customer.businessName ?? "",
       contactName: customer.contactName ?? "",
       phone: customer.phone ?? "",
       email: customer.email ?? "",
       city: customer.deliveryAddress?.city ?? "Jeddah",
-      district: customer.deliveryAddress?.district ?? "",
-      street: (customer.deliveryAddress as any)?.street ?? "",
-      notes: (customer.deliveryAddress as any)?.notes ?? "",
+      district: existingLocation,
+      street: "",
+      notes: "",
     });
     setFormErrors({});
     setShowForm(true);
@@ -212,8 +215,6 @@ export default function CustomersPage() {
 
     setSaving(true);
     try {
-      const hasAddress = formData.district.trim() || formData.street.trim() || formData.notes.trim();
-
       const payload: Record<string, unknown> = {
         businessName: formData.businessName.trim(),
         contactName: formData.contactName.trim(),
@@ -224,22 +225,22 @@ export default function CustomersPage() {
         payload.email = formData.email.trim();
       }
 
-      if (hasAddress) {
-        payload.deliveryAddress = {
-          city: formData.city.trim() || "Jeddah",
-          district: formData.district.trim(),
-          lat: 0,
-          lng: 0,
-          ...(formData.street.trim() && { street: formData.street.trim() }),
-          ...(formData.notes.trim() && { notes: formData.notes.trim() }),
-        };
+      // Parse delivery address from maps link or raw coordinates
+      if (formData.district.trim()) {
+        const coords = extractCoordinates(formData.district.trim());
+        if (coords) {
+          payload.deliveryAddress = {
+            city: "Jeddah",
+            district: "—",
+            lat: coords.lat,
+            lng: coords.lng,
+          };
+        }
       }
 
       if (editingCustomerId) {
-        // Update existing customer
         await updateDoc(doc(db, "users", editingCustomerId), payload);
       } else {
-        // Create new customer
         payload.role = "customer";
         payload.status = "approved";
         payload.createdAt = serverTimestamp();
@@ -253,6 +254,20 @@ export default function CustomersPage() {
     } finally {
       setSaving(false);
     }
+  }
+
+  function extractCoordinates(url: string): { lat: number; lng: number } | null {
+    const googleAt = url.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+    if (googleAt) return { lat: parseFloat(googleAt[1]), lng: parseFloat(googleAt[2]) };
+    const googleQ = url.match(/[?&]q=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+    if (googleQ) return { lat: parseFloat(googleQ[1]), lng: parseFloat(googleQ[2]) };
+    const googleQuery = url.match(/query=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+    if (googleQuery) return { lat: parseFloat(googleQuery[1]), lng: parseFloat(googleQuery[2]) };
+    const appleLl = url.match(/[?&]ll=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+    if (appleLl) return { lat: parseFloat(appleLl[1]), lng: parseFloat(appleLl[2]) };
+    const raw = url.trim().match(/^(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)$/);
+    if (raw) return { lat: parseFloat(raw[1]), lng: parseFloat(raw[2]) };
+    return null;
   }
 
   const filteredCustomers = filterCustomers(customers, statusFilter);
@@ -349,35 +364,24 @@ export default function CustomersPage() {
                 </div>
               </div>
 
-              {/* Optional delivery address */}
+              {/* Delivery address — paste a maps link */}
               <div className="border-t border-stone-100 pt-4">
-                <p className="mb-3 text-sm font-medium text-ink">
+                <p className="mb-2 text-sm font-medium text-ink">
                   {t.customers.fields.deliveryAddress}
                 </p>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className="mb-1 block text-sm font-medium text-ink-soft">
-                      {t.orders.detail.district}
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.district}
-                      onChange={(e) => setFormData((p) => ({ ...p, district: e.target.value }))}
-                      className="w-full rounded-md border border-stone-200 px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-clay/40"
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-sm font-medium text-ink-soft">
-                      {t.orders.detail.street}
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.street}
-                      onChange={(e) => setFormData((p) => ({ ...p, street: e.target.value }))}
-                      className="w-full rounded-md border border-stone-200 px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-clay/40"
-                    />
-                  </div>
-                </div>
+                <p className="mb-2 text-xs text-ink-soft">
+                  {locale === "ar"
+                    ? "الصق رابط خرائط جوجل أو أبل لتحديد موقع العميل"
+                    : "Paste a Google Maps or Apple Maps link to set the delivery location"}
+                </p>
+                <input
+                  type="text"
+                  value={formData.district}
+                  onChange={(e) => setFormData((p) => ({ ...p, district: e.target.value }))}
+                  dir="ltr"
+                  placeholder="https://maps.google.com/... or 21.52, 39.23"
+                  className="w-full rounded-md border border-stone-200 px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-clay/40"
+                />
               </div>
 
               <div className="flex gap-3 pt-2">
