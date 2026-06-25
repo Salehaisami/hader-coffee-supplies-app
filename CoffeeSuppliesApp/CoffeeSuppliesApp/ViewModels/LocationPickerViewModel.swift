@@ -116,9 +116,9 @@ final class LocationPickerViewModel {
 
     // MARK: - Derived
 
-    /// Whether the pin is inside the Jeddah delivery zone.
+    /// Whether the pin is inside any configured delivery zone.
     var isInJeddah: Bool {
-        JeddahGeofence.contains(pinnedCoordinate)
+        AppConfigManager.shared.isInDeliveryZone(pinnedCoordinate)
     }
 
     /// Whether the user can confirm this location (must be within Jeddah).

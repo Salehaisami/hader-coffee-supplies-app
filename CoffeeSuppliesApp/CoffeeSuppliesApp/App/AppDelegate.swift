@@ -1,6 +1,8 @@
 import UIKit
 import FirebaseCore
 import FirebaseAuth
+import FirebaseMessaging
+import FirebaseFirestore
 
 /// AppDelegate to handle APNs token forwarding for Firebase Phone Auth.
 /// Required because FirebaseAppDelegateProxyEnabled is set to false.
@@ -28,6 +30,13 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
         // Register for remote notifications so Firebase can receive APNs token for phone auth
         application.registerForRemoteNotifications()
+
+        // Save FCM token to user document when auth state changes
+        Auth.auth().addStateDidChangeListener { _, user in
+            guard let user = user else { return }
+            self.saveFCMToken(for: user.uid)
+        }
+
         return true
     }
 
@@ -36,6 +45,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
         Auth.auth().setAPNSToken(deviceToken, type: .unknown)
+        Messaging.messaging().apnsToken = deviceToken
     }
 
     func application(
@@ -65,5 +75,20 @@ class AppDelegate: NSObject, UIApplicationDelegate {
             return true
         }
         return false
+    }
+
+    // MARK: - FCM Token Persistence
+
+    /// Save the current FCM token to the user's Firestore document for push notifications.
+    private func saveFCMToken(for userId: String) {
+        guard let token = Messaging.messaging().fcmToken else { return }
+        let db = Firestore.firestore()
+        db.collection("users").document(userId).updateData([
+            "fcmToken": token
+        ]) { error in
+            if let error = error {
+                print("⚠️ [FCM] Failed to save token: \(error.localizedDescription)")
+            }
+        }
     }
 }

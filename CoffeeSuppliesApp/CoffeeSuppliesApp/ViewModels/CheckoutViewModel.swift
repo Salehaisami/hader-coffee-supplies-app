@@ -84,10 +84,16 @@ final class CheckoutViewModel {
 
     var isApplePayAvailable: Bool { paymentService.isApplePayAvailable }
 
-    /// Whether the pinned location is within the Jeddah delivery zone.
+    /// Whether the pinned location is within any configured delivery zone.
     var isInJeddah: Bool {
         guard let coordinate = deliveryCoordinate else { return false }
-        return JeddahGeofence.contains(coordinate)
+        return AppConfigManager.shared.isInDeliveryZone(coordinate)
+    }
+
+    /// Payment methods available based on remote config.
+    var availablePaymentMethods: [PaymentMethod] {
+        let enabled = AppConfigManager.shared.enabledPaymentMethods
+        return PaymentMethod.allCases.filter { enabled.contains($0.rawValue) }
     }
 
     /// Whether the order can be placed: non-empty cart, a valid in-zone location, and not already in progress.

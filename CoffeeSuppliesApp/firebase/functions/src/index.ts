@@ -38,6 +38,7 @@ export const onUserCreate = functions.auth.user().onCreate(async (user) => {
 /**
  * onOrderCreate — notify admin via both push (FCM) and email.
  * Also sends a WhatsApp order confirmation to the customer (T5.2).
+ * Checks notification config for customer-facing notifications.
  */
 export const onOrderCreate = functions.firestore
   .document("orders/{orderId}")
@@ -53,6 +54,22 @@ export const onOrderCreate = functions.firestore
     const total = order.total || 0;
     const customerName = order.businessName || "Unknown";
     const customerId = order.customerId;
+
+    // ── Load notification config ──
+    let notificationConfig = {
+      orderConfirmation: true,
+      orderStatusChange: true,
+      orderCancellation: true,
+      promotions: false,
+    };
+    try {
+      const configSnap = await db.collection("config").doc("notifications").get();
+      if (configSnap.exists) {
+        notificationConfig = { ...notificationConfig, ...configSnap.data() };
+      }
+    } catch (err) {
+      functions.logger.warn("Could not load notification config, using defaults:", err);
+    }
 
     // ── 1. Admin push notification (FCM topic) ──
     try {
@@ -95,6 +112,12 @@ export const onOrderCreate = functions.firestore
     }
 
     // ── 3. Customer WhatsApp confirmation (T5.2) ──
+    // Only send if orderConfirmation is enabled in config
+    if (!notificationConfig.orderConfirmation) {
+      functions.logger.info("Order confirmation notifications disabled, skipping customer WhatsApp");
+      return;
+    }
+
     const whatsappConfig = functions.config().whatsapp;
     if (whatsappConfig?.token && whatsappConfig?.phone_id) {
       try {
@@ -121,6 +144,7 @@ export const onOrderCreate = functions.firestore
 
 /**
  * onOrderUpdate — notify customer when status changes (push + WhatsApp).
+ * Checks the notification config to determine which notifications are enabled.
  */
 export const onOrderUpdate = functions.firestore
   .document("orders/{orderId}")
@@ -136,7 +160,27 @@ export const onOrderUpdate = functions.firestore
     const customerId = after.customerId;
     const shortId = orderId.slice(-6);
 
-    // Skip cancelled — customer initiated it
+    // ── Check notification config ──
+    let notificationConfig = {
+      orderConfirmation: true,
+      orderStatusChange: true,
+      orderCancellation: true,
+      promotions: false,
+    };
+    try {
+      const configSnap = await db.collection("config").doc("notifications").get();
+      if (configSnap.exists) {
+        notificationConfig = { ...notificationConfig, ...configSnap.data() };
+      }
+    } catch (err) {
+      functions.logger.warn("Could not load notification config, using defaults:", err);
+    }
+
+    // Skip if relevant notification type is disabled
+    if (newStatus === "cancelled" && !notificationConfig.orderCancellation) return;
+    if (newStatus !== "cancelled" && !notificationConfig.orderStatusChange) return;
+
+    // Skip cancelled if customer initiated it (existing behavior)
     if (newStatus === "cancelled") return;
 
     let title = "";

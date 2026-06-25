@@ -28,7 +28,7 @@ const SETTINGS_ITEMS: SettingsItem[] = [
     labelEn: "Delivery Zones",
     descriptionAr: "تحديد مناطق التوصيل المتاحة ونطاق الجيوفنس",
     descriptionEn: "Configure delivery area boundaries and geofence radius",
-    enabled: false,
+    enabled: true,
   },
   {
     href: "/settings/payment-methods",
@@ -36,7 +36,7 @@ const SETTINGS_ITEMS: SettingsItem[] = [
     labelEn: "Payment Methods",
     descriptionAr: "تفعيل أو تعطيل طرق الدفع المتاحة للعملاء",
     descriptionEn: "Enable or disable payment methods available to customers",
-    enabled: false,
+    enabled: true,
   },
   {
     href: "/settings/order-workflow",
@@ -44,7 +44,7 @@ const SETTINGS_ITEMS: SettingsItem[] = [
     labelEn: "Order Workflow",
     descriptionAr: "تخصيص مراحل الطلب والانتقالات بين الحالات",
     descriptionEn: "Customize order stages and status transitions",
-    enabled: false,
+    enabled: true,
   },
   {
     href: "/settings/delivery-estimates",
@@ -52,7 +52,7 @@ const SETTINGS_ITEMS: SettingsItem[] = [
     labelEn: "Delivery Estimates",
     descriptionAr: "تعيين مدة التوصيل الافتراضية للمنتجات",
     descriptionEn: "Set default delivery time estimates for products",
-    enabled: false,
+    enabled: true,
   },
   {
     href: "/settings/order-limits",
@@ -68,7 +68,7 @@ const SETTINGS_ITEMS: SettingsItem[] = [
     labelEn: "Notifications",
     descriptionAr: "إعدادات إشعارات الطلبات والتنبيهات",
     descriptionEn: "Order notifications and alert preferences",
-    enabled: false,
+    enabled: true,
   },
   {
     href: "/settings/general",
@@ -76,7 +76,7 @@ const SETTINGS_ITEMS: SettingsItem[] = [
     labelEn: "General",
     descriptionAr: "العملة، اللغة، واسم التطبيق",
     descriptionEn: "Currency, language, and app display name",
-    enabled: false,
+    enabled: true,
   },
 ];
 

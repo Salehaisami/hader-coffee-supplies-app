@@ -23,6 +23,7 @@
 		284DA2ED4D07699438AF0558 /* MiniMapSnapshotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 743B892D1AA46B77FF6E0DE8 /* MiniMapSnapshotView.swift */; };
 		28AD7168C63FF3DED7D2207B /* LocationPickerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C96049C396F5386280386008 /* LocationPickerViewModel.swift */; };
 		2F472B82FB9BAC84730A93F6 /* FirebaseFirestoreService.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA679419AD4941AE0249812 /* FirebaseFirestoreService.swift */; };
+		CFGM000000000000000002 /* AppConfigManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFGM000000000000000001 /* AppConfigManager.swift */; };
 		301C5309A4768EF15E122F9D /* StorageServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9651DB16E7D33D978B0AF8C7 /* StorageServiceProtocol.swift */; };
 		36FBF7667B5D24D49F86BDDC /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = FF5AACEC53D5325BC4203CF8 /* FirebaseMessaging */; };
 		392A23EE41228F70C02BFE64 /* CheckoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E1A622ED6E8481E0D0A938 /* CheckoutView.swift */; };
@@ -218,6 +219,7 @@
 		A9F04928A9883F1E1B5E1771 /* ProfileSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetupView.swift; sourceTree = "<group>"; };
 		AB7A2D0443CBFB2E90DBCC25 /* CartStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartStoreTests.swift; sourceTree = "<group>"; };
 		ACA679419AD4941AE0249812 /* FirebaseFirestoreService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseFirestoreService.swift; sourceTree = "<group>"; };
+		CFGM000000000000000001 /* AppConfigManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfigManager.swift; sourceTree = "<group>"; };
 		B168D06C0B775DF6BC7B4473 /* PhoneEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneEntryView.swift; sourceTree = "<group>"; };
 		B2C3457E27CF76F6EF90528F /* CartStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartStore.swift; sourceTree = "<group>"; };
 		B5A119ADEEA15795FDAB4243 /* ComponentSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentSnapshotTests.swift; sourceTree = "<group>"; };
@@ -302,6 +304,7 @@
 		30040EBA17675302F126C883 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				CFGM000000000000000001 /* AppConfigManager.swift */,
 				E872E4BC04EA46337CD452A2 /* ApplePayService.swift */,
 				9A5CF35B5128D25D760FEA0C /* FirebaseAuthService.swift */,
 				ACA679419AD4941AE0249812 /* FirebaseFirestoreService.swift */,
@@ -704,6 +707,7 @@
 				21E38E3481B0CE9937565F34 /* EmptyStateView.swift in Sources */,
 				08A8D5448B1C14467A4C7643 /* FirebaseAuthService.swift in Sources */,
 				2F472B82FB9BAC84730A93F6 /* FirebaseFirestoreService.swift in Sources */,
+				CFGM000000000000000002 /* AppConfigManager.swift in Sources */,
 				670C7D85631475FF6C8A4F89 /* FirebaseMessagingService.swift in Sources */,
 				891CE7DD335E3E549F45F154 /* FirebaseStorageService.swift in Sources */,
 				C3E6F0918AA65042D610DB82 /* FirestoreServiceProtocol.swift in Sources */,

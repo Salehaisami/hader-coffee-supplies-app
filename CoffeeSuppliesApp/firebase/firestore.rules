@@ -72,6 +72,12 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // ─── Config: authenticated read, admin-only write ───
+    match /config/{configId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
     // Helper: verify only specific field changed
     function onlyFieldChanged(field) {
       return request.resource.data.diff(resource.data).affectedKeys().hasOnly([field, 'updatedAt']);
