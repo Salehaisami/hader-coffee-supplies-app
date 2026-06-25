@@ -98,6 +98,7 @@ export default function CustomersPage() {
 
   // Add customer form state
   const [showForm, setShowForm] = useState(false);
+  const [editingCustomerId, setEditingCustomerId] = useState<string | null>(null);
   const [formData, setFormData] = useState<CustomerFormData>(EMPTY_FORM);
   const [formErrors, setFormErrors] = useState<CustomerFormErrors>({});
   const [saving, setSaving] = useState(false);
@@ -168,13 +169,31 @@ export default function CustomersPage() {
   }
 
   function openAddForm() {
+    setEditingCustomerId(null);
     setFormData(EMPTY_FORM);
+    setFormErrors({});
+    setShowForm(true);
+  }
+
+  function openEditForm(customer: User) {
+    setEditingCustomerId(customer.id);
+    setFormData({
+      businessName: customer.businessName ?? "",
+      contactName: customer.contactName ?? "",
+      phone: customer.phone ?? "",
+      email: customer.email ?? "",
+      city: customer.deliveryAddress?.city ?? "Jeddah",
+      district: customer.deliveryAddress?.district ?? "",
+      street: (customer.deliveryAddress as any)?.street ?? "",
+      notes: (customer.deliveryAddress as any)?.notes ?? "",
+    });
     setFormErrors({});
     setShowForm(true);
   }
 
   function closeForm() {
     setShowForm(false);
+    setEditingCustomerId(null);
     setFormErrors({});
   }
 
@@ -199,9 +218,6 @@ export default function CustomersPage() {
         businessName: formData.businessName.trim(),
         contactName: formData.contactName.trim(),
         phone: formData.phone.trim(),
-        role: "customer",
-        status: "approved",
-        createdAt: serverTimestamp(),
       };
 
       if (formData.email.trim()) {
@@ -219,11 +235,20 @@ export default function CustomersPage() {
         };
       }
 
-      const docRef = doc(collection(db, "users"));
-      await setDoc(docRef, { id: docRef.id, ...payload });
+      if (editingCustomerId) {
+        // Update existing customer
+        await updateDoc(doc(db, "users", editingCustomerId), payload);
+      } else {
+        // Create new customer
+        payload.role = "customer";
+        payload.status = "approved";
+        payload.createdAt = serverTimestamp();
+        const docRef = doc(collection(db, "users"));
+        await setDoc(docRef, { id: docRef.id, ...payload });
+      }
       closeForm();
     } catch (err) {
-      console.error("Failed to create customer:", err);
+      console.error("Failed to save customer:", err);
       setError(t.general.error);
     } finally {
       setSaving(false);
@@ -258,7 +283,9 @@ export default function CustomersPage() {
         {/* Add customer inline form */}
         {showForm && (
           <div className="mb-6 rounded-lg border border-stone-200 bg-white p-6">
-            <h2 className="mb-4 text-lg font-semibold text-ink">{t.customers.addCustomer}</h2>
+            <h2 className="mb-4 text-lg font-semibold text-ink">
+              {editingCustomerId ? (locale === "ar" ? "تعديل العميل" : "Edit Customer") : t.customers.addCustomer}
+            </h2>
             <form onSubmit={handleCreateCustomer} className="space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
@@ -412,6 +439,7 @@ export default function CustomersPage() {
           onActionCancel={() => setConfirming(null)}
           selectedIds={selectedIds}
           setSelectedIds={setSelectedIds}
+          onEdit={openEditForm}
         />
       </div>
 
@@ -458,6 +486,7 @@ function CustomersContent({
   onActionCancel,
   selectedIds,
   setSelectedIds,
+  onEdit,
 }: {
   customers: User[];
   loading: boolean;
@@ -469,6 +498,7 @@ function CustomersContent({
   onActionCancel: () => void;
   selectedIds: Set<string>;
   setSelectedIds: React.Dispatch<React.SetStateAction<Set<string>>>;
+  onEdit: (customer: User) => void;
 }) {
   const { t, locale } = useLocale();
 
@@ -560,6 +590,13 @@ function CustomersContent({
                 <td className="px-4 py-3">
                   {!isConfirming && !isUpdating && (
                     <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => onEdit(customer)}
+                        className="rounded-md px-3 py-1.5 text-xs font-medium text-clay hover:bg-stone-100 transition-colors"
+                      >
+                        {t.general.edit}
+                      </button>
                       {customer.status !== "approved" && (
                         <button
                           type="button"

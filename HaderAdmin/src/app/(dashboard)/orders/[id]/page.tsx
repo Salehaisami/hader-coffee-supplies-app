@@ -303,11 +303,35 @@ function DeliveryAddressCard({ order }: { order: Order }) {
     return null;
   }
 
+  async function geocodeAddress(address: string): Promise<{ lat: number; lng: number } | null> {
+    const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+    if (!apiKey) return null;
+    try {
+      const res = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`
+      );
+      const data = await res.json();
+      if (data.status === "OK" && data.results?.[0]?.geometry?.location) {
+        const { lat, lng } = data.results[0].geometry.location;
+        return { lat, lng };
+      }
+    } catch { /* ignore */ }
+    return null;
+  }
+
   async function handleSave() {
     setError(null);
-    const coords = extractCoordinates(mapsLink);
+
+    // Try URL/coordinate parsing first
+    let coords = extractCoordinates(mapsLink);
+
+    // If that fails, try geocoding the text as an address
+    if (!coords && mapsLink.trim().length > 5) {
+      coords = await geocodeAddress(mapsLink.trim());
+    }
+
     if (!coords) {
-      setError(isAr ? "لم نتمكن من استخراج الإحداثيات من الرابط" : "Could not extract coordinates from link");
+      setError(isAr ? "لم نتمكن من استخراج الإحداثيات من الرابط أو العنوان" : "Could not extract coordinates from link or address");
       return;
     }
 
@@ -341,7 +365,7 @@ function DeliveryAddressCard({ order }: { order: Order }) {
         <div className="space-y-3">
           <div>
             <label className="mb-1 block text-xs text-ink-soft">
-              {isAr ? "رابط خرائط جوجل أو أبل" : "Google Maps or Apple Maps link"}
+              {isAr ? "رابط خرائط أو عنوان" : "Maps link or address"}
             </label>
             <input
               type="text"
@@ -484,11 +508,33 @@ function CustomerInfoCard({ order, customer }: { order: Order; customer: User | 
     return null;
   }
 
+  async function geocodeAddress(address: string): Promise<{ lat: number; lng: number } | null> {
+    const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+    if (!apiKey) return null;
+    try {
+      const res = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`
+      );
+      const data = await res.json();
+      if (data.status === "OK" && data.results?.[0]?.geometry?.location) {
+        const { lat, lng } = data.results[0].geometry.location;
+        return { lat, lng };
+      }
+    } catch { /* ignore */ }
+    return null;
+  }
+
   async function handleSaveProfileLocation() {
     setError(null);
-    const coords = extractCoordinates(mapsLink);
-    if (!coords || !customer) {
-      setError(isAr ? "لم نتمكن من استخراج الإحداثيات من الرابط" : "Could not extract coordinates from link");
+    if (!customer) return;
+
+    let coords = extractCoordinates(mapsLink);
+    if (!coords && mapsLink.trim().length > 5) {
+      coords = await geocodeAddress(mapsLink.trim());
+    }
+
+    if (!coords) {
+      setError(isAr ? "لم نتمكن من استخراج الإحداثيات من الرابط أو العنوان" : "Could not extract coordinates from link or address");
       return;
     }
 
@@ -534,7 +580,7 @@ function CustomerInfoCard({ order, customer }: { order: Order; customer: User | 
                 type="text"
                 value={mapsLink}
                 onChange={(e) => setMapsLink(e.target.value)}
-                placeholder={isAr ? "رابط خرائط جوجل أو أبل" : "Google/Apple Maps link"}
+                placeholder={isAr ? "رابط خرائط أو عنوان" : "Maps link or address"}
                 dir="ltr"
                 className="w-full rounded-md border border-stone-200 px-2 py-1.5 text-xs"
               />
