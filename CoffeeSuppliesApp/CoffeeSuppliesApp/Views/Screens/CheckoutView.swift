@@ -154,6 +154,13 @@ private extension CheckoutView {
             }
             .padding(.horizontal, Spacing.sm)
 
+            if let limitMessage = viewModel.orderLimitMessage {
+                Text(limitMessage)
+                    .font(.appCaption)
+                    .foregroundStyle(Color.clay)
+                    .padding(.horizontal, Spacing.sm)
+            }
+
             PrimaryButton(
                 L10n.placeOrder,
                 isLoading: viewModel.isPlacingOrder,

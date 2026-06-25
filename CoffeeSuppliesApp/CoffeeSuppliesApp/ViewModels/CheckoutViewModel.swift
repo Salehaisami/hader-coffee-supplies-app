@@ -98,7 +98,31 @@ final class CheckoutViewModel {
 
     /// Whether the order can be placed: non-empty cart, a valid in-zone location, and not already in progress.
     var canPlaceOrder: Bool {
-        !cart.isEmpty && deliveryCoordinate != nil && isInJeddah && !businessName.isEmpty && !isPlacingOrder && !isSuspended
+        !cart.isEmpty && deliveryCoordinate != nil && isInJeddah && !businessName.isEmpty && !isPlacingOrder && !isSuspended && orderLimitMessage == nil
+    }
+
+    /// Returns an error message if the cart total violates order limits, nil otherwise.
+    var orderLimitMessage: String? {
+        let config = AppConfigManager.shared
+        let total = cart.subtotal
+
+        if config.minimumOrderAmount > 0 && total < config.minimumOrderAmount {
+            let min = NumberFormatting.priceWithCurrency(config.minimumOrderAmount)
+            return LanguageManager.shared.resolve(
+                ar: "الحد الأدنى للطلب \(min)",
+                en: "Minimum order is \(min)"
+            )
+        }
+
+        if config.maximumOrderAmount > 0 && total > config.maximumOrderAmount {
+            let max = NumberFormatting.priceWithCurrency(config.maximumOrderAmount)
+            return LanguageManager.shared.resolve(
+                ar: "الحد الأقصى للطلب \(max)",
+                en: "Maximum order is \(max)"
+            )
+        }
+
+        return nil
     }
 
     /// Message shown when the pin is outside Jeddah.

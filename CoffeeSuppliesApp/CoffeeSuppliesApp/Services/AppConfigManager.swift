@@ -48,6 +48,13 @@ final class AppConfigManager {
     var orderCancellationEnabled: Bool = true
     var promotionsEnabled: Bool = false
 
+    // MARK: - Order Limits
+
+    /// Minimum order amount in SAR. 0 means no minimum.
+    var minimumOrderAmount: Double = 0
+    /// Maximum order amount in SAR. 0 means no maximum.
+    var maximumOrderAmount: Double = 0
+
     // MARK: - Dependencies
 
     @ObservationIgnored private var firestoreService: FirestoreServiceProtocol?
@@ -71,6 +78,7 @@ final class AppConfigManager {
             group.addTask { await self.loadDeliveryEstimates() }
             group.addTask { await self.loadGeneral() }
             group.addTask { await self.loadNotifications() }
+            group.addTask { await self.loadOrderLimits() }
         }
     }
 
@@ -168,6 +176,19 @@ final class AppConfigManager {
             // Keep defaults
         }
     }
+
+    private func loadOrderLimits() async {
+        guard let service = firestoreService else { return }
+        do {
+            let config: OrderLimitsConfig = try await service.getDocument(
+                collection: "config", documentId: "orderLimits"
+            )
+            minimumOrderAmount = config.minimumOrderAmount
+            maximumOrderAmount = config.maximumOrderAmount
+        } catch {
+            // Keep defaults
+        }
+    }
 }
 
 // MARK: - Config DTOs
@@ -254,4 +275,9 @@ private struct NotificationsConfig: Codable {
     let orderStatusChange: Bool
     let orderCancellation: Bool
     let promotions: Bool
+}
+
+private struct OrderLimitsConfig: Codable {
+    let minimumOrderAmount: Double
+    let maximumOrderAmount: Double
 }

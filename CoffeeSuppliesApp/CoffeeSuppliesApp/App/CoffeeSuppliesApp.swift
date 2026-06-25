@@ -31,6 +31,8 @@ struct CoffeeSuppliesApp: App {
                     AppConfigManager.shared.orderStatusChangeEnabled = configManager.orderStatusChangeEnabled
                     AppConfigManager.shared.orderCancellationEnabled = configManager.orderCancellationEnabled
                     AppConfigManager.shared.promotionsEnabled = configManager.promotionsEnabled
+                    AppConfigManager.shared.minimumOrderAmount = configManager.minimumOrderAmount
+                    AppConfigManager.shared.maximumOrderAmount = configManager.maximumOrderAmount
                 }
         }
     }

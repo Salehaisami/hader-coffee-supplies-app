@@ -52,7 +52,7 @@ const SETTINGS_ITEMS: SettingsItem[] = [
     labelEn: "Order Limits",
     descriptionAr: "تحديد الحد الأدنى والأقصى لقيمة الطلب",
     descriptionEn: "Set minimum and maximum order amounts",
-    enabled: false,
+    enabled: true,
   },
   {
     href: "/settings/notifications",
