@@ -171,7 +171,7 @@ function OrderDetailContent({
             <LineItemsCard order={order} />
           </div>
           <div className="space-y-6">
-            <DeliveryAddressCard order={order} />
+            <DeliveryAddressCard order={order} customer={customer} />
             <PaymentInfoCard order={order} />
             <CustomerInfoCard order={order} customer={customer} />
           </div>
@@ -272,9 +272,12 @@ function LineItemsCard({ order }: { order: Order }) {
   );
 }
 
-function DeliveryAddressCard({ order }: { order: Order }) {
+function DeliveryAddressCard({ order, customer }: { order: Order; customer: User | null }) {
   const { t } = useLocale();
-  const address = order.deliveryAddress;
+
+  // Prefer customer's current profile location over the order's snapshot
+  // (order may have stale default coordinates from before the location fix)
+  const address = customer?.deliveryAddress ?? order.deliveryAddress;
 
   if (!address) {
     return (
@@ -284,21 +287,19 @@ function DeliveryAddressCard({ order }: { order: Order }) {
     );
   }
 
-  const hasRealDistrict = address.district && address.district !== "—" && address.district !== "-";
-
   return (
     <Card title={t.orders.detail.deliveryAddress}>
-      <dl className="space-y-2 text-sm">
-        {hasRealDistrict && <Field label={t.orders.detail.district} value={address.district} />}
-        {address.street && <Field label={t.orders.detail.street} value={address.street} />}
-        {address.notes && <Field label={t.orders.detail.notes} value={address.notes} />}
-        <Field label={t.orders.detail.coordinates ?? "Coordinates"} value={`${address.lat.toFixed(5)}, ${address.lng.toFixed(5)}`} mono />
-      </dl>
+      {address.street && (
+        <p className="text-sm text-ink mb-3">{address.street}</p>
+      )}
+      {address.notes && (
+        <p className="text-sm text-ink-soft mb-3">{address.notes}</p>
+      )}
       <a
         href={googleMapsSearchUrl(address.lat, address.lng)}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-4 inline-flex w-full items-center justify-center rounded-md bg-clay px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-clay-deep"
+        className="inline-flex w-full items-center justify-center rounded-md bg-clay px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-clay-deep"
       >
         {t.orders.detail.viewOnMap}
       </a>
