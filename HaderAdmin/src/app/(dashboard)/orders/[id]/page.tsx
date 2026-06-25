@@ -489,73 +489,6 @@ function PaymentInfoCard({ order }: { order: Order }) {
 function CustomerInfoCard({ order, customer }: { order: Order; customer: User | null }) {
   const { t, locale } = useLocale();
   const isAr = locale === "ar";
-  const [editingLocation, setEditingLocation] = useState(false);
-  const [mapsLink, setMapsLink] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  function extractCoordinates(url: string): { lat: number; lng: number } | null {
-    const googleAt = url.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/);
-    if (googleAt) return { lat: parseFloat(googleAt[1]), lng: parseFloat(googleAt[2]) };
-    const googleQ = url.match(/[?&]q=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
-    if (googleQ) return { lat: parseFloat(googleQ[1]), lng: parseFloat(googleQ[2]) };
-    const googleQuery = url.match(/query=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
-    if (googleQuery) return { lat: parseFloat(googleQuery[1]), lng: parseFloat(googleQuery[2]) };
-    const appleLl = url.match(/[?&]ll=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
-    if (appleLl) return { lat: parseFloat(appleLl[1]), lng: parseFloat(appleLl[2]) };
-    const raw = url.trim().match(/^(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)$/);
-    if (raw) return { lat: parseFloat(raw[1]), lng: parseFloat(raw[2]) };
-    return null;
-  }
-
-  async function geocodeAddress(address: string): Promise<{ lat: number; lng: number } | null> {
-    const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
-    if (!apiKey) return null;
-    try {
-      const res = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`
-      );
-      const data = await res.json();
-      if (data.status === "OK" && data.results?.[0]?.geometry?.location) {
-        const { lat, lng } = data.results[0].geometry.location;
-        return { lat, lng };
-      }
-    } catch { /* ignore */ }
-    return null;
-  }
-
-  async function handleSaveProfileLocation() {
-    setError(null);
-    if (!customer) return;
-
-    let coords = extractCoordinates(mapsLink);
-    if (!coords && mapsLink.trim().length > 5) {
-      coords = await geocodeAddress(mapsLink.trim());
-    }
-
-    if (!coords) {
-      setError(isAr ? "لم نتمكن من استخراج الإحداثيات من الرابط أو العنوان" : "Could not extract coordinates from link or address");
-      return;
-    }
-
-    setSaving(true);
-    try {
-      await updateDoc(doc(db, "users", customer.id), {
-        deliveryAddress: {
-          city: "Jeddah",
-          district: "—",
-          lat: coords.lat,
-          lng: coords.lng,
-        },
-      });
-      setEditingLocation(false);
-      setMapsLink("");
-    } catch (err) {
-      console.error("Failed to update customer location:", err);
-      setError(isAr ? "فشل الحفظ" : "Save failed");
-    }
-    setSaving(false);
-  }
 
   return (
     <Card title={t.nav.customers}>
@@ -568,61 +501,20 @@ function CustomerInfoCard({ order, customer }: { order: Order; customer: User | 
         {customer?.email && <Field label={t.customers.fields.email} value={customer.email} />}
       </dl>
 
-      {/* Customer profile location */}
-      {customer && (
+      {/* Customer profile location — view-only */}
+      {customer?.deliveryAddress && (
         <div className="mt-4 border-t border-stone-100 pt-3">
           <p className="text-xs font-medium text-ink-soft mb-2">
             {isAr ? "موقع العميل المحفوظ" : "Saved Customer Location"}
           </p>
-          {editingLocation ? (
-            <div className="space-y-2">
-              <input
-                type="text"
-                value={mapsLink}
-                onChange={(e) => setMapsLink(e.target.value)}
-                placeholder={isAr ? "رابط خرائط أو عنوان" : "Maps link or address"}
-                dir="ltr"
-                className="w-full rounded-md border border-stone-200 px-2 py-1.5 text-xs"
-              />
-              {error && <p className="text-xs text-red-600">{error}</p>}
-              <div className="flex gap-2">
-                <button
-                  onClick={handleSaveProfileLocation}
-                  disabled={saving || !mapsLink.trim()}
-                  className="rounded-md bg-clay px-2 py-1 text-xs font-medium text-white hover:bg-clay-deep disabled:opacity-50"
-                >
-                  {saving ? "..." : (isAr ? "حفظ" : "Save")}
-                </button>
-                <button
-                  onClick={() => { setEditingLocation(false); setMapsLink(""); setError(null); }}
-                  className="rounded-md border border-stone-200 px-2 py-1 text-xs text-ink hover:bg-stone-50"
-                >
-                  {isAr ? "إلغاء" : "Cancel"}
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="flex items-center justify-between">
-              {customer.deliveryAddress ? (
-                <a
-                  href={googleMapsSearchUrl(customer.deliveryAddress.lat, customer.deliveryAddress.lng)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-clay hover:underline"
-                >
-                  {t.orders.detail.viewOnMap}
-                </a>
-              ) : (
-                <span className="text-xs text-ink-soft">{isAr ? "لم يُحدد بعد" : "Not set"}</span>
-              )}
-              <button
-                onClick={() => setEditingLocation(true)}
-                className="text-xs text-clay hover:underline"
-              >
-                {isAr ? "تعديل" : "Edit"}
-              </button>
-            </div>
-          )}
+          <a
+            href={googleMapsSearchUrl(customer.deliveryAddress.lat, customer.deliveryAddress.lng)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-xs text-clay hover:underline"
+          >
+            {t.orders.detail.viewOnMap}
+          </a>
         </div>
       )}
     </Card>

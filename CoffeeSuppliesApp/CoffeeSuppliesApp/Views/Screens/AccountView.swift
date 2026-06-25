@@ -121,6 +121,9 @@ struct AccountView: View {
             }
         }
         .listStyle(.insetGrouped)
+        .refreshable {
+            await viewModel.refreshUser()
+        }
     }
 
     private var deleteAccountLabel: String {

@@ -15,7 +15,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { type User, type UserStatus } from "@/lib/types";
-import { formatTimestamp } from "@/lib/format";
+import { formatTimestamp, googleMapsSearchUrl } from "@/lib/format";
 import { useLocale } from "@/contexts/LocaleContext";
 import PageHeader from "@/components/PageHeader";
 
@@ -177,16 +177,13 @@ export default function CustomersPage() {
 
   function openEditForm(customer: User) {
     setEditingCustomerId(customer.id);
-    const existingLocation = customer.deliveryAddress
-      ? `${customer.deliveryAddress.lat}, ${customer.deliveryAddress.lng}`
-      : "";
     setFormData({
       businessName: customer.businessName ?? "",
       contactName: customer.contactName ?? "",
       phone: customer.phone ?? "",
       email: customer.email ?? "",
       city: customer.deliveryAddress?.city ?? "Jeddah",
-      district: existingLocation,
+      district: "",
       street: "",
       notes: "",
     });
@@ -369,10 +366,34 @@ export default function CustomersPage() {
                 <p className="mb-2 text-sm font-medium text-ink">
                   {t.customers.fields.deliveryAddress}
                 </p>
+
+                {/* Show current saved location when editing */}
+                {editingCustomerId && (() => {
+                  const editingCustomer = customers.find((c) => c.id === editingCustomerId);
+                  if (editingCustomer?.deliveryAddress) {
+                    return (
+                      <div className="mb-3 flex items-center gap-2 rounded-md bg-stone-50 px-3 py-2">
+                        <span className="text-xs text-ink-soft">
+                          {locale === "ar" ? "الموقع الحالي:" : "Current location:"}
+                        </span>
+                        <a
+                          href={googleMapsSearchUrl(editingCustomer.deliveryAddress.lat, editingCustomer.deliveryAddress.lng)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs font-medium text-clay hover:underline"
+                        >
+                          {locale === "ar" ? "عرض على الخريطة ↗" : "View on Map ↗"}
+                        </a>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+
                 <p className="mb-2 text-xs text-ink-soft">
                   {locale === "ar"
-                    ? "الصق رابط خرائط جوجل أو أبل لتحديد موقع العميل"
-                    : "Paste a Google Maps or Apple Maps link to set the delivery location"}
+                    ? "الصق رابط خرائط جوجل أو أبل لتحديث موقع العميل"
+                    : "Paste a Google Maps or Apple Maps link to update the delivery location"}
                 </p>
                 <input
                   type="text"
@@ -561,6 +582,7 @@ function CustomersContent({
             <th className="px-4 py-3 font-medium text-start">{t.customers.fields.contactName}</th>
             <th className="px-4 py-3 font-medium text-start">{t.customers.fields.phone}</th>
             <th className="px-4 py-3 font-medium text-start">{t.customers.fields.email}</th>
+            <th className="px-4 py-3 font-medium text-start">{locale === "ar" ? "الموقع" : "Location"}</th>
             <th className="px-4 py-3 font-medium text-start">{t.customers.fields.status}</th>
             <th className="px-4 py-3 font-medium text-start">{t.customers.fields.createdAt}</th>
             <th className="px-4 py-3 font-medium text-start">{t.general.actions}</th>
@@ -585,6 +607,20 @@ function CustomersContent({
                 <td className="px-4 py-3 text-ink">{customer.contactName || "—"}</td>
                 <td className="px-4 py-3 text-ink-soft" dir="ltr">{customer.phone || "—"}</td>
                 <td className="px-4 py-3 text-ink-soft" dir="ltr">{customer.email || "—"}</td>
+                <td className="px-4 py-3">
+                  {customer.deliveryAddress ? (
+                    <a
+                      href={googleMapsSearchUrl(customer.deliveryAddress.lat, customer.deliveryAddress.lng)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-clay hover:underline"
+                    >
+                      {locale === "ar" ? "عرض" : "Map"}
+                    </a>
+                  ) : (
+                    <span className="text-xs text-ink-soft">—</span>
+                  )}
+                </td>
                 <td className="px-4 py-3">
                   <CustomerStatusBadge status={customer.status} />
                 </td>

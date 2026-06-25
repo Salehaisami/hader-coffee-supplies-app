@@ -55,6 +55,9 @@ struct OrdersView: View {
             }
         }
         .listStyle(.insetGrouped)
+        .refreshable {
+            await viewModel.loadOrders()
+        }
     }
 
     private var emptyState: some View {
