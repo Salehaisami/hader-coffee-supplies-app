@@ -22,14 +22,16 @@ export function googleMapsSearchUrl(lat: number, lng: number): string {
   return `https://www.google.com/maps/search/?api=1&query=${query}`;
 }
 
-/** Formats a number as SAR currency using Western digits (e.g. "SAR 1,250.00" or "ر.س 1,250.00"). */
+/** Formats a number as SAR currency using Western digits (e.g. "SAR 1,250.00" or "1,250.00 ر.س"). */
 export function formatSar(amount: number, locale: string = "en"): string {
   const formatted = new Intl.NumberFormat("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount);
-  const symbol = locale === "ar" ? "ر.س" : "SAR";
-  return `${symbol} ${formatted}`;
+  if (locale === "ar") {
+    return `${formatted} ر.س`;
+  }
+  return `SAR ${formatted}`;
 }
 
 /** Formats a plain number with grouping using Western digits (e.g. "1,250"). */
