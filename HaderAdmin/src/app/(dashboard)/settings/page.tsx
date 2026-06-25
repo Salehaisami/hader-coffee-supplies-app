@@ -47,14 +47,6 @@ const SETTINGS_ITEMS: SettingsItem[] = [
     enabled: true,
   },
   {
-    href: "/settings/delivery-estimates",
-    labelAr: "مدة التوصيل",
-    labelEn: "Delivery Estimates",
-    descriptionAr: "تعيين مدة التوصيل الافتراضية للمنتجات",
-    descriptionEn: "Set default delivery time estimates for products",
-    enabled: true,
-  },
-  {
     href: "/settings/order-limits",
     labelAr: "حدود الطلبات",
     labelEn: "Order Limits",
