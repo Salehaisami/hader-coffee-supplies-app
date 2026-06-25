@@ -130,9 +130,12 @@ private extension OrderDetailView {
                 .font(.appHeadline)
                 .foregroundStyle(Color.primaryText)
 
-            Text(order.deliveryAddress.district)
-                .font(.appBody)
-                .foregroundStyle(Color.secondaryText)
+            let district = order.deliveryAddress.district
+            if !district.isEmpty && district != "—" && district != "-" {
+                Text(district)
+                    .font(.appBody)
+                    .foregroundStyle(Color.secondaryText)
+            }
 
             if let street = order.deliveryAddress.street {
                 Text(street)
