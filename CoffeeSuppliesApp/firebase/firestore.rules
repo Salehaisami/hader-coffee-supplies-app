@@ -61,9 +61,16 @@ service cloud.firestore {
       allow delete: if false; // Orders are never deleted
     }
 
-    // ─── Suppliers: admin-only (never exposed to the app) ───
+    // ─── Suppliers: authenticated read, admin-only write ───
     match /suppliers/{supplierId} {
-      allow read, write: if isAdmin();
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+
+      // ─── Supplier Inventory: authenticated read, admin-only write ───
+      match /inventory/{productId} {
+        allow read: if isAuthenticated();
+        allow write: if isAdmin();
+      }
     }
 
     // ─── Pricing Units: public read (app needs them), admin-only write ───

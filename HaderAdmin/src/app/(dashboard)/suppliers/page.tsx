@@ -389,7 +389,7 @@ function SuppliersList({
   onDeleteConfirm: (id: string) => void;
   onDeleteCancel: () => void;
 }) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
 
   if (loading) {
     return <p className="text-ink-soft">{t.general.loading}</p>;
@@ -449,6 +449,12 @@ function SuppliersList({
                   </span>
                 ) : (
                   <span className="inline-flex gap-2">
+                    <a
+                      href={`/inventory/${supplier.id}`}
+                      className="rounded px-2 py-1 text-xs text-sage hover:bg-stone-100"
+                    >
+                      {locale === "ar" ? "المخزون" : "Inventory"}
+                    </a>
                     <button
                       type="button"
                       onClick={() => onEdit(supplier)}
