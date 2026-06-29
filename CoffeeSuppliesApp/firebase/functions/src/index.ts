@@ -86,13 +86,26 @@ export const onOrderCreate = functions.firestore
     }
 
     // ── 2. Admin email notification ──
+    // Reads admin emails from config/general (managed via admin dashboard).
     // Uses the Firestore "mail" collection trigger pattern (Firebase Trigger Email extension).
-    // If the extension isn't installed, this write is a no-op (the collection just accumulates).
-    const adminEmail = functions.config().admin?.email;
-    if (adminEmail) {
+    let adminEmails: string[] = [];
+    try {
+      const generalSnap = await db.collection("config").doc("general").get();
+      const emailsStr = generalSnap.data()?.adminEmails || "";
+      adminEmails = emailsStr.split(",").map((e: string) => e.trim()).filter((e: string) => e.length > 0);
+    } catch (err) {
+      functions.logger.warn("Could not load admin emails from config:", err);
+    }
+    // Fallback to functions.config() if no emails in Firestore
+    if (adminEmails.length === 0) {
+      const fallback = functions.config().admin?.email;
+      if (fallback) adminEmails = [fallback];
+    }
+
+    if (adminEmails.length > 0) {
       try {
         await db.collection("mail").add({
-          to: adminEmail,
+          to: adminEmails,
           message: {
             subject: `[حاضر] طلب جديد #${shortId}`,
             text: [
@@ -105,7 +118,7 @@ export const onOrderCreate = functions.firestore
             ].join("\n"),
           },
         });
-        functions.logger.info(`Admin email queued to ${adminEmail}`);
+        functions.logger.info(`Admin email queued to ${adminEmails.join(", ")}`);
       } catch (err) {
         functions.logger.error("Failed to queue admin email:", err);
       }

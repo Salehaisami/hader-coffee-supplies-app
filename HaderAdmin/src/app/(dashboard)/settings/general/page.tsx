@@ -15,6 +15,7 @@ interface GeneralConfig {
   appName_en: string;
   supportPhone: string;
   supportEmail: string;
+  adminEmails: string;
 }
 
 const DEFAULT_CONFIG: GeneralConfig = {
@@ -26,6 +27,7 @@ const DEFAULT_CONFIG: GeneralConfig = {
   appName_en: "Hader",
   supportPhone: "+966500000000",
   supportEmail: "support@hader.sa",
+  adminEmails: "",
 };
 
 const CURRENCIES = [
@@ -96,6 +98,8 @@ export default function GeneralSettingsPage() {
     appNameEn: isAr ? "اسم التطبيق (إنجليزي)" : "App Name (English)",
     supportPhone: isAr ? "هاتف الدعم" : "Support Phone",
     supportEmail: isAr ? "بريد الدعم" : "Support Email",
+    adminEmails: isAr ? "إيميلات إشعارات الطلبات" : "Order Notification Emails",
+    adminEmailsHint: isAr ? "أدخل إيميل واحد أو أكثر (مفصولة بفاصلة) لاستقبال إشعارات الطلبات الجديدة" : "Enter one or more emails (comma-separated) to receive new order notifications",
     save: isAr ? "حفظ" : "Save",
     saved: isAr ? "تم الحفظ" : "Saved",
     loading: isAr ? "جاري التحميل..." : "Loading...",
@@ -158,6 +162,12 @@ export default function GeneralSettingsPage() {
             <div>
               <label className="mb-1 block text-xs font-medium text-ink-soft">{labels.supportEmail}</label>
               <input type="email" value={config.supportEmail} onChange={(e) => setConfig((p) => ({ ...p, supportEmail: e.target.value }))} className="w-full rounded-md border border-stone-200 px-3 py-2 text-sm" dir="ltr" placeholder="support@hader.sa" />
+            </div>
+
+            <div className="border-t border-stone-100 pt-4">
+              <label className="mb-1 block text-xs font-medium text-ink-soft">{labels.adminEmails}</label>
+              <input type="text" value={config.adminEmails} onChange={(e) => setConfig((p) => ({ ...p, adminEmails: e.target.value }))} className="w-full rounded-md border border-stone-200 px-3 py-2 text-sm" dir="ltr" placeholder="admin@hader.sa, ops@hader.sa" />
+              <p className="mt-1 text-xs text-ink-soft">{labels.adminEmailsHint}</p>
             </div>
 
             <button
